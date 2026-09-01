@@ -1,0 +1,254 @@
+[
+  {
+    "id": "109",
+    "variavel": "Área plantada",
+    "unidade": "Hectares",
+    "resultados": [
+      {
+        "classificacoes": [
+          {
+            "id": "81",
+            "nome": "Produto das lavouras temporárias",
+            "categoria": {
+              "2713": "Soja (em grão)"
+            }
+          }
+        ],
+        "series": [
+          {
+            "localidade": {
+              "id": "3538709",
+              "nivel": {
+                "id": "N6",
+                "nome": "Município"
+              },
+              "nome": "Piracicaba (SP)"
+            },
+            "serie": {
+              "2015": "400",
+              "2016": "500",
+              "2017": "500",
+              "2018": "500",
+              "2019": "1200",
+              "2020": "1200",
+              "2021": "1200",
+              "2022": "1200",
+              "2023": "1500",
+              "2024": "1600"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1000109",
+    "variavel": "Área plantada - percentual do total geral",
+    "unidade": "Percentual",
+    "resultados": [
+      {
+        "classificacoes": [
+          {
+            "id": "81",
+            "nome": "Produto das lavouras temporárias",
+            "categoria": {
+              "2713": "Soja (em grão)"
+            }
+          }
+        ],
+        "series": [
+          {
+            "localidade": {
+              "id": "3538709",
+              "nivel": {
+                "id": "N6",
+                "nome": "Município"
+              },
+              "nome": "Piracicaba (SP)"
+            },
+            "serie": {
+              "2015": "0.77",
+              "2016": "0.96",
+              "2017": "0.96",
+              "2018": "0.96",
+              "2019": "2.33",
+              "2020": "2.33",
+              "2021": "2.33",
+              "2022": "2.32",
+              "2023": "2.88",
+              "2024": "3.53"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "216",
+    "variavel": "Área colhida",
+    "unidade": "Hectares",
+    "resultados": [
+      {
+        "classificacoes": [
+          {
+            "id": "81",
+            "nome": "Produto das lavouras temporárias",
+            "categoria": {
+              "2713": "Soja (em grão)"
+            }
+          }
+        ],
+        "series": [
+          {
+            "localidade": {
+              "id": "3538709",
+              "nivel": {
+                "id": "N6",
+                "nome": "Município"
+              },
+              "nome": "Piracicaba (SP)"
+            },
+            "serie": {
+              "2015": "400",
+              "2016": "500",
+              "2017": "500",
+              "2018": "500",
+              "2019": "1200",
+              "2020": "1200",
+              "2021": "1200",
+              "2022": "1200",
+              "2023": "1500",
+              "2024": "1600"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1000216",
+    "variavel": "Área colhida - percentual do total geral",
+    "unidade": "Percentual",
+    "resultados": [
+      {
+        "classificacoes": [
+          {
+            "id": "81",
+            "nome": "Produto das lavouras temporárias",
+            "categoria": {
+              "2713": "Soja (em grão)"
+            }
+          }
+        ],
+        "series": [
+          {
+            "localidade": {
+              "id": "3538709",
+              "nivel": {
+                "id": "N6",
+                "nome": "Município"
+              },
+              "nome": "Piracicaba (SP)"
+            },
+            "serie": {
+              "2015": "0.77",
+              "2016": "0.96",
+              "2017": "0.96",
+              "2018": "0.96",
+              "2019": "2.33",
+              "2020": "2.33",
+              "2021": "2.33",
+              "2022": "2.32",
+              "2023": "2.88",
+              "2024": "3.53"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "214",
+    "variavel": "Quantidade produzida",
+    "unidade": "Toneladas",
+    "resultados": [
+      {
+        "classificacoes": [
+          {
+            "id": "81",
+            "nome": "Produto das lavouras temporárias",
+            "categoria": {
+              "2713": "Soja (em grão)"
+            }
+          }
+        ],
+        "series": [
+          {
+            "localidade": {
+              "id": "3538709",
+              "nivel": {
+                "id": "N6",
+                "nome": "Município"
+              },
+              "nome": "Piracicaba (SP)"
+            },
+            "serie": {
+              "2015": "960",
+              "2016": "1200",
+              "2017": "1200",
+              "2018": "1200",
+              "2019": "3000",
+              "2020": "2880",
+              "2021": "2880",
+              "2022": "2880",
+              "2023": "3600",
+              "2024": "4800"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "112",
+    "variavel": "Rendimento médio da produção",
+    "unidade": "Quilogramas por Hectare",
+    "resultados": [
+      {
+        "classificacoes": [
+          {
+            "id": "81",
+            "nome": "Produto das lavouras temporárias",
+            "categoria": {
+              "2713": "Soja (em grão)"
+            }
+          }
+        ],
+        "series": [
+          {
+            "localidade": {
+              "id": "3538709",
+              "nivel": {
+                "id": "N6",
+                "nome": "Município"
+              },
+              "nome": "Piracicaba (SP)"
+            },
+            "serie": {
+              "2015": "2400",
+              "2016": "2400",
+              "2017": "2400",
+              "2018": "2400",
+              "2019": "2500",
+              "2020": "2400",
+              "2021": "2400",
+              "2022": "2400",
+              "2023": "2400",
+              "2024": "3000"
+            }
+          }
+        ]
+      }
+    ]
+  }
+]
