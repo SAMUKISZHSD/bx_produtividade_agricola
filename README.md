@@ -8,6 +8,19 @@
 
 Projeto de Ciência de Dados e Inteligência Artificial voltado à previsão e alerta antecipado de **risco de baixa produtividade agrícola (quebra de safra)** para a cultura de **Soja em Grão** no município de **Piracicaba - SP** (safras 2015 a 2025).
 
+## Dados Acadêmicos
+ 
+**Turma:** SI noturno - Segunda-Feira
+ 
+**João Guilherme Cravo**
+RGM: 35880759
+ 
+**Jean Carlos Silva de Almeida**
+RGM: 33783276
+ 
+**Samuel Allan Nunes da Cunha**
+RGM: 34524746
+
 ---
 
 ##  1. Visão Geral do Problema de Negócio
@@ -95,3 +108,4 @@ pip install -r requirements.txt
 </table>
 
 </div>
+
