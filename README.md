@@ -68,7 +68,18 @@ pip install -r requirements.txt
 ---
 
 
-## 👥 Equipe do Projeto
+
+## 4. Documentacao do Projeto
+
+* **RFC (Proposta de Projeto):** [docs/RFC.md](docs/RFC.md)
+* **Dicionario de Dados:** [docs/Dicionario_de_Dados.md](docs/Dicionario_de_Dados.md)
+* **Diario da Sprint 1:** [docs/sprints/Sprint1_TrilhaC.md](docs/sprints/Sprint1_TrilhaC.md)
+* **Dados Brutos e Integrados:** `data/raw/` (`integrado.csv` com N = 10 safras consolidadas)
+* **Notebook de Coleta e Ingestao:** `notebooks/01_coleta_de_dados.ipynb`
+
+---
+
+## Equipe do Projeto
 
 <div align="center">
 
@@ -82,20 +93,14 @@ pip install -r requirements.txt
       <br>
       Desenvolvedor
     </td>
-
-<table>
-  <tr>
     <td align="center">
       <a href="https://github.com/jonnguii">
         <img src="https://github.com/jonnguii.png" width="100px;" alt="João Guilherme"/><br>
         <b>João Guilherme</b>
       </a>
       <br>
-      Desenvolvedor
+      Desenvolvedor / Scrum Master S1
     </td>
-
-<table>
-  <tr>
     <td align="center">
       <a href="https://github.com/SAMUKISZHSD">
         <img src="https://github.com/SAMUKISZHSD.png" width="100px;" alt="Samuel"/><br>
@@ -108,4 +113,5 @@ pip install -r requirements.txt
 </table>
 
 </div>
+
 
