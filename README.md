@@ -6,7 +6,7 @@
 [![NASA POWER API](https://img.shields.io/badge/Data_Source-NASA_POWER_API-red.svg)](https://power.larc.nasa.gov/)
 [![IBGE PAM API](https://img.shields.io/badge/Data_Source-IBGE_PAM_1612-green.svg)](https://servicodados.ibge.gov.br/)
 
-Projeto de Ciência de Dados e Inteligência Artificial voltado à previsão e alerta antecipado de **risco de baixa produtividade agrícola (quebra de safra)** para a cultura de **Soja em Grão** no município de **Piracicaba - SP** (safras 2015 a 2025).
+Projeto de Ciência de Dados e Inteligência Artificial voltado à previsão e alerta antecipado de **risco de baixa produtividade agrícola (quebra de safra)** para a cultura de **Soja em Grão** no município de **Sorriso - MT** (safras 2015 a 2025).
 
 ## Dados Acadêmicos
  
@@ -28,9 +28,9 @@ RGM: 34524746
 As variações agroclimáticas (anomalias de precipitação, estresse térmico, déficit de umidade no solo) são os principais fatores de risco para a produtividade da lavoura de soja. 
 
 * **Objetivo:** Construir um modelo preditivo capaz de sinalizar com antecedência se a safra agrícola terá rendimento abaixo do padrão histórico esperado.
-* **Recorte Geográfico:** Piracicaba - SP (Código IBGE: `3538709` | Lat: `-22.7253`, Lon: `-47.6492`).
-* **Recorte Temporal:** Safras de 2015 a 2025.
-* **Unidade de Análise:** Ano-safra de soja (janela de desenvolvimento da cultura: Setembro do ano anterior a Abril/Agosto do ano de colheita).
+* **Recorte Geográfico:** Sorriso - MT (Código IBGE: `5107925` | Lat: `-12.5414`, Lon: `-55.7269`).
+* **Recorte Temporal:** Safras de 2015 a 2025 (com safras consolidadas 2015 a 2024 para treino e teste).
+* **Unidade de Análise:** Ano-safra de soja (janela de desenvolvimento da cultura: Setembro do ano anterior a Abril/Maio do ano de colheita).
 ---
 
 

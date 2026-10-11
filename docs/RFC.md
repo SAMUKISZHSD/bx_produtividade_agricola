@@ -2,25 +2,25 @@
 
 | Campo | Valor |
 |---|---|
-| **Titulo** | Previsao de Risco de Baixa Produtividade Agricola para Soja em Piracicaba - SP |
+| **Titulo** | Previsao de Risco de Baixa Produtividade Agricola para Soja em Sorriso - MT |
 | **Trilha** | C - Risco de baixa produtividade agricola |
 | **Equipe** | Joao Guilherme Cravo (RGM 35880759), Jean Carlos Silva de Almeida (RGM 33783276), Samuel Allan Nunes da Cunha (RGM 34524746) |
 | **Autores** | Grupo 3 - Trilha C |
-| **Status** | Aprovado (Sprint 1) |
-| **Data** | Setembro de 2026 |
-| **Sprint de referencia** | 1 |
+| **Status** | Aprovado (Sprint 1 / Re-arquitetado Sprint 2) |
+| **Data** | Outubro de 2026 |
+| **Sprint de referencia** | 2 |
 
 ---
 
 ## 1. Resumo (TL;DR)
 
-O projeto visa prever o risco de quebra de safra (baixa produtividade agricola em kg/ha) da cultura de soja em grao no municipio de Piracicaba - SP, cruzando variaveis agroclimaticas diarias da NASA POWER com dados historicos de producao do IBGE PAM. O modelo destina-se a orientar produtores rurais, cooperativas e seguradoras agricolas em decisoes preventivas de manejo e contratacao de seguro rural.
+O projeto visa prever o risco de quebra de safra (baixa produtividade agricola em kg/ha) da cultura de soja em grao no municipio de Sorriso - MT, cruzando variaveis agroclimaticas diarias da NASA POWER com dados historicos de producao do IBGE PAM. O modelo destina-se a orientar produtores rurais, cooperativas e seguradoras agricolas em decisoes preventivas de manejo e contratacao de seguro rural.
 
 ---
 
 ## 2. Contexto e motivacao
 
-A soja representa uma das culturas de maior peso economico no agronegocio paulista. O rendimento da lavoura e dependente de fatores meteorologicos, sofrendo perdas expressivas quando ocorrem deficits hidricos ou picos de calor em fases fenologicas criticas, como floracao e enchimento de graos. A previsao antecipada da produtividade com meses de antecedencia subsidia medidas mitigadoras e planejamento financeiro, reduzindo a exposicao do produtor ao risco climatico.
+A soja representa a principal cultura economica de Sorriso - MT, reconhecida como a Capital Nacional do Agronegocio e um dos maiores polos produtores de soja do planeta. O rendimento da lavoura e fortemente dependente de fatores meteorologicos, sofrendo perdas expressivas quando ocorrem deficits hidricos (veranicos) ou anomalias termicas em fases fenologicas criticas, como floracao e enchimento de graos. A previsao antecipada da produtividade subsidia medidas mitigadoras e planejamento financeiro, reduzindo a exposicao do produtor e de agentes financeiros ao risco climatico.
 
 ---
 
@@ -29,9 +29,9 @@ A soja representa uma das culturas de maior peso economico no agronegocio paulis
 | Pergunta | Resposta |
 |---|---|
 | **Qual evento sera previsto?** | Ocorrencia de quebra de safra (rendimento medio por hectare abaixo do patamar historico aceitavel). |
-| **Como e definida a classe positiva?** | Classe 1 (quebra de safra) definida por rendimento medio inferior a 2.450 kg/ha, com base na media historica municipal de 2.470 kg/ha. Classe 0 representa safras normais ou de alto rendimento (>= 2.450 kg/ha). |
+| **Como e definida a classe positiva?** | Classe 1 (quebra de safra) definida por rendimento medio inferior a 3.400 kg/ha, calibrado a partir da media historica municipal de 3.477 kg/ha (safras consolidadas 2015 a 2024). Classe 0 representa safras normais ou de alto rendimento (>= 3.400 kg/ha). |
 | **Qual e o horizonte da previsao?** | Antecedencia de 2 a 3 meses em relacao ao encerramento da colheita (previsao realizada durante a fase de floracao e enchimento de vagens). |
-| **Qual e a unidade de analise?** | Ano-safra de soja para o municipio de Piracicaba-SP (1 linha = 1 safra anual). |
+| **Qual e a unidade de analise?** | Ano-safra de soja para o municipio de Sorriso-MT (1 linha = 1 safra anual). |
 
 ---
 
@@ -39,10 +39,10 @@ A soja representa uma das culturas de maior peso economico no agronegocio paulis
 
 | Pergunta | Resposta |
 |---|---|
-| **Recorte geografico e cultura** | Soja em grao no municipio de Piracicaba - SP (Codigo IBGE: 3538709, Latitude: -22.7253, Longitude: -47.6492). |
-| **Periodo historico considerado** | Safras de 2015 a 2024 consolidadas (10 safras integradas; safra de 2025 ainda nao finalizada no IBGE PAM). |
-| **Dentro do escopo** | Ingestao de dados da NASA POWER e IBGE PAM, pipeline de pre-processamento sem vazamento temporal, integracao em data/raw/integrado.csv, avaliacao de modelos baseline e classificadores Supervisionados. |
-| **Fora do escopo** | Previsao de precos de mercado, diagnostico de pragas biologicas, modelagem de outras culturas (milho, cana) ou expansao para outros municipios nesta etapa. |
+| **Recorte geografico e cultura** | Soja em grao no municipio de Sorriso - MT (Codigo IBGE: 5107925, Latitude: -12.5414, Longitude: -55.7269). |
+| **Periodo historico considerado** | Safras de 2015 a 2024 consolidadas (10 safras integradas; safra de 2025 descartada por estimativas estaticas nao consolidadas no IBGE PAM). |
+| **Dentro do escopo** | Ingestao de dados da NASA POWER e IBGE PAM para Sorriso-MT, pipeline de pre-processamento sem vazamento temporal, integracao em data/raw/integrado.csv, avaliacao de modelos baseline e classificadores Supervisionados. |
+| **Fora do escopo** | Previsao de precos de mercado, diagnostico de pragas biologicas, modelagem de outras culturas (milho safrinha, algodao) ou expansao para outros municipios nesta etapa. |
 
 **Nota sobre a amostra:** A integracao resulta em N = 10 safras anuais consolidadas. A dimensionalidade reduzida restringe o uso de arquiteturas de alta complexidade e exige modelos parcimoniosos com forte controle contra sobreajuste (overfitting).
 
@@ -113,4 +113,5 @@ Contrato de variaveis detalhado em: [Dicionario_de_Dados.md](docs/Dicionario_de_
 | Versao | Data | Autor | Descricao da Modificacao |
 |---|---|---|---|
 | v0.1 | 31/08/2026 | Grupo 3 | Proposta inicial do projeto. |
-| v0.2 | 21/09/2026 | Grupo 3 | Formalizacao do limiar numerico de quebra (< 2.450 kg/ha), atualizacao da amostra para 10 safras consolidadas (2015-2024), documentacao de ausencia da safra 2025 e detalhamento de criterios anti-vazamento. |
+| v0.2 | 21/09/2026 | Grupo 3 | Formalizacao do limiar numerico de quebra, atualizacao da amostra para 10 safras consolidadas (2015-2024), documentacao de ausencia da safra 2025 e detalhamento de criterios anti-vazamento. |
+| v0.3 | 05/10/2026 | Grupo 3 | Re-arquitetura do projeto para migracao 100% Sorriso-MT (Codigo IBGE 5107925), recalibracao formal do limiar de quebra de safra para < 3.400 kg/ha baseado na media historica de 3.477 kg/ha e harmonizacao do pipeline de dados. |

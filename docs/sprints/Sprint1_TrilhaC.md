@@ -11,6 +11,9 @@
 **Scrum Master do Sprint:** Joao Guilherme Cravo  
 **Repositorio GitHub:** [SAMUKISZHSD/bx_produtividade_agricola](https://github.com/SAMUKISZHSD/bx_produtividade_agricola)  
 
+> [!NOTE]
+> **Aditivo de Transicao de Escopo (Sprint 2):** Conforme deliberacao tecnica para a continuidade do projeto na Sprint 2, o municipio foi migrado integralmente de Piracicaba-SP para **Sorriso-MT** (Codigo IBGE: `5107925`, Lat: `-12.5414`, Lon: `-55.7269`), refletindo os dados consolidados em `data/raw/` e a recalibracao formal do limiar de quebra de safra para `< 3.400 kg/ha` documentada no `RFC.md` v0.3 e `Dicionario_de_Dados.md` v0.2.
+
 ---
 
 ### Contrato desta Sprint
