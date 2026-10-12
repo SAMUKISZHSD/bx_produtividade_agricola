@@ -69,13 +69,17 @@ pip install -r requirements.txt
 
 
 
-## 4. Documentacao do Projeto
+## 4. Documentação do Projeto e Diários de Bordo
 
 * **RFC (Proposta de Projeto):** [docs/RFC.md](docs/RFC.md)
-* **Dicionario de Dados:** [docs/Dicionario_de_Dados.md](docs/Dicionario_de_Dados.md)
-* **Diario da Sprint 1:** [docs/sprints/Sprint1_TrilhaC.md](docs/sprints/Sprint1_TrilhaC.md)
-* **Dados Brutos e Integrados:** `data/raw/` (`integrado.csv` com N = 10 safras consolidadas)
-* **Notebook de Coleta e Ingestao:** `notebooks/01_coleta_de_dados.ipynb`
+* **Dicionário de Dados:** [docs/Dicionario_de_Dados.md](docs/Dicionario_de_Dados.md)
+* **Diário de Sprint 1 (Kickoff e Coleta):** [docs/sprints/Sprint1_TrilhaC.md](docs/sprints/Sprint1_TrilhaC.md)
+* **Diário de Sprint 2 (Limpeza, Split e EDA):** [docs/sprints/Sprint2_TrilhaC.md](docs/sprints/Sprint2_TrilhaC.md)
+* **Diário de Sprint 3 (Ingestão Robusta e Baselines):** [docs/sprints/Sprint3_TrilhaC.md](docs/sprints/Sprint3_TrilhaC.md)
+* **Quadro Oficial no Trello:** [Projeto de Ciência de Dados (Trello)](https://trello.com/invite/b/6a975ab20fa3094b426c0c68/ATTI02cea94da7f784bcf30e1e3d24341426A34F2CE2/📊-projeto-de-ciencia-de-dados)
+* **Evidências Visuais de Scrum:** [docs/assets/scrum/](docs/assets/scrum/)
+* **Dados Consolidados:** `data/raw/` e `data/interim/`
+* **Pipelines em Notebooks:** [notebooks/](notebooks/)
 
 ---
 

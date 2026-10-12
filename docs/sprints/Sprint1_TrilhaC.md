@@ -8,7 +8,7 @@
 * Jean Carlos Silva de Almeida (RGM: 33783276)
 * Samuel Allan Nunes da Cunha (RGM: 34524746)
 
-**Scrum Master do Sprint:** Joao Guilherme Cravo  
+**Scrum Master do Sprint:** Jean Carlos Silva de Almeida  
 **Repositorio GitHub:** [SAMUKISZHSD/bx_produtividade_agricola](https://github.com/SAMUKISZHSD/bx_produtividade_agricola)  
 
 > [!NOTE]
@@ -118,26 +118,30 @@
 2. Como desenvolvedor, preciso consultar a API de Dados Agregados do IBGE PAM para obter as metricas de produtividade e area de soja consolidadas.
 3. Como cientista de dados, preciso agregar o clima por ano-safra e realizar a integracao (merge 1:1) com o IBGE, gerando o arquivo data/raw/integrado.csv para servir de base as etapas subsequentes.
 
-**Quadro de Tarefas:** [SAMUKISZHSD/bx_produtividade_agricola - Projects](https://github.com/users/SAMUKISZHSD/projects/)
+* **Quadro Oficial no Trello:** [Quadro Trello - Projeto de Ciência de Dados](https://trello.com/invite/b/6a975ab20fa3094b426c0c68/ATTI02cea94da7f784bcf30e1e3d24341426A34F2CE2/📊-projeto-de-ciencia-de-dados)
+* **GitHub Projects:** [SAMUKISZHSD/bx_produtividade_agricola - Projects](https://github.com/users/SAMUKISZHSD/projects/)
+
+### Evidência Visual do Quadro de Tarefas (Sprint 1)
+![Quadro Trello - Sprint 1](../assets/scrum/trello_sprint1.png)
 
 ---
 
-## 7. Diario de bordo (Retrospectiva individual)
+## 7. Diário de bordo (Retrospectiva individual)
 
-| Integrante | Papel Scrum | Atividades Realizadas na Sprint | Dificuldades Tecnicas | Proximos Passos |
+| Integrante | Papel Scrum | O que fiz nesta Sprint | Dificuldades | O que pretendo fazer a seguir |
 |---|---|---|---|---|
-| **Joao Guilherme** | Scrum Master | Coordenacao das metas da sprint, organizacao do board e backlog, padronizacao do merge 1:1 e consolidacao do diario de bordo e da RFC. | Assegurar o fechamento do escopo em conformidade rigorosa com as rubricas de avaliacao da disciplina. | Facilitar a transicao para a Sprint 2, acompanhando os prazos de limpeza e split no board. |
-| **Jean Carlos** | Product Owner | Definicao do escopo de negocio (soja em Piracicaba), priorizacao do custo de falso negativo, refinamento das user stories e aprovacao dos dados do IBGE PAM. | Calibrar o limiar historico de quebra de safra em conformidade com as perdas reais da cultura. | Validar os criterios de negocio da variavel-alvo e definir as prioridades analiticas da Sprint 2. |
-| **Samuel Allan** | Equipe de Dev | Execucao tecnica das requisicoes as APIs, inspecao de headers HTTP, verificacao de qualidade (.info, .describe, checagens de dominio) e codificacao do alvo no notebook. | Tratamento de codigos sentinela (-999.0) da NASA e ajuste de filtro do IBGE para descartar variaveis de percentual. | Implementar os scripts de limpeza e transformacao para geracao da base interim na Sprint 2. |
+| **Jean Carlos Silva** | Scrum Master / Dev (JA) | Criei o board no Trello, organizei o backlog inicial e estruturei o repositório no GitHub. Ajudei a documentar as chamadas das APIs da NASA e do IBGE (Tópico 2), dei uma revisada na checagem inicial de qualidade dos dados brutos (Tópico 5) e ajudei a fechar a RFC e os arquivos de entrega (Tópico 8). | Entender como a professora queria a divisão dos artefatos da Trilha C e garantir que todo mundo estivesse na mesma página com as regras da disciplina logo no início. | Pegar o dataset integrado na Sprint 2 para fazer a limpeza de ponta a ponta, tirar a safra 2025 que veio zoada do IBGE, gerar o arquivo limpo na pasta interim e fechar o split temporal de treino e teste. |
+| **João Guilherme Cravo** | Product Owner / Dev (JS) | Ajudei a definir o problema de negócio focado na cultura de soja em Sorriso-MT (Tópico 1), fiz a integração bruta no notebook unindo os dados climáticos da NASA com a produção do IBGE PAM numa tabela só (Tópico 4), e ajudei a fechar a retrospectiva do diário (Tópico 7). | Fazer o merge bater certinho ano a ano sem perder safras e entender o formato de tabela agregada que a API do IBGE devolve no JSON. | Na Sprint 2, focar na engenharia de atributos climáticos e na definição formal da variável-alvo no notebook 04. |
+| **Samuel Allan Nunes** | Dev (SA) | Escrevi as funções de requisição nas APIs da NASA POWER e do IBGE PAM no notebook 01 (Tópico 3), inspecionei as respostas brutas e os códigos sentinelas, e ajudei na organização do board e documentação Scrum (Tópico 6). | Lidar com os códigos sentinela da NASA (que usa -999.0 pra dias sem leitura) pra não enviesar os cálculos, além de filtrar só as variáveis que realmente importavam do IBGE. | Na Sprint 2, assumir a verificação residual de nulos depois do split e rodar a análise exploratória (EDA) nos dados de treino. |
 
 ---
 
-## 8. Evidencias da entrega
+## 8. Evidências da entrega
 
 * **Notebook executado:** [notebooks/01_coleta_de_dados.ipynb](notebooks/01_coleta_de_dados.ipynb)
 * **Tabela integrada bruta:** [data/raw/integrado.csv](data/raw/integrado.csv)
-* **JSONs preservados:** `data/raw/nasa_power_Piracicaba_SP_2015_2025.json` e `data/raw/ibge_pam_Piracicaba_SP_2015_2025.json`
+* **JSONs preservados:** `data/raw/nasa_power_Sorriso_MT_2015_2025.json` e `data/raw/ibge_pam_Sorriso_MT_2015_2025.json`
 * **RFC:** [docs/RFC.md](docs/RFC.md)
-* **Dicionario de Dados:** [docs/Dicionario_de_Dados.md](docs/Dicionario_de_Dados.md)
+* **Dicionário de Dados:** [docs/Dicionario_de_Dados.md](docs/Dicionario_de_Dados.md)
 
 ---
