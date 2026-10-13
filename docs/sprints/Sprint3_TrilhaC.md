@@ -26,15 +26,15 @@
 
 ## 1. Aprofundamento da ingestão (Pipeline CD)
 
-- [ ] Período histórico de safras ampliado, ou período redefinido com justificativa. Se o recorte mudar: versionar o novo bruto em `data/raw/`, **reaplicar as regras de limpeza da Sprint 2** para gerar de novo o `interim`, e reaplicar o **mesmo critério** de split (safras antigas / recentes).
-- [ ] Tratamento de erros revisado e robustecido (reexecução após falhas parciais)
-- [ ] Coleta idempotente comprovada (reexecução não duplica registros)
-- [ ] `data/raw/` intocado como origem; `data/interim/` = tabela limpa (Sprint 2); `data/processed/` = matriz já com features para o modelo (esta sprint em diante)
-- [ ] `requirements.txt` (ou equivalente) com versões usadas na coleta
-- [ ] N (municípios × safras) atualizado após qualquer recorte
+- [x] Período histórico de safras ampliado, ou período redefinido com justificativa. Se o recorte mudar: versionar o novo bruto em `data/raw/`, **reaplicar as regras de limpeza da Sprint 2** para gerar de novo o `interim`, e reaplicar o **mesmo critério** de split (safras antigas / recentes). (Mantido o recorte consolidado de Sorriso-MT: 2015 a 2024, após exclusão fundamentada de 2025).
+- [x] Tratamento de erros revisado e robustecido (reexecução após falhas parciais via cache local preservado em `data/raw/`).
+- [x] Coleta idempotente comprovada (reexecução no notebook `01_coleta_de_dados.ipynb` comprovou 0 duplicatas e checksum SHA-256 idêntico).
+- [x] `data/raw/` intocado como origem; `data/interim/` = tabela limpa (Sprint 2); `data/processed/` = matriz já com features para o modelo (esta sprint em diante, arquivo `data/processed/dados_modelo.csv`).
+- [x] `requirements.txt` (ou equivalente) com versões usadas na coleta e execução do pipeline.
+- [x] N (municípios × safras) atualizado após qualquer recorte (N = 10 safras consolidadas).
 
-**N atual (treino / teste):**
-**Evidências (link do notebook/commit):**
+**N atual (treino / teste):** Treino = 8 safras (2015 a 2022) | Teste = 2 safras (2023 a 2024) (Sorriso-MT)  
+**Evidências (link do notebook/commit):** Notebook [notebooks/01_coleta_de_dados.ipynb](../../notebooks/01_coleta_de_dados.ipynb) (Seção 9: Comprovação de Idempotência e Geração da Camada Processed) e artefato [data/processed/dados_modelo.csv](../../data/processed/dados_modelo.csv).
 
 ## 2. Preparação para modelagem
 
