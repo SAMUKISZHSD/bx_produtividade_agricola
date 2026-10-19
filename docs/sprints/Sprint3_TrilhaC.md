@@ -60,7 +60,24 @@
 
 **Resultados (Dummy vs. persistência vs. Naive Bayes) e interpretação:**
 
+A tabela final abaixo consolida a comparação dos três baselines no mesmo split temporal e mostra com clareza o que pode e o que não pode ser interpretado nesta sprint:
+
+| Modelo | Acurácia | Precisão ponderada | Recall ponderado | F1 ponderado | Observação |
+|---|---:|---:|---:|---:|---|
+| `DummyClassifier` | ~1.0000 | ~1.0000 | ~1.0000 | ~1.0000 | Se comporta como baseline da classe majoritária; não traz informação sobre o evento raro |
+| `Persistência` | ~1.0000 | ~1.0000 | ~1.0000 | ~1.0000 | Mesma lógica do baseline temporal; útil para estabilizar a leitura do problema, mas sem aprender o risco |
+| `GaussianNB` | ~1.0000 | ~1.0000 | ~1.0000 | ~1.0000 | Baseline probabilístico simples; não há evidência de separação real da classe 1 neste teste |
+
+Para a classe `Quebra` (classe 1), a leitura correta é: o suporte no teste é zero, ou seja, o evento não apareceu na janela de avaliação. Isso torna as métricas por classe estatisticamente não informativas para a classe rara e invalida qualquer inferência forte de recall ou F1 para quebra de safra. Em outras palavras, os valores perfeitos de acurácia são consequência do desenho amostral e não indicam que o modelo está “certo” em detectar risco real.
+
+Do ponto de vista de negócio, o erro mais caro é o falso negativo: prever “Normal” quando a safra quebra. Como a classe positiva ainda não aparece no conjunto de teste, a decisão de negócio deve ser adiada até a janela de avaliação incluir eventos reais de risco. A acurácia alta aqui é um artefato de amostra e não um sinal de qualidade preditiva.
+
 **Evidências (link do notebook, métricas):**
+
+- Notebook: [notebooks/07_dummyclassifier_gaussiannb_pipeline.ipynb](../../notebooks/07_dummyclassifier_gaussiannb_pipeline.ipynb)
+- Dataset de entrada: [data/processed/dados_modelo.csv](../../data/processed/dados_modelo.csv)
+- Observação crítica: treino = 8 safras, teste = 2 safras e `y_test.value_counts()` = `{0: 2}`; não há casos da classe 1 no teste atual.
+
 
 ## 4. Scrum
 
