@@ -6,10 +6,10 @@
 **Ultima atualizacao:** 21/09/2026  
 **Versao:** v0.1 (Sprint 1)  
 
-* **Unidade de analise:** 1 ano-safra de soja para o municipio de Piracicaba-SP.
-* **N apos o merge (Sprint 1, bruto):** 10 safras consolidadas (2015 a 2024).
-* **N apos a limpeza (Sprint 2, data/interim):** A preencher na Sprint 2
-* **Split (Sprint 2):** A formalizar na Sprint 2
+* **Unidade de analise:** 1 ano-safra de soja para o municipio de Sorriso-MT.
+* **N apos o merge (bruto):** 11 safras (2015 a 2025 integradas em data/raw/integrado.csv).
+* **N apos a limpeza (data/interim/limpo.csv):** 10 safras consolidadas (2015 a 2024, safra 2025 descartada por estimativas estaticas nao consolidadas).
+* **Split Temporal:** Treino: safras 2015 a 2022 (8 safras) | Teste: safras 2023 a 2024 (2 safras).
 
 ---
 
@@ -17,8 +17,8 @@
 
 | Fonte | API / Endpoint | Cobertura temporal disponivel | Resolucao temporal | Medido ou modelado? | Limitacoes conhecidas |
 |---|---|---|---|---|---|
-| **NASA POWER** | https://power.larc.nasa.gov/api/temporal/daily/point | 1981 ate o presente | Diaria | Modelado | Estimativa por sensoriamento remoto e reanalise fisica (resolucao 0.5 grau). Utiliza codigo -999.0 como sentinela de ausencia de medicao. |
-| **IBGE (PAM)** | Agregado 1612 (Lavouras Temporarias, Cultura 2713) | Historico anual | Anual (Safra) | Medido / Declaratorio | Dados municipais oficiais consolidados apos encerramento da colheita. A safra de 2025 ainda nao foi divulgada pelo orgao. |
+| **NASA POWER** | https://power.larc.nasa.gov/api/temporal/daily/point | 1981 ate o presente | Diaria | Modelado | Estimativa por sensoriamento remoto e reanalise fisica (resolucao 0.5 grau). Coordenadas centrais de Sorriso-MT (-12.5414, -55.7269). Utiliza codigo -999.0 como sentinela de ausencia de medicao. |
+| **IBGE (PAM)** | Agregado 1612 (Lavouras Temporarias, Cultura 2713) | Historico anual | Anual (Safra) | Medido / Declaratorio | Dados municipais oficiais de Sorriso-MT (codigo 5107925) consolidados apos encerramento da colheita. A safra de 2025 ainda nao foi divulgada oficialmente pelo orgao. |
 
 ---
 
@@ -47,7 +47,7 @@ data/raw/ permanece preservado. O arquivo de integracao inicial e data/raw/integ
 | Problema identificado | Regra aplicada | Celulas afetadas | N depois | Observacoes |
 |---|---|---|---|---|
 | Sentinela -999.0 da NASA POWER | Substituido por valor nulo (pd.NA) antes da agregacao | Registros pontuais | 10 safras | Conforme especificacao tecnica da API |
-| Safra 2025 do IBGE nao consolidada | Juncao via how='inner' com validate='1:1' | 1 ano (2025) | 10 safras | Retencao do intervalo completo 2015 a 2024 |
+| Safra 2025 do IBGE nao consolidada | Filtragem por ano <= 2024 em data/interim/limpo.csv | 1 ano (2025) | 10 safras | Retencao do intervalo completo consolidado 2015 a 2024 |
 
 ---
 
@@ -57,16 +57,20 @@ data/raw/ permanece preservado. O arquivo de integracao inicial e data/raw/integ
 |---|---|
 | **Nome da coluna** | quebra_safra |
 | **Definicao da classe positiva** | 1 = Quebra de safra (baixa produtividade crítica). 0 = Safra normal ou superior. |
-| **Limiar adotado e justificativa** | Rendimento estritamente inferior a 2.450 kg/ha. A media historica observada entre 2015 e 2024 e de aproximadamente 2.470 kg/ha. O limiar segrega as safras de menor desempenho (2.400 kg/ha) como classe positiva e safras com rendimentos de 2.500 e 3.000 kg/ha como classe negativa. |
+| **Limiar adotado e justificativa** | Rendimento estritamente inferior a 3.400 kg/ha. A media historica observada entre 2015 e 2024 em Sorriso-MT e de aproximadamente 3.477 kg/ha (desvio padrao ~293 kg/ha). O limiar segrega como quebra (classe positiva = 1) safras com perdas decorrentes de estresses agroclimaticos (2015 com 3.148 kg/ha, 2016 com 2.880 kg/ha e 2021 com 3.360 kg/ha) e safras com rendimentos superiores (3.480 a 3.870 kg/ha) como classe negativa (0). |
 | **Variavel de origem** | Coluna rendimento_kg_ha da tabela 1612 do IBGE PAM. |
 | **Horizonte de previsao** | De 2 a 3 meses antes da colheita (durante o enchimento de graos). |
-| **Distribuicao no dado bruto** | 8 safras com quebra/baixa produtividade (80%) contra 2 safras de rendimento superior (20%) no intervalo 2015 a 2024. |
+| **Distribuicao no dado consolidado** | 3 safras com quebra (30%) contra 7 safras de produtividade normal ou superior (70%) no intervalo 2015 a 2024. |
 
 ---
 
-## 4. Atributos derivados (Sprints 2 e 4)
+## 4. Atributos derivados (Sprints 2 e 4 - data/interim/04_dados_com_features.csv)
 
-A preencher nas Sprints 2 e 4 conforme criacao de atributos adicionais.
+| Nome da coluna | Formula / Metodo | Tipo | Descricao | Razoabilidade Agronomica |
+|---|---|---|---|---|
+| `amplitude_termica` | `T2M_MAX - T2M_MIN` | Numerica continua (°C) | Amplitude termica media diária ao longo do ciclo | Grandes variacoes diarias elevam estresse osmotico e fisiologico na soja. |
+| `precipitacao_por_temperatura` | `PRECTOTCORR / (T2M + 0.001)` | Numerica continua (mm/°C) | Indice de balanço de agua frente a evapotranspiracao | Quantifica a eficiencia da umidade sob regime de calor no Cerrado. |
+| `GWET_x_PREC` | `GWETROOT * PRECTOTCORR` | Numerica continua | Interacao umidade do solo x volume precipitado | Identifica anos de precipitacao efetiva retida na zona radicular da cultura. |
 
 ---
 
@@ -83,9 +87,9 @@ A preencher nas Sprints 2 e 4 conforme criacao de atributos adicionais.
 
 ## 6. Observacoes gerais e limitacoes
 
-* **Tamanho amostral reduzido (N = 10):** A granularidade anual do IBGE gera uma base de 10 safras municipais, impondo a necessidade de algoritmos de baixa variancia e sem sobreajuste.
+* **Tamanho amostral reduzido (N = 10):** A granularidade anual do IBGE gera uma base de 10 safras municipais consolidadas (2015 a 2024), impondo a necessidade de algoritmos de baixa variancia e sem sobreajuste.
 * **Dados climaticos de reanalise:** Os registros da NASA POWER originam-se de modelos atmosfericos globais e sensores orbitais, nao de estacao fisica meteorologica em solo no municipio.
-* **Pendencia de safra:** O registro de 2025 da NASA POWER foi coletado, mas permanece desvinculado do merge ate a divulgacao oficial dos dados pelo IBGE.
+* **Pendencia de safra:** O registro de 2025 da NASA POWER e do IBGE foi filtrado em data/interim/ por consistir em estimativas estaticas nao consolidadas.
 
 ---
 
@@ -93,4 +97,5 @@ A preencher nas Sprints 2 e 4 conforme criacao de atributos adicionais.
 
 | Versao | Sprint | Data | Modificacoes |
 |---|---|---|---|
-| v0.1 | Sprint 1 | 21/09/2026 | Levantamento inicial de variaveis brutas, correcao de filtro de variaveis, integracao em data/raw/integrado.csv, estabelecimento do limiar numerico formal (< 2.450 kg/ha) e definicao de colunas excluidas por vazamento. |
+| v0.1 | Sprint 1 | 21/09/2026 | Levantamento inicial de variaveis brutas, correcao de filtro de variaveis, integracao em data/raw/integrado.csv, estabelecimento do limiar numerico formal e definicao de colunas excluidas por vazamento. |
+| v0.2 | Sprint 2 | 05/10/2026 | Re-arquitetura do dicionario de dados para Sorriso-MT 100% (Codigo IBGE 5107925), recalibracao formal do limiar para < 3.400 kg/ha, adicao dos atributos derivados de engenharia de features e formalizacao do split temporal. |

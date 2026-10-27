@@ -1,0 +1,174 @@
+[
+  {
+    "id": "109",
+    "variavel": "Área plantada",
+    "unidade": "Hectares",
+    "resultados": [
+      {
+        "classificacoes": [
+          {
+            "id": "81",
+            "nome": "Produto das lavouras temporárias",
+            "categoria": {
+              "2713": "Soja (em grão)"
+            }
+          }
+        ],
+        "series": [
+          {
+            "localidade": {
+              "id": "5107925",
+              "nivel": {
+                "id": "N6",
+                "nome": "Município"
+              },
+              "nome": "Sorriso (MT)"
+            },
+            "serie": {
+              "2015": "625900",
+              "2016": "620000",
+              "2017": "620000",
+              "2018": "600000",
+              "2019": "605000",
+              "2020": "590000",
+              "2021": "605000",
+              "2022": "598500",
+              "2023": "598500",
+              "2024": "600000",
+              "2025": "550000"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "216",
+    "variavel": "Área colhida",
+    "unidade": "Hectares",
+    "resultados": [
+      {
+        "classificacoes": [
+          {
+            "id": "81",
+            "nome": "Produto das lavouras temporárias",
+            "categoria": {
+              "2713": "Soja (em grão)"
+            }
+          }
+        ],
+        "series": [
+          {
+            "localidade": {
+              "id": "5107925",
+              "nivel": {
+                "id": "N6",
+                "nome": "Município"
+              },
+              "nome": "Sorriso (MT)"
+            },
+            "serie": {
+              "2015": "619900",
+              "2016": "615000",
+              "2017": "620000",
+              "2018": "600000",
+              "2019": "605000",
+              "2020": "590000",
+              "2021": "598500",
+              "2022": "598500",
+              "2023": "598500",
+              "2024": "599000",
+              "2025": "550000"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "214",
+    "variavel": "Quantidade produzida",
+    "unidade": "Toneladas",
+    "resultados": [
+      {
+        "classificacoes": [
+          {
+            "id": "81",
+            "nome": "Produto das lavouras temporárias",
+            "categoria": {
+              "2713": "Soja (em grão)"
+            }
+          }
+        ],
+        "series": [
+          {
+            "localidade": {
+              "id": "5107925",
+              "nivel": {
+                "id": "N6",
+                "nome": "Município"
+              },
+              "nome": "Sorriso (MT)"
+            },
+            "serie": {
+              "2015": "1951710",
+              "2016": "1771200",
+              "2017": "2157600",
+              "2018": "2232000",
+              "2019": "2141700",
+              "2020": "2283300",
+              "2021": "2010960",
+              "2022": "2118690",
+              "2023": "2244375",
+              "2024": "2084520",
+              "2025": "2343000"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "112",
+    "variavel": "Rendimento médio da produção",
+    "unidade": "Quilogramas por Hectare",
+    "resultados": [
+      {
+        "classificacoes": [
+          {
+            "id": "81",
+            "nome": "Produto das lavouras temporárias",
+            "categoria": {
+              "2713": "Soja (em grão)"
+            }
+          }
+        ],
+        "series": [
+          {
+            "localidade": {
+              "id": "5107925",
+              "nivel": {
+                "id": "N6",
+                "nome": "Município"
+              },
+              "nome": "Sorriso (MT)"
+            },
+            "serie": {
+              "2015": "3148",
+              "2016": "2880",
+              "2017": "3480",
+              "2018": "3720",
+              "2019": "3540",
+              "2020": "3870",
+              "2021": "3360",
+              "2022": "3540",
+              "2023": "3750",
+              "2024": "3480",
+              "2025": "4260"
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

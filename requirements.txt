@@ -3,7 +3,7 @@ numpy>=1.24.0
 pandas>=2.0.0
 openpyxl>=3.1.0
 
-# HTTP & APIs
+# HTTP & APIs (Ingestão de Dados - NASA POWER e IBGE PAM)
 requests>=2.31.0
 urllib3>=2.0.0
 
@@ -15,6 +15,7 @@ seaborn>=0.12.0
 scikit-learn>=1.3.0
 joblib>=1.3.0
 
-# Interactive Notebook Environment
+# Interactive Notebook Environment & Pipeline Execution
 jupyter>=1.0.0
 ipykernel>=6.25.0
+nbconvert>=7.16.0

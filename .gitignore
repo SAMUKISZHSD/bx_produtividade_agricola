@@ -29,3 +29,6 @@ ENV/
 # OS specific files
 .DS_Store
 Thumbs.db
+
+# Automation & Local Scripts
+scripts/
