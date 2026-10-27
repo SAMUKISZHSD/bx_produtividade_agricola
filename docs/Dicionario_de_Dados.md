@@ -3,8 +3,8 @@
 **Projeto:** Previsao de Risco de Baixa Produtividade Agricola (Soja)  
 **Trilha:** C - Risco de baixa produtividade agricola  
 **Equipe:** Grupo 3 (Joao Guilherme Cravo, Jean Carlos Silva de Almeida, Samuel Allan Nunes da Cunha)  
-**Ultima atualizacao:** 21/09/2026  
-**Versao:** v0.1 (Sprint 1)  
+**Ultima atualizacao:** 11/10/2026  
+**Versao:** v0.3 (Sprint 4)  
 
 * **Unidade de analise:** 1 ano-safra de soja para o municipio de Sorriso-MT.
 * **N apos o merge (bruto):** 11 safras (2015 a 2025 integradas em data/raw/integrado.csv).
@@ -64,13 +64,17 @@ data/raw/ permanece preservado. O arquivo de integracao inicial e data/raw/integ
 
 ---
 
-## 4. Atributos derivados (Sprints 2 e 4 - data/interim/04_dados_com_features.csv)
+## 4. Atributos derivados (Sprints 2 e 4 - data/processed/dados_modelo.csv)
 
 | Nome da coluna | Formula / Metodo | Tipo | Descricao | Razoabilidade Agronomica |
 |---|---|---|---|---|
 | `amplitude_termica` | `T2M_MAX - T2M_MIN` | Numerica continua (°C) | Amplitude termica media diária ao longo do ciclo | Grandes variacoes diarias elevam estresse osmotico e fisiologico na soja. |
 | `precipitacao_por_temperatura` | `PRECTOTCORR / (T2M + 0.001)` | Numerica continua (mm/°C) | Indice de balanço de agua frente a evapotranspiracao | Quantifica a eficiencia da umidade sob regime de calor no Cerrado. |
 | `GWET_x_PREC` | `GWETROOT * PRECTOTCORR` | Numerica continua | Interacao umidade do solo x volume precipitado | Identifica anos de precipitacao efetiva retida na zona radicular da cultura. |
+| `deficit_hidrico_solo` | Contagem de dias em Jan-Fev com `GWETROOT < 0.70` | Numerica discreta (dias) | Frequencia de deficit hidrico na zona radicular na floracao/enchimento | Seca na raiz no enchimento aborta vagens e reduz drasticamente o peso de graos. |
+| `dias_pico_calor` | Contagem de dias em Jan-Fev com `T2M_MAX >= 35.0` | Numerica discreta (dias) | Frequencia de calor extremo na fase reprodutiva da cultura | Temperaturas acima de 35°C causam esterilidade de polen e estresse osmotico agudo. |
+| `veranico_max_dias` | Maior sequencia de dias consecutivos com chuva $< 1.0$ mm em Jan-Fev | Numerica discreta (dias) | Duracao do maior veranico no periodo reprodutivo | Estiagens prolongadas consecutivas rompem a capacidade de retencao do solo. |
+| `precipitacao_enchimento` | Soma da precipitacao pluviometrica em Jan-Fev (mm) | Numerica continua (mm) | Volume pluviometrico acumulado no bimestre critico | Balanco hidrico efetivo disponivel durante a formacao da produtividade final. |
 
 ---
 
@@ -99,3 +103,4 @@ data/raw/ permanece preservado. O arquivo de integracao inicial e data/raw/integ
 |---|---|---|---|
 | v0.1 | Sprint 1 | 21/09/2026 | Levantamento inicial de variaveis brutas, correcao de filtro de variaveis, integracao em data/raw/integrado.csv, estabelecimento do limiar numerico formal e definicao de colunas excluidas por vazamento. |
 | v0.2 | Sprint 2 | 05/10/2026 | Re-arquitetura do dicionario de dados para Sorriso-MT 100% (Codigo IBGE 5107925), recalibracao formal do limiar para < 3.400 kg/ha, adicao dos atributos derivados de engenharia de features e formalizacao do split temporal. |
+| v0.3 | Sprint 4 | 11/10/2026 | Inclusao dos atributos fenologicos derivados da NASA POWER (deficit_hidrico_solo, dias_pico_calor, veranico_max_dias e precipitacao_enchimento) focados nos erros de 2021, selecao parcimoniosa e congelamento do ColumnTransformer. |
