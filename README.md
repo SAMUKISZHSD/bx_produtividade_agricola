@@ -23,6 +23,19 @@ RGM: 34524746
 
 ---
 
+## Entregas Oficiais do Projeto & Mostra de Tecnologia
+
+| Entrega | Formato / Localização | Status / Acesso |
+| :--- | :--- | :--- |
+| **Artigo Técnico TechBlog** | GitHub Pages (`docs/index.html`) | [Acessar Artigo Online](https://samukiszhsd.github.io/bx_produtividade_agricola/) |
+| **Dashboard Streamlit** | [streamlit_app.py](streamlit_app.py) | Rodar local: `streamlit run streamlit_app.py` |
+| **Vídeo Pitch de 90s** | YouTube (Não Listado) | `[Mock / Placeholder para Link do YouTube]` |
+| **QR Code do Artigo** | PNG & SVG (`docs/img/`, `docs/mostra/`) | [Ver QR Code](docs/img/qrcode_artigo.png) |
+| **Inscrição Mostra (30/10)** | [docs/mostra/INSCRICAO_MOSTRA_30_10.md](docs/mostra/INSCRICAO_MOSTRA_30_10.md) | Logo 500x500, Nome, Descritivo e Tags |
+| **Quadro de Observação** | Seção 7 do Artigo & RFC | 2 refs analisadas, 3 decisões e 1 exclusão |
+
+---
+
 ##  1. Visão Geral do Problema de Negócio
 
 As variações agroclimáticas (anomalias de precipitação, estresse térmico, déficit de umidade no solo) são os principais fatores de risco para a produtividade da lavoura de soja. 

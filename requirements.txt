@@ -14,6 +14,12 @@ seaborn>=0.12.0
 # Machine Learning & Modeling
 scikit-learn>=1.3.0
 joblib>=1.3.0
+xgboost>=1.7.0
+
+# Interactive Dashboard & Delivery
+streamlit>=1.30.0
+pillow>=10.0.0
+qrcode>=7.4.0
 
 # Interactive Notebook Environment & Pipeline Execution
 jupyter>=1.0.0
