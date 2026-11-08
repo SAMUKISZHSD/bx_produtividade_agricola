@@ -1,0 +1,8 @@
+{
+  "modelo_referencia": "LogisticRegression",
+  "limiar_otimo": 0.35,
+  "motivo": "Minimizacao de FN com base no custo de seguro rural do RFC e maximizacao de F1 na validacao temporal do treino",
+  "recall_validacao": 1.0,
+  "precisao_validacao": 0.5,
+  "f1_validacao": 0.67
+}
