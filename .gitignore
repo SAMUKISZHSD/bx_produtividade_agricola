@@ -32,3 +32,5 @@ Thumbs.db
 
 # Automation & Local Scripts
 scripts/
+.agents/
+.claude/
