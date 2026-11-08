@@ -4,7 +4,7 @@
 **Trilha:** C - Risco de baixa produtividade agricola  
 **Equipe:** Grupo 3 (Joao Guilherme Cravo, Jean Carlos Silva de Almeida, Samuel Allan Nunes da Cunha)  
 **Ultima atualizacao:** 31/10/2026  
-**Versao:** v0.3 (Sprint 4)  
+**Versao:** v0.4 (Sprint 5)  
 
 * **Unidade de analise:** 1 ano-safra de soja para o municipio de Sorriso-MT (Codigo IBGE 5107925).
 * **N apos o merge (bruto):** 11 safras (2015 a 2025 integradas em `data/raw/integrado.csv`).
@@ -104,3 +104,4 @@
 | v0.1 | Sprint 1 | 21/09/2026 | Levantamento inicial de variaveis brutas, correcao de filtro de variaveis, integracao em data/raw/integrado.csv, estabelecimento do limiar numerico formal e definicao de colunas excluidas por vazamento. |
 | v0.2 | Sprint 2 | 05/10/2026 | Re-arquitetura do dicionario de dados para Sorriso-MT 100% (Codigo IBGE 5107925), recalibracao formal do limiar para < 3.400 kg/ha, adicao dos atributos derivados de engenharia de features e formalizacao do split temporal. |
 | v0.3 | Sprint 4 | 31/10/2026 | Inclusao das features da janela critica Jan-Fev (`deficit_hidrico_solo`, `dias_pico_calor`, `precipitacao_enchimento`, `veranico_max_dias`), descarte justificado de atributos anuais colineares, congelamento do contrato de 4 features para a Sprint 5 e documentacao do risco de vazamento em `amplitude_termica`. |
+| v0.4 | Sprint 5 | 08/11/2026 | Selecao e congelamento do modelo campeao (Logistic Regression L2 com class_weight balanced), calibracao do limiar otimo de decisao (p = 0.35) balizado pelo custo de FN do RFC, geracao do Model Card e persistencia do banco SQLite (data/monitoramento_safra.db). |

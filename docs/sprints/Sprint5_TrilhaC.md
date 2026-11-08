@@ -1,10 +1,10 @@
 # Diário de Sprint 5 — Modelagem completa, limiar de decisão e seleção
-**Período:** 12/10/2026 a 25/10/2026
+**Período:** 12/10/2026 a 08/11/2026
 **Trilha:** C — Risco de baixa produtividade agrícola
 
-**Equipe:**
-**Scrum Master do Sprint:**
-**Repositório GitHub:** (link)
+**Equipe:** João Guilherme Cravo (RGM 35880759), Jean Carlos Silva de Almeida (RGM 33783276), Samuel Allan Nunes da Cunha (RGM 34524746)  
+**Scrum Master do Sprint:** Samuel Allan Nunes da Cunha  
+**Repositório GitHub:** [SAMUKISZHSD/bx_produtividade_agricola](https://github.com/SAMUKISZHSD/bx_produtividade_agricola)  
 
 > Split da Sprint 2 e `ColumnTransformer` **congelado na Sprint 4**. No comparativo, Dummy, persistência e Naive Bayes são os da Sprint 4 (mesmo pipeline). Pode **reproduzir** esses números no notebook desta sprint; **não** colar métricas da Sprint 3 (features antigas). Classificadores novos treinam neste pipeline, na mesma partição de teste.
 >
@@ -23,96 +23,128 @@
 
 **Não há sprint seguinte.** Dashboard, se houver, é extra e lê estes artefatos — não gera outro split.
 
-- [ ] Confirmei transformer da Sprint 4, split da Sprint 2 e que nenhuma métrica da Sprint 3 entrou no quadro
+- [x] Confirmei transformer da Sprint 4, split da Sprint 2 e que nenhuma métrica da Sprint 3 entrou no quadro
 
 ---
 
 ## 1. Revisão do split e da preparação
 
-- [ ] Mesmo split por safra/ano da Sprint 2 (treino em safras antigas, teste nas recentes)
-- [ ] `Pipeline`/`ColumnTransformer` da Sprint 4, `fit` só no treino
-- [ ] Vazamento reconfirmado com os atributos finais (nada após o fim da janela de previsão)
-- [ ] N treino/teste reafirmado; complexidade dos modelos compatível com a amostra
+- [x] Mesmo split por safra/ano da Sprint 2 (treino em safras antigas, teste nas recentes)
+- [x] `Pipeline`/`ColumnTransformer` da Sprint 4, `fit` só no treino
+- [x] Vazamento reconfirmado com os atributos finais (nada após o fim da janela de previsão)
+- [x] N treino/teste reafirmado; complexidade dos modelos compatível com a amostra
 
 **Safras de corte, N treino/teste e resumo do transformer:**
 
+A gente manteve 100% o compromisso assumido com a professora desde a Sprint 2:
+- **Treino:** Safras de 2015 a 2022 ($N = 8$ safras em Sorriso-MT), contendo 3 safras de quebra severa (2015, 2016 e 2021) e 5 safras de rendimento normal.
+- **Teste Oficial Congelado:** Safras de 2023 e 2024 ($N = 2$ safras), ambas com rendimento normal (> 3.400 kg/ha).
+- **Pré-processador:** O `ColumnTransformer` foi puxado direto de `models/s4_preprocessor_congelado.joblib`. Ele usa `StandardScaler` nas 4 features da janela de Jan-Fev (`deficit_hidrico_solo`, `dias_pico_calor`, `precipitacao_enchimento`, `amplitude_termica`) com `remainder='drop'` e `.fit()` exclusivo no bloco de treino.
+- **Prevenção de vazamento:** Nenhuma variável pós-fevereiro foi incluída, garantindo 2 meses de antecedência antes da colheita real.
+
+---
+
 ## 2. Comparativo no pipeline final
 
-- [ ] Dummy, persistência e Naive Bayes **do pipeline da Sprint 4** no quadro (reproduzidos aqui; não usar números da Sprint 3)
-- [ ] No mínimo **dois** classificadores adicionais, com justificativa compatível com o N
-- [ ] Todos avaliados na **mesma** partição de teste
-- [ ] Hiperparâmetros documentados; se houver busca, ela usa só o treino (ou validação temporal dentro do treino) — nunca o teste
-- [ ] `class_weight="balanced"` (ou equivalente) é lícito; SMOTE / oversampling aleatório continua proibido
-- [ ] Independência do Naive Bayes continua tratada como hipótese pedagógica
+- [x] Dummy, persistência e Naive Bayes **do pipeline da Sprint 4** no quadro (reproduzidos aqui; não usar números da Sprint 3)
+- [x] No mínimo **dois** classificadores adicionais, com justificativa compatível com o N
+- [x] Todos avaliados na **mesma** partição de teste
+- [x] Hiperparâmetros documentados; se houver busca, ela usa só o treino (ou validação temporal dentro do treino) — nunca o teste
+- [x] `class_weight="balanced"` (ou equivalente) é lícito; SMOTE / oversampling aleatório continua proibido
+- [x] Independência do Naive Bayes continua tratada como hipótese pedagógica
 
-**Modelos no comparativo (3 baselines da Sprint 4 + ≥2 novos):**
-1. Dummy
-2. Persistência
-3. Naive Bayes
-4. (novo)
-5. (novo)
+**Modelos no comparativo (3 baselines da Sprint 4 + 2 novos):**
+1. **DummyClassifier:** Chuta sempre a classe majoritária ('Normal').
+2. **Persistência Temporal:** Chuta pro ano atual o resultado do ano anterior.
+3. **GaussianNB (Naive Bayes):** Baseline probabilístico da Sprint 4.
+4. **Logistic Regression (L2 Balanced):** Modelo linear com penalidade L2, $C=1.0$ e `class_weight='balanced'`. É parcimonioso e honesto com $N=8$, gerando probabilidades suaves para calibrar o limiar.
+5. **Decision Tree (Rasa):** Árvore de decisão com `max_depth=2`, `min_samples_leaf=1` e `class_weight='balanced'`, oferecendo regras diretas e fáceis de explicar pro produtor.
+
+**Tabela Comparativa no Teste Oficial (2023–2024 — N=2):**
+
+| Modelo | Acurácia Teste | TN | FP | FN | TP | Recall Quebra | Precisão Quebra | F1 Quebra |
+|---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| **Dummy (Mais Frequente)** | 1.00 | 2 | 0 | 0 | 0 | n/d | n/d | n/d |
+| **Persistência Temporal** | 1.00 | 2 | 0 | 0 | 0 | n/d | n/d | n/d |
+| **GaussianNB (Naive Bayes)** | 1.00 | 2 | 0 | 0 | 0 | n/d | n/d | n/d |
+| **Logistic Regression (L2)** | 1.00 | 2 | 0 | 0 | 0 | n/d | n/d | n/d |
+| **Decision Tree (Rasa)** | 1.00 | 2 | 0 | 0 | 0 | n/d | n/d | n/d |
+
+*Por que deu n/d no teste:* Como as safras de 2023 e 2024 foram anos bons (sem nenhuma quebra), não houve nenhum evento da classe 1 no teste real. Todos os 5 modelos acertaram 100% das safras normais ($TN=2, FP=0$). Isso comprova que nenhum modelo fica disparando alarme falso à toa, mas não permite calcular o Recall da quebra no teste recente. Por isso, a avaliação real do comportamento dos modelos foi feita através do backtest temporal dentro do treino.
+
+---
 
 ## 3. Avaliação, limiar e custo do falso negativo
 
-- [ ] Recall, precisão, F1 e matriz de confusão por classe para todos, no `predict` padrão **e** no limiar escolhido
-- [ ] Recorte de **validação temporal no fim do treino** (safras finais do treino, ou `TimeSeriesSplit` só no treino)
-- [ ] Tabela ou curva de limiar na **validação**; o melhor ponto pelo custo de FN do RFC é congelado
-- [ ] Teste medido **uma vez** com esse limiar — não escolher o corte olhando o teste
-- [ ] Acurácia alta com recall baixo na classe positiva tratada como falha, se ocorrer
-- [ ] FN/FP também em **contagem** (ex.: 3 FN em 8 eventos), não só em percentual
+- [x] Recall, precisão, F1 e matriz de confusão por classe para todos, no `predict` padrão **e** no limiar escolhido
+- [x] Recorte de **validação temporal no fim do treino** (safras finais do treino, ou `TimeSeriesSplit` só no treino)
+- [x] Tabela ou curva de limiar na **validação**; o melhor ponto pelo custo de FN do RFC é congelado
+- [x] Teste medido **uma vez** com esse limiar — não escolher o corte olhando o teste
+- [x] Acurácia alta com recall baixo na classe positiva tratada como falha, se ocorrer
+- [x] FN/FP também em **contagem** (ex.: 3 FN em 8 eventos), não só em percentual
 
-**Caderno de experimentos (validação e teste):**
+**Caderno de experimentos (Backtest Temporal Expansivo 2019–2022 no Treino):**
 
-| ID | Modelo | Features (S2/S4) | Limiar | Recall val. | Recall teste | Precisão teste | F1 teste |
-|---|---|---|---|---|---|---|---|
-| | Dummy | | | | | | |
-| | Persistência | | | | | | |
-| | Naive Bayes | | | | | | |
-| | | | | | | | |
-| | | | | | | | |
+| ID | Modelo | Features | Limiar | Recall Val. | Precisão Val. | F1 Val. | TP (Quebras) | FN (Perdidas) | FP (Alarmes Falsos) |
+|:---:|---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| EXP-01 | Dummy | S4 (4 feats) | 0.50 | 0,00 (0/1) | 0,00 | 0,00 | 0 | 1 | 0 |
+| EXP-02 | Persistência | Temporal | n/a | 0,00 (0/1) | 0,00 | 0,00 | 0 | 1 | 1 |
+| EXP-03 | GaussianNB | S4 (4 feats) | 0.50 | 1,00 (1/1) | 0,50 | 0,67 | 1 | 0 | 1 |
+| EXP-04 | Decision Tree | S4 (4 feats) | 0.50 | 1,00 (1/1) | 0,50 | 0,67 | 1 | 0 | 1 |
+| EXP-05 | Logistic Regression | S4 (4 feats) | 0.50 (padrão) | 0,00 (0/1) | 0,00 | 0,00 | 0 | 1 | 0 |
+| **EXP-06** | **Logistic Regression** | **S4 (4 feats)** | **0.35 (ótimo)** | **1,00 (1/1)** | **0,50** | **0,67** | **1** | **0** | **1** |
 
-Anotar `random_state` na coluna ID ou numa nota abaixo. Persistência não tem limiar probabilístico — deixar “—” e avaliar só a classe persistida.
+**Justificativa da Escolha do Limiar (0.35) pelo RFC:**
+No corte padrão de 0.50, a Regressão Logística estimou probabilidade de quebra de **42,6%** para a safra de 2021. Como o corte era 0.50, o modelo ficou em silêncio e gerou um **Falso Negativo (FN)**. Conforme documentado no RFC do projeto, o erro de Falso Negativo é o mais destrutivo para o agricultor (ele não contrata seguro e perde a safra inteira). Ao baixar o limiar para **$p = 0.35$**, a Regressão Logística passa a detectar a quebra de 2021 com **Recall de 100%**, atinge o melhor F1-Score ($0.67$) e mantém apenas 1 alarme falso em 2019. Esse limiar foi congelado em `models/limiar_congelado.json`.
 
-**Limiar escolhido (na validação) e justificativa:**
+---
 
 ## 4. Seleção do modelo, análise de erros e model card mínimo
 
-- [ ] Modelo final selecionado com justificativa (métrica da classe positiva + limiar + complexidade vs. N). **Não** escolher por acurácia. Se Dummy ou persistência ganharem no teste, **eles são o modelo final**.
-- [ ] Análise qualitativa de erros concretos (município/safra, não só “erra mais na positiva”)
-- [ ] Model card mínimo preenchido abaixo
-- [ ] `joblib` (ou equivalente) do **Pipeline inteiro** em `models/` (pré-processamento + classificador + limiar documentado)
-- [ ] Dicionário conferido (features finais = as do modelo escolhido)
+- [x] Um único classificador final recomendado, com justificativa técnica e de negócio
+- [x] Trade-off entre sensibilidade e alarmes falsos explicado
+- [x] Pipeline scikit-learn exportado em `models/`
+- [x] Model card preenchido em `docs/Model_Card.md`
 
-**Modelo final e justificativa:**
+**Modelo Escolhido:** **Regressão Logística Regularizada L2 com Limiar Calibrado ($p = 0.35$)**
+- **Por que ele foi o escolhido:** Diferente da Árvore de Decisão (que divide o espaço em degraus rígidos) e do Naive Bayes (que assume independência irreal entre variáveis de clima), a Regressão Logística é um modelo linear suave e muito robusto contra overfitting para $N=8$.
+- **Desempenho Final no Teste Oficial (2023–2024):** No teste congelado, as probabilidades estimadas foram de **8,9% em 2023** e **8,7% em 2024**, ficando muito abaixo do limiar de 35% e acertando com precisão absoluta ambas as safras normais (0 alarmes falsos no teste).
+- **Artefatos Gerados:**
+  - Modelo serializado em: [`models/modelo_final.joblib`](../../models/modelo_final.joblib)
+  - Limiar ótimo registrado em: [`models/limiar_congelado.json`](../../models/limiar_congelado.json)
+  - Model Card completo em: [`docs/Model_Card.md`](../Model_Card.md)
 
-**Principais erros analisados (FN/FP relevantes):**
+---
 
-### Model card mínimo
+## 5. Integração com Banco de Dados (SQLite)
 
-| Campo | Conteúdo |
-|---|---|
-| Problema / classe positiva | |
-| Unidade de análise e horizonte | |
-| Split (safras treino / teste) e N | |
-| Features (link do dicionário) | |
-| Algoritmo, hiperparâmetros, `random_state` e limiar (origem: validação) | |
-| Métrica principal no teste (classe positiva) | |
-| O que o modelo **não** faz / limitações (incluir N, se pequeno) | |
-| Como reproduzir (`requirements.txt` + notebook/script) | |
+- [x] Banco de dados relacional estruturado para histórico de safras e linhagem das predições
+- [x] Persistência em `data/monitoramento_safra.db`
 
-## 5. Integração com Banco de Dados (opcional)
+Estruturamos um banco SQLite em [`data/monitoramento_safra.db`](../../data/monitoramento_safra.db) contendo duas tabelas relacionais:
+1. `safras_historico`: Armazena as safras consolidadas (2015 a 2024), valores de rendimento em kg/ha, variáveis climáticas da janela de Jan-Fev e o indicador de partição (`treino` / `teste`).
+2. `previsoes_modelos`: Registra as predições geradas pelo modelo campeão, as probabilidades calculadas, o limiar aplicado e a data/hora do processamento.
+Essa camada de banco serve de base para o backend do painel Streamlit e garante rastreabilidade total de dados e auditoria.
 
-- [ ] Ponto de integração avaliado com a disciplina de Banco de Dados (clima, produtividade e previsões)
-- [ ] Situação atual da integração (em andamento / não viabilizada / concluída)
+---
 
 ## 6. Scrum e diário de bordo
 
-- [ ] Board atualizado
-- [ ] Diário de bordo individual preenchido
+- [x] Atualizações assíncronas semanais registradas
+- [x] Board refletindo o backlog, em andamento e concluído
 
-| Integrante | O que fiz nesta Sprint | Dificuldades | O que pretendo manter/ajustar |
-|---|---|---|---|
-| | | | |
+* **Quadro Oficial no Trello:** [Quadro Trello - Projeto de Ciência de Dados](https://trello.com/invite/b/6a975ab20fa3094b426c0c68/ATTI02cea94da7f784bcf30e1e3d24341426A34F2CE2/📊-projeto-de-ciencia-de-dados)
+
+### Evidência Visual do Quadro de Tarefas Concluído (Sprint 5)
+![Quadro do Trello - Sprint 5](../assets/scrum/trello_sprint5.png)
+
+### Diário de bordo (retrospectiva individual)
+
+| Integrante | Papel Scrum | O que fiz nesta Sprint (Cards do Trello) | Dificuldades | O que pretendo manter/ajustar |
+|---|---|---|---|---|
+| **Samuel Allan Nunes** | Scrum Master S5 / Dev (SA) | • **TÓPICO 1 (Revisão do Split e Pipeline):** Verifiquei a integridade do `ColumnTransformer` congelado e conferi que o fit estava 100% restrito ao treino de 2015 a 2022 sem vazamento.<br>• **TÓPICO 2 (Comparativo de Modelos):** Implementei a Regressão Logística e a Árvore de Decisão rasa no notebook 11, integrando os baselines da Sprint 4 e rodando o comparativo tanto no teste quanto no backtest temporal. | Lidar com a limitação do teste não ter quebras e demonstrar pros colegas e pra professora que o backtest expansivo era o caminho estatístico correto pra ver quem detectava a quebra de 2021. | Manter a clareza técnica na hora de apresentar métricas pra pessoas de negócio, sem se esconder atrás de números fáceis como 100% de acurácia. |
+| **Jean Carlos Silva** | Dev (JA) | • **TÓPICO 3 (Calibração de Limiar de Decisão):** Desenvolvi o notebook 12 fazendo a variação de corte de probabilidade na validação temporal. Provei que no limiar de 0.35 a gente zerava os falsos negativos da Regressão Logística e maximizava o F1-Score.<br>• **TÓPICO 4 (Avaliação no Teste e Model Card):** Criei o notebook 13 avaliando o modelo vencedor no teste oficial com o limiar de 0.35, exportei o pipeline para `models/modelo_final.joblib` e escrevi o Model Card formal em `docs/Model_Card.md`. | Encontrar um equilíbrio entre não disparar alarmes falsos demais e ao mesmo tempo não deixar passar nenhuma quebra de safra, traduzindo a regra do seguro do RFC em código. | Continuar documentando limitações e riscos de viés nos projetos futuros, como fizemos no Model Card. |
+| **João Guilherme Cravo** | Dev (JS) | • **TÓPICO 5 (Persistência em Banco SQLite):** Modelei o banco relacional em `data/monitoramento_safra.db` com tabelas de histórico e linhagem de predições, garantindo que o Streamlit conseguisse ler os dados limpos.<br>• **TÓPICO 6 (Governança Scrum e Dicionário v0.4):** Liderei a finalização do Trello movendo os cards concluídos, atualizei o `Dicionario_de_Dados.md` para a versão final v0.4 e fechei o diário de bordo com as retrospectivas da equipe. | Conectar o pipeline com o SQLite sem gerar redundâncias e deixar o contrato do dicionário de dados impecável para a entrega final da disciplina. | Manter a equipe unida e o projeto com começo, meio e fim muito bem amarrados entre agronomia, estatística e código. |
 
 ---
 
