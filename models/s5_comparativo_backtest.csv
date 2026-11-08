@@ -1,0 +1,6 @@
+Modelo,Recall Quebra (C1),Precisão Quebra (C1),F1 Quebra (C1),TP (Quebra detectada),FN (Quebra perdida),FP (Alarme falso),TN (Normal acertada)
+Dummy (Mais Frequente),0.00,0.00,0.00,0,1,0,3
+GaussianNB (Naive Bayes),1.00,0.50,0.67,1,0,1,2
+Logistic Regression (L2),0.00,0.00,0.00,0,1,0,3
+Decision Tree (Rasa),1.00,0.50,0.67,1,0,1,2
+Persistência Temporal,0.00,0.00,0.00,0,1,1,2
