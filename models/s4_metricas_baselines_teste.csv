@@ -1,0 +1,4 @@
+modelo,N,TN,FP,FN,TP,suporte_Normal,suporte_Quebra,precisao_Normal,recall_Normal,f1_Normal,precisao_Quebra,recall_Quebra,f1_Quebra,acuracia
+DummyClassifier,2,2,0,0,0,2,0,1.0,1.0,1.0,,,,1.0
+Persistência,2,2,0,0,0,2,0,1.0,1.0,1.0,,,,1.0
+GaussianNB,2,2,0,0,0,2,0,1.0,1.0,1.0,,,,1.0
