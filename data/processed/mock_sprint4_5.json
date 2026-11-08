@@ -1,0 +1,318 @@
+{
+  "project_metadata": {
+    "municipio": "Sorriso - MT",
+    "codigo_ibge": "5107925",
+    "cultura": "Soja em Grão",
+    "media_historica_kg_ha": 3477.0,
+    "limiar_quebra_kg_ha": 3400.0,
+    "amostra_total_anos": 10,
+    "periodo_treino": "2015-2022 (8 safras)",
+    "periodo_teste": "2023-2024 (2 safras)",
+    "split_tipo": "Temporal estrito (sem vazamento)",
+    "is_mock": true,
+    "mock_note": "[MOCK SPRINT 4/5: Calibrado com dados agroclimáticos reais de Sorriso-MT. Pronto para substituição automática ao executar os cadernos finais de modelagem.]"
+  },
+  "historico_safras": [
+    {
+      "ano": 2015,
+      "split": "treino",
+      "deficit_hidrico_solo": 47,
+      "dias_pico_calor": 0,
+      "amplitude_termica": 24.48,
+      "precipitacao_enchimento": 159.28,
+      "rendimento_kg_ha_real": 3148,
+      "quebra_safra_real": 1,
+      "diagnostico": "Seca severa contínua no solo durante janeiro e fevereiro. Quebra clássica."
+    },
+    {
+      "ano": 2016,
+      "split": "treino",
+      "deficit_hidrico_solo": 28,
+      "dias_pico_calor": 4,
+      "amplitude_termica": 23.79,
+      "precipitacao_enchimento": 257.40,
+      "rendimento_kg_ha_real": 2880,
+      "quebra_safra_real": 1,
+      "diagnostico": "Forte onda de calor (4 dias >35°C) combinada com déficit hídrico prolongado."
+    },
+    {
+      "ano": 2017,
+      "split": "treino",
+      "deficit_hidrico_solo": 0,
+      "dias_pico_calor": 0,
+      "amplitude_termica": 27.62,
+      "precipitacao_enchimento": 425.38,
+      "rendimento_kg_ha_real": 3520,
+      "quebra_safra_real": 0,
+      "diagnostico": "Chuva regular e solo úmido em todo o enchimento. Safra plena."
+    },
+    {
+      "ano": 2018,
+      "split": "treino",
+      "deficit_hidrico_solo": 0,
+      "dias_pico_calor": 0,
+      "amplitude_termica": 26.29,
+      "precipitacao_enchimento": 724.46,
+      "rendimento_kg_ha_real": 3870,
+      "quebra_safra_real": 0,
+      "diagnostico": "Volume hídrico excepcional (724 mm em Jan-Fev). Recorde de produtividade."
+    },
+    {
+      "ano": 2019,
+      "split": "treino",
+      "deficit_hidrico_solo": 15,
+      "dias_pico_calor": 0,
+      "amplitude_termica": 25.44,
+      "precipitacao_enchimento": 382.11,
+      "rendimento_kg_ha_real": 3480,
+      "quebra_safra_real": 0,
+      "diagnostico": "Veranico intermediário (15 dias de déficit), mas chuva distribuída evitou quebra."
+    },
+    {
+      "ano": 2020,
+      "split": "treino",
+      "deficit_hidrico_solo": 15,
+      "dias_pico_calor": 0,
+      "amplitude_termica": 27.58,
+      "precipitacao_enchimento": 299.01,
+      "rendimento_kg_ha_real": 3490,
+      "quebra_safra_real": 0,
+      "diagnostico": "Condição limítrofe no limite inferior de segurança hídrica, sem calor extremo."
+    },
+    {
+      "ano": 2021,
+      "split": "treino (validação)",
+      "deficit_hidrico_solo": 42,
+      "dias_pico_calor": 3,
+      "amplitude_termica": 28.69,
+      "precipitacao_enchimento": 418.57,
+      "rendimento_kg_ha_real": 3360,
+      "quebra_safra_real": 1,
+      "diagnostico": "A Armadilha de 2021: 1.634mm no ano, mas Jan-Fev teve 42 dias de seca na raiz e 3 dias de calor extremo!"
+    },
+    {
+      "ano": 2022,
+      "split": "treino (validação)",
+      "deficit_hidrico_solo": 0,
+      "dias_pico_calor": 0,
+      "amplitude_termica": 30.48,
+      "precipitacao_enchimento": 463.11,
+      "rendimento_kg_ha_real": 3610,
+      "quebra_safra_real": 0,
+      "diagnostico": "Ano de excelente distribuição pluviométrica. Produtividade alta."
+    },
+    {
+      "ano": 2023,
+      "split": "teste",
+      "deficit_hidrico_solo": 0,
+      "dias_pico_calor": 0,
+      "amplitude_termica": 27.11,
+      "precipitacao_enchimento": 476.27,
+      "rendimento_kg_ha_real": 3580,
+      "quebra_safra_real": 0,
+      "diagnostico": "Safra normal no conjunto de teste cego. Nenhum estresse hídrico crítico."
+    },
+    {
+      "ano": 2024,
+      "split": "teste",
+      "deficit_hidrico_solo": 4,
+      "dias_pico_calor": 0,
+      "amplitude_termica": 27.50,
+      "precipitacao_enchimento": 556.25,
+      "rendimento_kg_ha_real": 3560,
+      "quebra_safra_real": 0,
+      "diagnostico": "Chuva abundante e solo estável. Safra normal no teste temporal cego."
+    }
+  ],
+  "tabela_lift_s3_s4": [
+    {
+      "modelo": "DummyClassifier",
+      "recall_s3": 0.0,
+      "recall_s4": 0.0,
+      "f1_s3": 0.0,
+      "f1_s4": 0.0,
+      "delta_recall": 0.0,
+      "observacao": "Piso de acurácia da classe majoritária; cego a quebras de safra."
+    },
+    {
+      "modelo": "Persistência",
+      "recall_s3": 0.0,
+      "recall_s4": 0.0,
+      "f1_s3": 0.0,
+      "f1_s4": 0.0,
+      "delta_recall": 0.0,
+      "observacao": "Não antecipa mudanças bruscas climáticas entre safras consecutivas."
+    },
+    {
+      "modelo": "GaussianNB",
+      "recall_s3": 0.67,
+      "recall_s4": 1.0,
+      "f1_s3": 0.57,
+      "f1_s4": 0.86,
+      "delta_recall": 0.33,
+      "observacao": "Com as variáveis de Jan-Fev, passa a capturar a quebra de 2021 (eliminou o Falso Negativo crítico)."
+    }
+  ],
+  "modelos_sprint5": {
+    "DummyClassifier": {
+      "nome": "Dummy (Classe Majoritária)",
+      "familia": "Baseline Ingênuo",
+      "tipo": "baseline",
+      "recall_classe_1": 0.0,
+      "precisao_classe_1": 0.0,
+      "f1_classe_1": 0.0,
+      "acuracia_teste": 1.0,
+      "fn_teste": 0,
+      "fp_teste": 0,
+      "fn_treino": 3,
+      "fp_treino": 0,
+      "matriz_teste": [[2, 0], [0, 0]],
+      "tempo_treino_ms": 0.45,
+      "tempo_predicao_ms": 0.04,
+      "risco_overfitting": "Nulo",
+      "interpretabilidade": "Nula",
+      "hiperparametros": "strategy='most_frequent'"
+    },
+    "Persistencia": {
+      "nome": "Persistência Temporal (yt-1)",
+      "familia": "Baseline Temporal",
+      "tipo": "baseline",
+      "recall_classe_1": 0.0,
+      "precisao_classe_1": 0.0,
+      "f1_classe_1": 0.0,
+      "acuracia_teste": 1.0,
+      "fn_teste": 0,
+      "fp_teste": 0,
+      "fn_treino": 2,
+      "fp_treino": 2,
+      "matriz_teste": [[2, 0], [0, 0]],
+      "tempo_treino_ms": 0.1,
+      "tempo_predicao_ms": 0.01,
+      "risco_overfitting": "Nulo",
+      "interpretabilidade": "Trivial",
+      "hiperparametros": "lag=1 safra"
+    },
+    "GaussianNB": {
+      "nome": "Gaussian Naive Bayes",
+      "familia": "Probabilístico Bayesiano",
+      "tipo": "baseline_estatistico",
+      "recall_classe_1": 1.0,
+      "precisao_classe_1": 0.75,
+      "f1_classe_1": 0.86,
+      "acuracia_teste": 1.0,
+      "fn_teste": 0,
+      "fp_teste": 0,
+      "fn_treino": 0,
+      "fp_treino": 1,
+      "matriz_teste": [[2, 0], [0, 0]],
+      "tempo_treino_ms": 1.15,
+      "tempo_predicao_ms": 0.08,
+      "risco_overfitting": "Baixo",
+      "interpretabilidade": "Média (probabilidades sob independência condicional)",
+      "hiperparametros": "var_smoothing=1e-9"
+    },
+    "DecisionTreeClassifier": {
+      "nome": "Árvore de Decisão Parcimoniosa",
+      "familia": "Árvore Individual (Particionamento Binário)",
+      "tipo": "modelo_destaque",
+      "recall_classe_1": 1.0,
+      "precisao_classe_1": 1.0,
+      "f1_classe_1": 1.0,
+      "acuracia_teste": 1.0,
+      "fn_teste": 0,
+      "fp_teste": 0,
+      "fn_treino": 0,
+      "fp_treino": 0,
+      "matriz_teste": [[2, 0], [0, 0]],
+      "tempo_treino_ms": 1.42,
+      "tempo_predicao_ms": 0.12,
+      "risco_overfitting": "Médio (controlado com max_depth=3 e min_samples_leaf=2)",
+      "interpretabilidade": "Máxima (regras lógicas diretas if/else auditáveis)",
+      "hiperparametros": "criterion='gini', max_depth=3, min_samples_leaf=2, class_weight='balanced', random_state=42, threshold=0.50",
+      "regras_decisao": [
+        "1. Se deficit_hidrico_solo > 20.0 dias: avança para Nó 2; senão prediz NORMAL (Risco Baixo, prob < 0.10).",
+        "2. Se dias_pico_calor >= 2.5 dias OU deficit_hidrico_solo >= 35.0 dias: prediz ALERTA DE QUEBRA (Risco Alto, prob 0.95)."
+      ]
+    },
+    "RandomForestClassifier": {
+      "nome": "Random Forest (Bagging)",
+      "familia": "Ensemble Bagging (Votação Paralela)",
+      "tipo": "ensemble_bagging",
+      "recall_classe_1": 1.0,
+      "precisao_classe_1": 0.85,
+      "f1_classe_1": 0.92,
+      "acuracia_teste": 1.0,
+      "fn_teste": 0,
+      "fp_teste": 0,
+      "fn_treino": 0,
+      "fp_treino": 1,
+      "matriz_teste": [[2, 0], [0, 0]],
+      "tempo_treino_ms": 22.8,
+      "tempo_predicao_ms": 2.15,
+      "risco_overfitting": "Baixo (agregação bootstrap reduz variância)",
+      "interpretabilidade": "Média (votação de 50 árvores via Feature Importance)",
+      "hiperparametros": "n_estimators=50, max_depth=2, min_samples_leaf=2, class_weight='balanced', random_state=42"
+    },
+    "XGBClassifier": {
+      "nome": "XGBoost (Gradient Boosting)",
+      "familia": "Ensemble Boosting (Correção Sequencial de Resíduos)",
+      "tipo": "ensemble_boosting",
+      "recall_classe_1": 1.0,
+      "precisao_classe_1": 0.82,
+      "f1_classe_1": 0.90,
+      "acuracia_teste": 1.0,
+      "fn_teste": 0,
+      "fp_teste": 0,
+      "fn_treino": 0,
+      "fp_treino": 1,
+      "matriz_teste": [[2, 0], [0, 0]],
+      "tempo_treino_ms": 18.4,
+      "tempo_predicao_ms": 1.85,
+      "risco_overfitting": "Alto em N pequeno (requer regularização L1/L2 e early stopping)",
+      "interpretabilidade": "Baixa (soma ponderada de resíduos)",
+      "hiperparametros": "n_estimators=30, max_depth=2, learning_rate=0.08, reg_lambda=1.5, scale_pos_weight=2.33, random_state=42"
+    }
+  },
+  "feature_importance": [
+    {
+      "feature": "deficit_hidrico_solo",
+      "descricao": "Dias em Jan-Fev com umidade da raiz GWETROOT < 0.70",
+      "peso": 0.54,
+      "correlacao_alvo": 0.9027
+    },
+    {
+      "feature": "dias_pico_calor",
+      "descricao": "Dias em Jan-Fev com temperatura máxima T2M_MAX >= 35.0°C",
+      "peso": 0.24,
+      "correlacao_alvo": 0.7354
+    },
+    {
+      "feature": "precipitacao_enchimento",
+      "descricao": "Precipitação pluviométrica acumulada em Jan-Fev (mm)",
+      "peso": 0.14,
+      "correlacao_alvo": -0.5545
+    },
+    {
+      "feature": "amplitude_termica",
+      "descricao": "Variação térmica média diária (T2M_MAX - T2M_MIN) (°C)",
+      "peso": 0.08,
+      "correlacao_alvo": 0.4120
+    }
+  ],
+  "melhor_modelo_destaque": {
+    "modelo_escolhido": "DecisionTreeClassifier",
+    "titulo": "Árvore de Decisão Parcimoniosa (Vencedora Técnica)",
+    "quatro_topicos_obrigatorios": {
+      "topico_1_por_que_superou": "Alcançou Recall de 100% nas safras de quebra sem nenhum Falso Negativo (o erro mais destrutivo para o agricultor e seguradora). Em uma base consolidada com N=8 no treino e N=2 no teste, arquiteturas hipercomplexas como Random Forest e XGBoost sofrem com variância de amostragem bootstrap e calibragem de gradiente em poucas linhas, enquanto a árvore simples capturou com precisão cirúrgica os dois nós físicos determinantes (déficit hídrico no solo e pico térmico em Jan-Fev), além de rodar em menos de 0.15ms.",
+      "topico_2_como_funciona_simples": "A Árvore de Decisão funciona como um fluxograma lógico direto: diante de uma nova safra, ela pergunta primeiro se o solo ficou em déficit por mais de 20 dias no bimestre de enchimento. Se não ficou, classifica imediatamente como Safra Normal. Se o solo sofreu seca, ela avalia se houve ocorrência de calor extremo (>= 3 dias acima de 35°C) ou se o déficit ultrapassou 35 dias. Havendo confirmação, aciona o Alerta de Quebra de Safra.",
+      "topico_3_hiperparametros_e_efeitos": {
+        "max_depth_3": "Limita a árvore a no máximo 3 níveis de profundidade, impedindo que ramos isolados memorizem ruídos de medição.",
+        "min_samples_leaf_2": "Exige que cada nó folha contenha ao menos 2 safras históricas, garantindo relevância estatística às regras.",
+        "class_weight_balanced": "Penaliza mais severamente erros na classe minoritária de quebra (30% dos dados), priorizando o Recall.",
+        "criterion_gini": "Mede a impureza das divisões priorizando separações puras com rapidez computacional.",
+        "limiar_decisao_0_50": "Ponto de corte ótimo fixado na validação temporal dentro do treino."
+      },
+      "topico_4_onde_ainda_erra": "Apresenta sensibilidade em safras limítrofes como 2019 e 2020, nas quais ocorreram 15 dias de déficit hídrico moderado. Embora a safra final tenha se mantido ligeiramente acima do limiar (3.480 e 3.490 kg/ha), a probabilidade predita pela árvore oscila em torno de 42% a 48%. Se o limiar fosse rebaixado para 0.40, ocorreria um Falso Positivo (alarme falso), gerando custo de seguro desnecessário."
+    }
+  }
+}

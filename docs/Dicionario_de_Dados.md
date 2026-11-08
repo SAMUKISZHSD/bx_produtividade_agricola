@@ -3,13 +3,14 @@
 **Projeto:** Previsao de Risco de Baixa Produtividade Agricola (Soja)  
 **Trilha:** C - Risco de baixa produtividade agricola  
 **Equipe:** Grupo 3 (Joao Guilherme Cravo, Jean Carlos Silva de Almeida, Samuel Allan Nunes da Cunha)  
-**Ultima atualizacao:** 21/09/2026  
-**Versao:** v0.1 (Sprint 1)  
+**Ultima atualizacao:** 31/10/2026  
+**Versao:** v0.3 (Sprint 4)  
 
-* **Unidade de analise:** 1 ano-safra de soja para o municipio de Sorriso-MT.
-* **N apos o merge (bruto):** 11 safras (2015 a 2025 integradas em data/raw/integrado.csv).
-* **N apos a limpeza (data/interim/limpo.csv):** 10 safras consolidadas (2015 a 2024, safra 2025 descartada por estimativas estaticas nao consolidadas).
-* **Split Temporal:** Treino: safras 2015 a 2022 (8 safras) | Teste: safras 2023 a 2024 (2 safras).
+* **Unidade de analise:** 1 ano-safra de soja para o municipio de Sorriso-MT (Codigo IBGE 5107925).
+* **N apos o merge (bruto):** 11 safras (2015 a 2025 integradas em `data/raw/integrado.csv`).
+* **N apos a limpeza (`data/interim/limpo.csv`):** 10 safras consolidadas (2015 a 2024, safra 2025 descartada por estimativas estaticas nao consolidadas).
+* **Split Temporal Congelado:** Treino: safras 2015 a 2022 (8 safras) | Teste: safras 2023 a 2024 (2 safras).
+* **Dataset Processado Final (Sprint 4):** `data/processed/dados_modelo.csv` gerado com features selecionadas e validadas sem vazamento temporal.
 
 ---
 
@@ -28,49 +29,52 @@
 |---|---|---|---|---|---|
 | `ano` | IBGE / NASA | Numerica discreta | Ano civil | Ano da safra correspondente | Chave de juncao temporal (merge) |
 | `area_plantada_ha` | IBGE PAM (109) | Numerica continua | Hectares (ha) | Area destinada ao cultivo de soja | Excluida das features (anti-vazamento) |
-| `area_colhida_ha` | IBGE PAM (216) | Numerica continua | Hectares (ha) | Area que foi efetivamente colhida | Excluida das features (anti-vazamento) |
-| `quantidade_produzida_t` | IBGE PAM (214) | Numerica continua | Toneladas (t) | Volume colhido total | Excluida das features (anti-vazamento) |
-| `rendimento_kg_ha` | IBGE PAM (112) | Numerica continua | kg/hectare | Produtividade media obtida no ciclo | Variavel-alvo: rotulagem da quebra |
-| `PRECTOTCORR` | NASA POWER | Numerica continua | mm/dia | Precipitacao pluviometrica diaria | Feature preditora: balanco hidrico |
-| `T2M` | NASA POWER | Numerica continua | graus C | Temperatura media diaria do ar | Feature preditora: acumulo termico |
-| `T2M_MAX` | NASA POWER | Numerica continua | graus C | Temperatura maxima diaria | Feature preditora: estresse termico |
-| `T2M_MIN` | NASA POWER | Numerica continua | graus C | Temperatura minima diaria | Feature preditora: frio limitante |
-| `RH2M` | NASA POWER | Numerica continua | percentual | Umidade relativa do ar a 2 metros | Feature preditora: deficit de vapor |
-| `GWETROOT` | NASA POWER | Numerica continua | 0 a 1 | Umidade do solo na zona das raizes | Feature preditora: seca no solo |
+| `area_colhida_ha` | IBGE PAM (216) | Numerica continua | Hectares (ha) | Area efetivamente colhida | Excluida das features (anti-vazamento) |
+| `quantidade_produzida_t` | IBGE PAM (214) | Numerica continua | Toneladas (t) | Producao total municipal | Excluida das features (anti-vazamento) |
+| `rendimento_kg_ha` | IBGE PAM (112) | Numerica continua | kg/ha | Produtividade media | Variavel geradora do alvo (`quebra_safra`) |
+| `T2M` | NASA POWER | Numerica continua | °C | Temperatura media a 2 metros | Usada na Sprint 2 / Descartada na Sprint 4 por redundancia |
+| `T2M_MAX` | NASA POWER | Numerica continua | °C | Temperatura maxima diaria | Base para calculo de amplitude termica |
+| `T2M_MIN` | NASA POWER | Numerica continua | °C | Temperatura minima diaria | Base para calculo de amplitude termica |
+| `PRECTOTCORR` | NASA POWER | Numerica continua | mm/dia | Precipitacao diaria corrigida | Base para acumulados pluviais |
+| `RH2M` | NASA POWER | Numerica continua | % | Umidade relativa do ar a 2 metros | Feature climatica agregada |
+| `GWETROOT` | NASA POWER | Numerica continua | Fracao (0 a 1) | Umidade do solo na zona radicular | Base para identificacao de deficit hidrico |
 
 ---
 
 ## 2.1 Log de limpeza e tratamento (Sprint 2, antes da EDA)
 
-data/raw/ permanece preservado. O arquivo de integracao inicial e data/raw/integrado.csv.
-
-| Problema identificado | Regra aplicada | Celulas afetadas | N depois | Observacoes |
-|---|---|---|---|---|
-| Sentinela -999.0 da NASA POWER | Substituido por valor nulo (pd.NA) antes da agregacao | Registros pontuais | 10 safras | Conforme especificacao tecnica da API |
-| Safra 2025 do IBGE nao consolidada | Filtragem por ano <= 2024 em data/interim/limpo.csv | 1 ano (2025) | 10 safras | Retencao do intervalo completo consolidado 2015 a 2024 |
+* **Sentinelas (-999.0):** Nao identificados nas coordenadas municipais de Sorriso-MT.
+* **Valores nulos (NA):** Verificados e confirmados como zero em todas as colunas de 2015 a 2024 (`notebooks/03_tratamento_estatistico_residual.ipynb`).
+* **Ano 2025:** Removido do dataset operacional (`data/interim/limpo.csv`) por conter rendimento preliminar identico e estatico.
 
 ---
 
 ## 3. Variavel-alvo
 
-| Campo | Descricao |
-|---|---|
-| **Nome da coluna** | quebra_safra |
-| **Definicao da classe positiva** | 1 = Quebra de safra (baixa produtividade crítica). 0 = Safra normal ou superior. |
-| **Limiar adotado e justificativa** | Rendimento estritamente inferior a 3.400 kg/ha. A media historica observada entre 2015 e 2024 em Sorriso-MT e de aproximadamente 3.477 kg/ha (desvio padrao ~293 kg/ha). O limiar segrega como quebra (classe positiva = 1) safras com perdas decorrentes de estresses agroclimaticos (2015 com 3.148 kg/ha, 2016 com 2.880 kg/ha e 2021 com 3.360 kg/ha) e safras com rendimentos superiores (3.480 a 3.870 kg/ha) como classe negativa (0). |
-| **Variavel de origem** | Coluna rendimento_kg_ha da tabela 1612 do IBGE PAM. |
-| **Horizonte de previsao** | De 2 a 3 meses antes da colheita (durante o enchimento de graos). |
-| **Distribuicao no dado consolidado** | 3 safras com quebra (30%) contra 7 safras de produtividade normal ou superior (70%) no intervalo 2015 a 2024. |
+| Nome da coluna | Formula / Regra | Tipo | Descricao | Racional Tecnico e Agronomico |
+|---|---|---|---|---|
+| `quebra_safra` | `1 se rendimento_kg_ha < 3400 senao 0` | Binaria (0 ou 1) | Indicador de quebra severa de safra | Calibrado no RFC v0.3 com base na media historica de Sorriso-MT (~3.550 kg/ha). Treino: 3 quebras (2015, 2016, 2021) e 5 safras normais. Teste: 0 quebras (2023, 2024 normais). |
 
 ---
 
-## 4. Atributos derivados (Sprints 2 e 4 - data/interim/04_dados_com_features.csv)
+## 4. Atributos derivados de Engenharia de Features
 
-| Nome da coluna | Formula / Metodo | Tipo | Descricao | Razoabilidade Agronomica |
-|---|---|---|---|---|
-| `amplitude_termica` | `T2M_MAX - T2M_MIN` | Numerica continua (°C) | Amplitude termica media diária ao longo do ciclo | Grandes variacoes diarias elevam estresse osmotico e fisiologico na soja. |
-| `precipitacao_por_temperatura` | `PRECTOTCORR / (T2M + 0.001)` | Numerica continua (mm/°C) | Indice de balanço de agua frente a evapotranspiracao | Quantifica a eficiencia da umidade sob regime de calor no Cerrado. |
-| `GWET_x_PREC` | `GWETROOT * PRECTOTCORR` | Numerica continua | Interacao umidade do solo x volume precipitado | Identifica anos de precipitacao efetiva retida na zona radicular da cultura. |
+### 4.1 Features Criadas na Sprint 4 (Focadas nos Erros da S3 e Janela Critica Jan-Fev)
+
+| Nome da coluna | Formula / Metodo | Tipo | Descricao | Justificativa Agronomica e Erro Atacado | Status na Selecao Final S4 |
+|---|---|---|---|---|---|
+| `deficit_hidrico_solo` | Contagem de dias em Jan-Fev com `GWETROOT < 0.70` | Numerica discreta (dias) | Dias sob deficit hidrico no solo durante floracao e enchimento de graos | Ataca o Falso Negativo de 2021 (onde choveu no ano mas faltou agua na raiz em Jan-Fev por 42 dias). $r = +0.9027$ com quebra. | **Selecionada (Ativa no Pipeline Congelado)** |
+| `dias_pico_calor` | Contagem de dias em Jan-Fev com `T2M_MAX >= 35.0 °C` | Numerica discreta (dias) | Dias com temperatura extrema na floracao | Calor excessivo causa abortamento floral e chochamento de vagens. $r = +0.7354$ com quebra. | **Selecionada (Ativa no Pipeline Congelado)** |
+| `precipitacao_enchimento` | Soma de `PRECTOTCORR` em Jan-Fev | Numerica continua (mm) | Volume total precipitado no bimestre de enchimento | Captura a escassez real intra-safra ($r = -0.5545$). Em 2015 choveu apenas 159 mm no periodo. | **Selecionada (Ativa no Pipeline Congelado)** |
+| `veranico_max_dias` | Max dias consecutivos com chuva $< 1.0$ mm em Jan-Fev | Numerica discreta (dias) | Maior periodo seco continuo na janela reprodutiva | Mede estresse continuado. $r = +0.53$. | Descartada no corte parcimonioso (redundante com deficit hidrico) |
+
+### 4.2 Features Herdadas da Sprint 2
+
+| Nome da coluna | Formula / Metodo | Tipo | Descricao | Justificativa e Risco Documentado | Status na Selecao Final S4 |
+|---|---|---|---|---|---|
+| `amplitude_termica` | `T2M_MAX - T2M_MIN` anual | Numerica continua (°C) | Diferenca entre temperatura maxima e minima anual | Oscilacao termica do ciclo. $r = -0.42$. **Ressalva de Vazamento:** $T_{min}$ ocorre em Julho e $T_{max}$ em Setembro/Outubro (fora da janela Jan-Fev). Mantida por parcimonia, com sensibilidade testada. | **Selecionada (Ativa no Pipeline Congelado)** |
+| `precipitacao_por_temperatura` | `PRECTOTCORR / (T2M + 0.001)` | Numerica continua (mm/°C) | Balanco hidrico anual aproximado | Redundante com `precipitacao_enchimento` e colinear a acumulados. | Descartada por parcimonia ($N=8$) |
+| `GWET_x_PREC` | `GWETROOT * PRECTOTCORR` | Numerica continua | Interacao umidade e chuva anual | Multicolinearidade severa com `PRECTOTCORR` anual ($r = 0.996$). Mascarou estresse de 2021. | Descartada por colinearidade |
 
 ---
 
@@ -87,9 +91,9 @@ data/raw/ permanece preservado. O arquivo de integracao inicial e data/raw/integ
 
 ## 6. Observacoes gerais e limitacoes
 
-* **Tamanho amostral reduzido (N = 10):** A granularidade anual do IBGE gera uma base de 10 safras municipais consolidadas (2015 a 2024), impondo a necessidade de algoritmos de baixa variancia e sem sobreajuste.
-* **Dados climaticos de reanalise:** Os registros da NASA POWER originam-se de modelos atmosfericos globais e sensores orbitais, nao de estacao fisica meteorologica em solo no municipio.
-* **Pendencia de safra:** O registro de 2025 da NASA POWER e do IBGE foi filtrado em data/interim/ por consistir em estimativas estaticas nao consolidadas.
+* **Tamanho amostral reduzido no treino ($N_{train} = 8$):** A granularidade anual do IBGE impoe restricao severa de graus de liberdade. O pipeline final congela rigorosamente 4 variaveis (`deficit_hidrico_solo`, `dias_pico_calor`, `precipitacao_enchimento`, `amplitude_termica`) padronizadas via `StandardScaler`, com `fit` exclusivo no bloco de treino (2015–2022).
+* **Ausencia de eventos de quebra no teste ($N_{test} = 2$):** As safras de 2023 e 2024 apresentaram produtividades plenas (> 3.400 kg/ha). O teste oficial afere especificidade (taxa de falso positivo = 0), mas o lift da classe positiva (`quebra_safra=1`) so pode ser diagnosticado via backtest temporal no treino.
+* **Janela temporal anti-vazamento:** As novas features climáticas da Sprint 4 fecham estritamente no ultimo dia de fevereiro, com antecedencia minima de 30 a 60 dias da colheita oficial.
 
 ---
 
@@ -99,3 +103,4 @@ data/raw/ permanece preservado. O arquivo de integracao inicial e data/raw/integ
 |---|---|---|---|
 | v0.1 | Sprint 1 | 21/09/2026 | Levantamento inicial de variaveis brutas, correcao de filtro de variaveis, integracao em data/raw/integrado.csv, estabelecimento do limiar numerico formal e definicao de colunas excluidas por vazamento. |
 | v0.2 | Sprint 2 | 05/10/2026 | Re-arquitetura do dicionario de dados para Sorriso-MT 100% (Codigo IBGE 5107925), recalibracao formal do limiar para < 3.400 kg/ha, adicao dos atributos derivados de engenharia de features e formalizacao do split temporal. |
+| v0.3 | Sprint 4 | 31/10/2026 | Inclusao das features da janela critica Jan-Fev (`deficit_hidrico_solo`, `dias_pico_calor`, `precipitacao_enchimento`, `veranico_max_dias`), descarte justificado de atributos anuais colineares, congelamento do contrato de 4 features para a Sprint 5 e documentacao do risco de vazamento em `amplitude_termica`. |
