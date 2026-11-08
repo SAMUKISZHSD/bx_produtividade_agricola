@@ -1,0 +1,5 @@
+configuração,TP,FN,FP,TN,precisão Quebra,recall Quebra,F1 Quebra
+S3 (9 features),0,1,2,1,0.0,0.0,0.0
+"S4 (4 features, seleção no treino todo)",1,0,1,2,0.5,1.0,0.6666666666666666
+S4 sem amplitude_termica (3 features),1,0,1,2,0.5,1.0,0.6666666666666666
+Top-4 |r| escolhidas dentro de cada dobra,0,1,1,2,0.0,0.0,0.0

@@ -28,7 +28,7 @@
 
 **Não sai daqui:** Dummy, persistência, Naive Bayes, F1, modelo escolhido.
 
-- [ ] Confirmei que o notebook desta sprint lê o `data/raw` da Sprint 1
+- [x] Confirmei que o notebook desta sprint lê o `data/raw` da Sprint 1
 
 ---
 
@@ -38,93 +38,107 @@
 
 ### 1.1 Inspeção (contar o sujo, ainda sem corrigir)
 
-- [ ] Estatística descritiva das colunas numéricas
-- [ ] Ausentes quantificados por coluna
-- [ ] Duplicatas (linhas e por chave município × safra)
-- [ ] Valores inválidos (produtividade negativa, safra incompleta) e sentinelas da API/IBGE
+- [x] Estatística descritiva das colunas numéricas
+- [x] Ausentes quantificados por coluna
+- [x] Duplicatas (linhas e por chave município × safra)
+- [x] Valores inválidos (produtividade negativa, safra incompleta) e sentinelas da API/IBGE
 
 **Diagnóstico (números):**
+- **Base bruta inicial:** 11 safras (2015 a 2025 integradas em `data/raw/integrado.csv`).
+- **Valores ausentes (NAs):** 0 valores nulos em todas as colunas.
+- **Linhas duplicadas:** 0 duplicatas no dataset e 0 duplicatas na chave temporal `ano`.
+- **Sentinelas (-999.0):** Nenhum valor sentinela encontrado nas medições da NASA POWER para as coordenadas de Sorriso-MT.
+- **Anomalia de domínio detectada:** A safra de 2025 do IBGE PAM continha valores preliminares repetidos e área estática, sem consolidação da colheita real pelo IBGE, necessitando exclusão formal.
 
 ### 1.2 Regras aplicadas
 
 Não imputar com média/mediana/moda do dataset **inteiro**. Imputação estatística, se precisar, é a seção 3 (depois do split).
 
-- [ ] Tipos e unidades padronizados
-- [ ] Duplicatas tratadas com contagem
-- [ ] Sentinelas / indicadores de ausência → `NaN` explícito
-- [ ] Pares município-safra incompletos tratados com regra escrita (manter, excluir ou marcar)
-- [ ] Inválidos de domínio tratados com regra escrita
-- [ ] Log: o que foi feito, em quantas linhas/células, N depois
-- [ ] Tabela salva em `data/interim/`
-- [ ] Dicionário (log de limpeza) atualizado
+- [x] Tipos e unidades padronizados
+- [x] Duplicatas tratadas com contagem
+- [x] Sentinelas / indicadores de ausência → `NaN` explícito
+- [x] Pares município-safra incompletos tratados com regra escrita (manter, excluir ou marcar)
+- [x] Inválidos de domínio tratados com regra escrita
+- [x] Log: o que foi feito, em quantas linhas/células, N depois
+- [x] Tabela salva em `data/interim/`
+- [x] Dicionário (log de limpeza) atualizado
 
 | Problema encontrado | Regra aplicada | Linhas/células afetadas | N depois |
 |---|---|---|---|
-| | | | |
+| Safra 2025 com dados preliminares/estáticos no IBGE PAM | Exclusão formal da safra 2025 para manter apenas safras consolidadas | 1 linha (safra 2025) | N = 10 safras (2015 a 2024) |
+| Valores sentinela potenciais (-999.0) | Mapeamento preventivo e conversão para NaN (nenhum detectado) | 0 linhas | N = 10 safras |
 
-**N após a limpeza (município × safra):**
-**Evidências (link do notebook/commit):**
+**N após a limpeza (município × safra):** 1 município (Sorriso-MT) × 10 safras consolidadas (2015 a 2024) = 10 safras.  
+**Evidências (link do notebook/commit):** Notebook [`notebooks/02_limpeza_split_temporal.ipynb`](../../notebooks/02_limpeza_split_temporal.ipynb) e arquivo limpo salvo em [`data/interim/limpo.csv`](../../data/interim/limpo.csv).
 
 ## 2. Split temporal / por safra
 
 Sobre a tabela **já limpa** (`data/interim/`).
 
-- [ ] Treino = safras mais antigas; teste = mais recentes (sem embaralhar o tempo)
-- [ ] Corte explícito; N treino e N teste
-- [ ] Teste isolado: não usa para limiar, janelas nem parâmetros de imputação
+- [x] Treino = safras mais antigas; teste = mais recentes (sem embaralhar o tempo)
+- [x] Corte explícito; N treino e N teste
+- [x] Teste isolado: não usa para limiar, janelas nem parâmetros de imputação
 
-**Corte (safras treino / teste):**
-**Municípios:**
-**N treino / N teste:**
-**Justificativa:**
+**Corte (safras treino / teste):** Treino = 2015 a 2022 | Teste = 2023 a 2024  
+**Municípios:** Sorriso - MT (Código IBGE: 5107925)  
+**N treino / N teste:** N Treino = 8 safras | N Teste = 2 safras  
+**Justificativa:** Split puramente temporal (time-series split) preservando a ordem cronológica dos dados sem embaralhamento aleatório. O bloco de teste isola as duas safras mais recentes para avaliar capacidade de generalização futura, sendo blindado contra vazamento (nenhuma média, desvio padrão ou limiar utiliza as safras de 2023–2024).
 
 ## 3. Tratamento estatístico residual (depois do split, antes da EDA)
 
 Só NA que a limpeza de domínio não resolveu. Parâmetros saem **somente do treino**.
 
-- [ ] Estratégia justificada (imputar agora / deixar NA para o `ColumnTransformer` da Sprint 3)
-- [ ] Se imputar: regra ajustada no treino e aplicada ao teste
+- [x] Estratégia justificada (imputar agora / deixar NA para o `ColumnTransformer` da Sprint 3)
+- [x] Se imputar: regra ajustada no treino e aplicada ao teste
 
-**Regra residual (ou “não há NA restantes”):**
+**Regra residual (ou “não há NA restantes”):** Não há NAs restantes. A verificação detalhada coluna por coluna comprovou 0 valores ausentes e 0 sentinelas no dataset limpo. Não foi necessária nenhuma imputação estatística residual por média ou mediana. Evidência no notebook [`notebooks/03_tratamento_estatistico_residual.ipynb`](../../notebooks/03_tratamento_estatistico_residual.ipynb).
 
 ## 4. Análise exploratória (EDA) — treino já tratado
 
-- [ ] Estatística descritiva da variável de origem do alvo **no treino**
-- [ ] Evolução por safra, histogramas, boxplots
-- [ ] Correlação no treino
-- [ ] Outliers discutidos (não só plotados)
+- [x] Estatística descritiva da variável de origem do alvo **no treino**
+- [x] Evolução por safra, histogramas, boxplots
+- [x] Correlação no treino
+- [x] Outliers discutidos (não só plotados)
 
 > Desbalanceamento de **classes** só depois da seção 5 (quando o alvo existir). Nesta seção explora-se a variável de origem (produtividade bruta).
 
 **Principais achados da EDA (treino):**
+- **Produtividade média no treino (2015 a 2022):** 3.476,25 kg/ha, variando entre 3.018 kg/ha (mínima histórica em 2016) e 3.960 kg/ha (máxima em 2022).
+- **Oscilação e quebras de safra:** Diferente de Piracicaba (que apresentava valores estáticos de 2.400 kg/ha), Sorriso-MT apresenta variação real de produtividade, permitindo mapear anos de perda severa em 2015, 2016 e 2021.
+- **Relação com clima:** Identificou-se forte correlação entre veranicos na fase de floração/enchimento e queda brusca na produtividade da soja.
+- **Outliers:** As safras de 2015 e 2016 representam quebras severas reais decorrentes de estresse hídrico no Cerrado e foram preservadas integralmente por serem o fenômeno de interesse do projeto.
 
-**Evidências (gráficos, link do notebook):**
+**Evidências (gráficos, link do notebook):** Notebook [`notebooks/05_analise_exploratoria_eda.ipynb`](../../notebooks/05_analise_exploratoria_eda.ipynb).
 
 ## 5. Definição da variável-alvo
 
-**Classe positiva (safra de risco / baixa produtividade):**
-**Limiar e justificativa (treino, alinhada ao RFC):**
-**Horizonte (o que já é conhecido no momento da decisão):**
-**Desbalanceamento no treino:**
+**Classe positiva (safra de risco / baixa produtividade):** `1` = Quebra de safra (rendimento < 3.400 kg/ha); `0` = Safra normal ou alta (>= 3.400 kg/ha).  
+**Limiar e justificativa (treino, alinhada ao RFC):** Limiar formal de **3.400 kg/ha**, calibrado a partir da média histórica de Sorriso-MT no treino (~3.476 kg/ha), formalizado no RFC v0.3.  
+**Horizonte (o que já é conhecido no momento da decisão):** Variáveis agroclimáticas acumuladas até o encerramento da fase vegetativa/enchimento de grãos, fornecendo antecedência de 2 a 3 meses antes da conclusão da colheita.  
+**Desbalanceamento no treino:** 3 safras de quebra (37,5%) e 5 safras normais (62,5%) em N=8.
 
-- [ ] Classe positiva sem ambiguidade, ligada ao custo de FN
-- [ ] Desbalanceamento das classes quantificado **no treino**
-- [ ] Seção do alvo no dicionário preenchida
-- [ ] Colunas de construção do alvo na lista de exclusão (vazamento)
+- [x] Classe positiva sem ambiguidade, ligada ao custo de FN
+- [x] Desbalanceamento das classes quantificado **no treino**
+- [x] Seção do alvo no dicionário preenchida
+- [x] Colunas de construção do alvo na lista de exclusão (vazamento)
 
 ## 6. Engenharia de atributos (Feature Engineering)
 
-- [ ] Agregações por ciclo/safra e defasagens (safra anterior) só com informação anterior ao fim da janela de previsão
-- [ ] Cada feature seria calculável **no momento real da previsão** (mesmo horizonte do RFC; sem clima posterior à decisão)
-- [ ] Código IBGE / município **não** entram como número; calendário (safra, mês) vale. Município como categoria só se todos os do teste existirem no treino — e mesmo assim justificar (risco de só memorizar o lugar)
-- [ ] Variáveis de calendário agrícola quando pertinente
-- [ ] Parâmetros definidos **no treino**, depois aplicados ao teste
-- [ ] Nada agregado após o fim da janela de decisão da safra
-- [ ] Cada atributo justificado um a um; dicionário atualizado
+- [x] Agregações por ciclo/safra e defasagens (safra anterior) só com informação anterior ao fim da janela de previsão
+- [x] Cada feature seria calculável **no momento real da previsão** (mesmo horizonte do RFC; sem clima posterior à decisão)
+- [x] Código IBGE / município **não** entram como número; calendário (safra, mês) vale. Município como categoria só se todos os do teste existirem no treino — e mesmo assim justificar (risco de só memorizar o lugar)
+- [x] Variáveis de calendário agrícola quando pertinente
+- [x] Parâmetros definidos **no treino**, depois aplicados ao teste
+- [x] Nada agregado após o fim da janela de decisão da safra
+- [x] Cada atributo justificado um a um; dicionário atualizado
 
 **Descrição e justificativa dos atributos:**
+1. **`amplitude_termica`:** Calculada como `T2M_MAX - T2M_MIN`. Expressa a oscilação térmica extrema a que a lavoura foi exposta durante o ciclo.
+2. **`precipitacao_por_temperatura`:** Razão entre precipitação total e temperatura média (`PRECTOTCORR / (T2M + 0.001)`), servindo como aproximação de disponibilidade hídrica versus evapotranspiração.
+3. **`GWET_x_PREC`:** Interação direta entre umidade na raiz e chuva acumulada (`GWETROOT * PRECTOTCORR`), medindo se a precipitação efetivamente umedeceu o perfil radicular.
+- **Variáveis excluídas por vazamento:** `rendimento_kg_ha`, `quantidade_produzida_t`, `area_colhida_ha` e `area_plantada_ha` foram removidas formalmente do conjunto preditor.
 
-**Evidências (trecho de código, link do notebook):**
+**Evidências (trecho de código, link do notebook):** Notebook [`notebooks/04_alvo_e_features.ipynb`](../../notebooks/04_alvo_e_features.ipynb) e artefato salvo em [`data/interim/04_dados_com_features.csv`](../../data/interim/04_dados_com_features.csv).
 
 ## 7. Scrum
 

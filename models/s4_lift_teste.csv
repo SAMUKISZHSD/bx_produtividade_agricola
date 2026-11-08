@@ -1,0 +1,4 @@
+Modelo,Recall S3,Recall S4,F1 S3,F1 S4,Precisão S3,Precisão S4,FN S3,FN S4,FP S3,FP S4,Eventos reais,Delta recall
+DummyClassifier,,,,,,,0,0,0,0,0,
+Persistência,,,,,,,0,0,0,0,0,
+GaussianNB,,,,,,,0,0,0,0,0,

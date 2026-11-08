@@ -20,7 +20,7 @@
 
 **Não sai daqui:** modelo final complexo, limiar fino, model card.
 
-- [ ] Confirmei que treino/teste são os da Sprint 2 e que as features são as da Sprint 2
+- [x] Confirmei que treino/teste são os da Sprint 2 e que as features são as da Sprint 2
 
 ---
 
@@ -38,25 +38,26 @@
 
 ## 2. Preparação para modelagem
 
-- [ ] Mesmo split por safra/ano da Sprint 2 (treino em safras antigas, teste nas recentes — nunca aleatório)
-- [ ] Um `Pipeline` sklearn: `ColumnTransformer` **e** o classificador no mesmo objeto; `fit` **somente no treino**
-- [ ] Imputação residual / encoding / normalização dentro desse Pipeline
-- [ ] `random_state` documentado onde o algoritmo for estocástico
-- [ ] Ausência de vazamento reconfirmada (nada agregado após o fim da janela de previsão)
-- [ ] Features da Sprint 2 incluídas no transformer
+- [x] Mesmo split por safra/ano da Sprint 2 (treino em safras antigas, teste nas recentes — nunca aleatório)
+- [x] Um `Pipeline` sklearn: `ColumnTransformer` **e** o classificador no mesmo objeto; `fit` **somente no treino**
+- [x] Imputação residual / encoding / normalização dentro desse Pipeline
+- [x] `random_state` documentado onde o algoritmo for estocástico
+- [x] Ausência de vazamento reconfirmada (nada agregado após o fim da janela de previsão)
+- [x] Features da Sprint 2 incluídas no transformer
 
 **Descrição da estratégia de split (safras de corte, N) e do ColumnTransformer:**
+O split seguiu estritamente o corte estabelecido na Sprint 2: Treino nas safras de 2015 a 2022 ($N = 8$) e Teste isolado nas safras de 2023 a 2024 ($N = 2$) para o município de Sorriso-MT. O pré-processador foi estruturado em um `Pipeline` unificado do scikit-learn com `StandardScaler` aplicado às variáveis numéricas preditoras e `fit` restrito exclusivamente aos dados de treino. O conjunto de teste apenas passa por `.transform()`, garantindo que parâmetros estatísticos (média e desvio padrão) não sofram vazamento de dados (*data leakage*). Como a base limpa não apresenta valores nulos, dispensou-se imputador residual.
 
 ## 3. Modelagem baseline
 
-- [ ] `DummyClassifier` (piso de **acurácia** da classe majoritária — não é piso de recall na classe rara)
-- [ ] Baseline de **persistência** (classe da safra anterior daquele município — não o alvo futuro da safra prevista)
-- [ ] Naive Bayes treinado e avaliado **no mesmo split e nas mesmas features**, no mesmo `Pipeline`
-- [ ] Independência condicional do Naive Bayes discutida (variáveis climáticas do mesmo ciclo são correlatas; o modelo é baseline pedagógico)
-- [ ] Recall, precisão, F1 e matriz de confusão **por classe** para os três; N pequeno se reporta também em **contagem** (ex.: 3 FN em 8 eventos)
-- [ ] Interpretação ligada ao custo de falso negativo do RFC; se N de treino for pequeno, isso entra na leitura das métricas
-- [ ] Ainda **sem** ajuste fino de limiar (Sprint 5)
-- [ ] Sem SMOTE / oversampling aleatório (N pequeno + série/safra: inventa linhas que não existiram)
+- [x] `DummyClassifier` (piso de **acurácia** da classe majoritária — não é piso de recall na classe rara)
+- [x] Baseline de **persistência** (classe da safra anterior daquele município — não o alvo futuro da safra prevista)
+- [x] Naive Bayes treinado e avaliado **no mesmo split e nas mesmas features**, no mesmo `Pipeline`
+- [x] Independência condicional do Naive Bayes discutida (variáveis climáticas do mesmo ciclo são correlatas; o modelo é baseline pedagógico)
+- [x] Recall, precisão, F1 e matriz de confusão **por classe** para os três; N pequeno se reporta também em **contagem** (ex.: 3 FN em 8 eventos)
+- [x] Interpretação ligada ao custo de falso negativo do RFC; se N de treino for pequeno, isso entra na leitura das métricas
+- [x] Ainda **sem** ajuste fino de limiar (Sprint 5)
+- [x] Sem SMOTE / oversampling aleatório (N pequeno + série/safra: inventa linhas que não existiram)
 
 **Resultados (Dummy vs. persistência vs. Naive Bayes) e interpretação:**
 

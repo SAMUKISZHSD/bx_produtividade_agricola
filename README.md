@@ -73,13 +73,17 @@ pip install -r requirements.txt
 
 * **RFC (Proposta de Projeto):** [docs/RFC.md](docs/RFC.md)
 * **Dicionário de Dados:** [docs/Dicionario_de_Dados.md](docs/Dicionario_de_Dados.md)
+* **Model Card do Modelo Campeão:** [docs/Model_Card.md](docs/Model_Card.md)
 * **Diário de Sprint 1 (Kickoff e Coleta):** [docs/sprints/Sprint1_TrilhaC.md](docs/sprints/Sprint1_TrilhaC.md)
 * **Diário de Sprint 2 (Limpeza, Split e EDA):** [docs/sprints/Sprint2_TrilhaC.md](docs/sprints/Sprint2_TrilhaC.md)
 * **Diário de Sprint 3 (Ingestão Robusta e Baselines):** [docs/sprints/Sprint3_TrilhaC.md](docs/sprints/Sprint3_TrilhaC.md)
+* **Diário de Sprint 4 (Iteração de Atributos, Retreino e Pipeline Congelado):** [docs/sprints/Sprint4_TrilhaC.md](docs/sprints/Sprint4_TrilhaC.md)
+* **Diário de Sprint 5 (Modelagem Completa, Limiar e Seleção):** [docs/sprints/Sprint5_TrilhaC.md](docs/sprints/Sprint5_TrilhaC.md)
 * **Quadro Oficial no Trello:** [Projeto de Ciência de Dados (Trello)](https://trello.com/invite/b/6a975ab20fa3094b426c0c68/ATTI02cea94da7f784bcf30e1e3d24341426A34F2CE2/📊-projeto-de-ciencia-de-dados)
 * **Evidências Visuais de Scrum:** [docs/assets/scrum/](docs/assets/scrum/)
-* **Dados Consolidados:** `data/raw/` e `data/interim/`
+* **Dados Consolidados:** `data/raw/`, `data/interim/`, `data/processed/` e `data/monitoramento_safra.db`
 * **Pipelines em Notebooks:** [notebooks/](notebooks/)
+* **Modelos e Artefatos Serializados:** [models/](models/)
 
 ---
 
