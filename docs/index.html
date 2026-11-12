@@ -1,0 +1,3170 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Previsão de Risco de Quebra de Safra na Soja com Árvores de Decisão | SojaRisco</title>
+  <meta name="description"
+    content="Do dado de satélite da NASA POWER e IBGE PAM ao alerta antecipado de quebra de safra de soja em Sorriso-MT: Baseline, Árvore de Decisão, Random Forest e XGBoost.">
+  <link rel="icon" type="image/png" href="img/logo_sojarisco.png">
+  <script>try { if (localStorage.theme === 'dark' || (!('theme' in localStorage) && matchMedia('(prefers-color-scheme: dark)').matches)) document.documentElement.classList.add('dark') } catch (e) { }</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap"
+    rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js" defer></script>
+  <link rel="stylesheet" href="https://unpkg.com/lenis@1.1.18/dist/lenis.css">
+  <script src="https://unpkg.com/lenis@1.1.18/dist/lenis.min.js"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest" defer></script>
+  <style>
+    :root {
+      --text-main: #18181b;
+      --text-muted: #343a40;
+      --text-light: #868e96;
+      --bg-page: #fafafa;
+      --bg-surface: #ffffff;
+      --bg-surface-alt: #eff6ff;
+      --border-color: #dbeafe;
+      --brand-primary: #2563eb;
+      --brand-primary-light: #eff6ff;
+      --brand-dark: #1e3a8a;
+      --brand-accent: #3b82f6;
+      --brand-warning-light: #fef3c7;
+      --brand-danger: #dc2626;
+      --brand-danger-light: #fee2e2;
+      --font-serif: Verdana, system-ui, sans-serif;
+      --font-sans: Verdana, system-ui, sans-serif;
+      --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+      --radius-sm: 6px
+    }
+
+    html.dark {
+      --text-main: #f8f9fa;
+      --text-muted: #ced4da;
+      --text-light: #adb5bd;
+      --bg-page: #09090b;
+      --bg-surface: #18181b;
+      --bg-surface-alt: #172554;
+      --border-color: #1e3a8a;
+      --brand-primary: #60a5fa;
+      --brand-primary-light: #1e293b;
+      --brand-dark: #93c5fd;
+      --brand-accent: #38bdf8;
+      --brand-warning-light: #451a03;
+      --brand-danger: #f87171;
+      --brand-danger-light: #450a0a
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: 84px;
+      color-scheme: light dark
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg-page);
+      color: var(--text-main);
+      font: 18px/1.7 var(--font-serif);
+      -webkit-font-smoothing: antialiased
+    }
+
+    a {
+      color: var(--brand-primary)
+    }
+
+    code {
+      font-family: var(--font-mono);
+      font-size: .86em;
+      background: var(--bg-surface-alt);
+      padding: .08em .35em;
+      border-radius: var(--radius-sm)
+    }
+
+    #main-header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: var(--bg-page);
+      border-bottom: 1px solid var(--border-color);
+      padding-top: env(safe-area-inset-top, 0px);
+      width: 100%;
+    }
+
+    .header-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 32px;
+      font-family: var(--font-sans);
+      width: 100%;
+    }
+
+    .brand-logo-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--text-main);
+      font-weight: 700;
+      font-size: 1.25rem;
+      letter-spacing: 0.025em;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+
+    .header-nav {
+      display: inline-flex;
+      align-items: center;
+      gap: 32px;
+      margin: 0 auto;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      line-height: 1;
+    }
+
+    .header-nav a {
+      display: inline-flex;
+      align-items: center;
+      color: var(--text-muted);
+      text-decoration: none;
+      padding: 6px 0;
+      border-bottom: 2px solid transparent;
+      transition: color 0.15s, border-color 0.15s;
+    }
+
+    .header-nav a:hover {
+      color: var(--text-main);
+      border-color: var(--brand-primary);
+    }
+
+    .header-actions {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+
+    .btn-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border: 1px solid var(--border-color);
+      background: var(--bg-surface-alt);
+      color: var(--text-main);
+      border-radius: 9999px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.15s, border-color 0.15s;
+      padding: 0;
+      margin: 0;
+      line-height: 1;
+    }
+
+    .btn-icon:hover {
+      background: var(--border-color);
+    }
+
+    .btn-sm-header {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-sans);
+      font-weight: 600;
+      font-size: 0.85rem;
+      line-height: 1;
+      background: var(--brand-primary);
+      color: #ffffff;
+      padding: 0 16px;
+      height: 36px;
+      border-radius: 8px;
+      text-decoration: none;
+      border: 0;
+      cursor: pointer;
+      transition: opacity 0.15s;
+    }
+
+    .btn-sm-header:hover {
+      opacity: 0.9;
+    }
+
+    .reading-progress-track {
+      height: 2px;
+      background: transparent
+    }
+
+    #progress-bar {
+      height: 2px;
+      width: 0;
+      background: var(--brand-primary)
+    }
+
+    .main-wrapper {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+      width: 100%;
+    }
+
+    .editorial-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 260px;
+      gap: 56px;
+    }
+
+    .article-content {
+      max-width: 100%;
+      padding-bottom: 80px;
+    }
+
+    .article-hero {
+      padding: 56px 0 28px;
+      border-bottom: 1px solid var(--border-color)
+    }
+
+    .hero-meta-row {
+      font: 14px var(--font-sans);
+      color: var(--text-light);
+      margin-bottom: 14px
+    }
+
+    .hero-title {
+      font-size: clamp(30px, 4.6vw, 44px);
+      line-height: 1.14;
+      font-weight: 600;
+      letter-spacing: -.012em;
+      margin: 0 0 16px
+    }
+
+    .hero-subtitle {
+      font-size: 20px;
+      line-height: 1.5;
+      color: var(--text-muted);
+      margin: 0 0 26px
+    }
+
+    .authors-strip {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px 28px;
+      align-items: center;
+      justify-content: space-between;
+      font: 14px/1.5 var(--font-sans);
+      color: var(--text-muted)
+    }
+
+    .authors-group {
+      display: flex;
+      gap: 14px;
+      align-items: center
+    }
+
+    .authors-avatars {
+      display: flex
+    }
+
+    .author-mini-avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      border: 2px solid var(--bg-page);
+      margin-left: -10px;
+      background: var(--bg-surface-alt);
+      object-fit: cover
+    }
+
+    .author-mini-avatar:first-child {
+      margin-left: 0
+    }
+
+    .article-dates {
+      text-align: right
+    }
+
+    .editorial-mock-note {
+      margin-top: 22px;
+      padding: 10px 14px;
+      border-left: 3px solid var(--border-color);
+      font: 14px/1.5 var(--font-sans);
+      color: var(--text-muted)
+    }
+
+    .note-tag {
+      font-weight: 600;
+      color: var(--text-main);
+      margin-right: 4px
+    }
+
+    .hero-title,
+    .hero-subtitle,
+    .hero-meta-row,
+    .authors-strip {
+      animation: rise .7s cubic-bezier(.2, .7, .2, 1) both
+    }
+
+    .hero-meta-row {
+      animation-delay: 0s
+    }
+
+    .hero-title {
+      animation-delay: .08s
+    }
+
+    .hero-subtitle {
+      animation-delay: .2s
+    }
+
+    .authors-strip {
+      animation-delay: .32s
+    }
+
+    @keyframes rise {
+      from {
+        opacity: 0;
+        transform: translateY(10px)
+      }
+
+      to {
+        opacity: 1;
+        transform: none
+      }
+    }
+
+    section {
+      margin-top: 56px
+    }
+
+    h2 {
+      font-size: 27px;
+      line-height: 1.25;
+      margin: 0 0 16px;
+      font-weight: 600
+    }
+
+    h3 {
+      font: 600 17px/1.35 var(--font-sans);
+      margin: 32px 0 8px
+    }
+
+    p {
+      margin: 0 0 16px
+    }
+
+    .lead-learn {
+      background: var(--bg-surface-alt);
+      padding: 14px 18px;
+      border-left: 3px solid var(--brand-primary);
+      font-size: 17px
+    }
+
+    ul,
+    ol {
+      padding-left: 24px;
+      margin: 0 0 16px
+    }
+
+    li {
+      margin: 6px 0
+    }
+
+    .tech-term {
+      font-weight: 600;
+      border-bottom: 1px dotted var(--brand-primary)
+    }
+
+    .didactic-note {
+      color: var(--text-muted);
+      font-size: .93em
+    }
+
+    .callout-box {
+      margin: 22px 0;
+      padding: 16px 20px;
+      border: 1px solid var(--border-color);
+      border-left: 3px solid var(--brand-primary);
+      background: var(--bg-surface)
+    }
+
+    .callout-title {
+      font: 600 15px var(--font-sans);
+      margin-bottom: 6px
+    }
+
+    .callout-box h4 {
+      font-family: var(--font-sans)
+    }
+
+    .table-responsive {
+      overflow-x: auto;
+      margin: 20px 0
+    }
+
+    .editorial-table {
+      border-collapse: collapse;
+      width: 100%;
+      min-width: 560px;
+      font: 14px/1.45 var(--font-sans)
+    }
+
+    .editorial-table th,
+    .editorial-table td {
+      padding: 8px 12px 8px 0;
+      text-align: left;
+      vertical-align: top;
+      border-top: 1px solid var(--border-color)
+    }
+
+    .editorial-table thead th {
+      border-top: 2px solid var(--text-main);
+      border-bottom: 1px solid var(--text-main);
+      font-weight: 600
+    }
+
+    .editorial-table tbody tr:last-child td {
+      border-bottom: 2px solid var(--text-main)
+    }
+
+    .editorial-table .highlight-row td {
+      background: var(--brand-primary-light)
+    }
+
+    .figure-wrapper {
+      margin: 28px 0;
+      padding: 0
+    }
+
+    .figure-header {
+      margin-bottom: 10px
+    }
+
+    .figure-title {
+      font: 600 15px/1.4 var(--font-sans)
+    }
+
+    .figure-caption {
+      font: 14px/1.5 var(--font-sans);
+      color: var(--text-muted);
+      margin: 10px 0 0
+    }
+
+    svg {
+      max-width: 100%
+    }
+
+    svg text {
+      font-family: var(--font-sans) !important
+    }
+
+    .fig-anim:not(.in) g,
+    .fig-anim:not(.in) path,
+    .fig-anim:not(.in)>rect,
+    .fig-anim:not(.in)>text {
+      opacity: 0
+    }
+
+    .fig-anim.in g,
+    .fig-anim.in path,
+    .fig-anim.in>rect,
+    .fig-anim.in>text {
+      animation: fade .55s ease both;
+      animation-delay: calc(var(--i, 0)*.1s)
+    }
+
+    @keyframes fade {
+      from {
+        opacity: 0
+      }
+
+      to {
+        opacity: 1
+      }
+    }
+
+    .tree-simulator {
+      border: 1px solid var(--border-color);
+      padding: 18px
+    }
+
+    .choice-label {
+      display: block;
+      font: 600 14px var(--font-sans);
+      margin-bottom: 8px
+    }
+
+    .quick-safras-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px
+    }
+
+    .btn-safra-chip {
+      font: 14px/1.3 var(--font-sans);
+      text-align: left;
+      padding: 10px 12px;
+      border: 1px solid var(--border-color);
+      background: var(--bg-surface);
+      color: var(--text-main);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: border-color .2s, background .2s
+    }
+
+    .btn-safra-chip:hover {
+      border-color: var(--brand-primary)
+    }
+
+    .btn-safra-chip.active {
+      border-color: var(--brand-primary);
+      background: var(--brand-primary-light);
+      box-shadow: inset 0 0 0 1px var(--brand-primary)
+    }
+
+    .chip-year {
+      display: block;
+      font-weight: 600
+    }
+
+    .chip-desc {
+      display: block;
+      font-size: 12.5px;
+      color: var(--text-muted)
+    }
+
+    .progressive-panel {
+      margin: 14px 0;
+      border-top: 1px solid var(--border-color);
+      padding-top: 10px;
+      font-family: var(--font-sans);
+      font-size: 14px
+    }
+
+    .progressive-summary {
+      cursor: pointer;
+      font-weight: 600;
+      display: flex;
+      justify-content: space-between;
+      list-style: none
+    }
+
+    .progressive-summary::-webkit-details-marker {
+      display: none
+    }
+
+    .progressive-content {
+      padding-top: 14px
+    }
+
+    .simulator-controls-compact {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px 24px
+    }
+
+    .control-item label {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 4px
+    }
+
+    .control-val {
+      font-family: var(--font-mono);
+      color: var(--text-muted)
+    }
+
+    input[type=range] {
+      width: 100%;
+      accent-color: var(--brand-primary)
+    }
+
+    .tree-svg-container {
+      text-align: center;
+      margin: 10px 0
+    }
+
+    .tree-node-rect rect {
+      transition: stroke .3s, stroke-width .3s, opacity .3s
+    }
+
+    .tree-node-rect,
+    #tree line {
+      transition: opacity .35s
+    }
+
+    .tree-node-rect.on rect {
+      stroke: var(--brand-primary);
+      stroke-width: 3
+    }
+
+    .tree-node-rect.dim {
+      opacity: .3
+    }
+
+    line.on {
+      stroke: var(--brand-primary) !important;
+      stroke-width: 3 !important;
+      stroke-dasharray: 140;
+      animation: dash .6s ease both
+    }
+
+    @keyframes dash {
+      from {
+        stroke-dashoffset: 140
+      }
+
+      to {
+        stroke-dashoffset: 0
+      }
+    }
+
+    .simulator-verdict-card {
+      border-top: 1px solid var(--border-color);
+      padding-top: 12px;
+      font-family: var(--font-sans)
+    }
+
+    .verdict-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px
+    }
+
+    .verdict-status {
+      font-weight: 600;
+      font-size: 17px;
+      transition: color .3s
+    }
+
+    .verdict-status.alert {
+      color: var(--brand-danger)
+    }
+
+    .verdict-status.ok {
+      color: var(--brand-primary)
+    }
+
+    .verdict-prob {
+      font-family: var(--font-mono);
+      font-size: 14px
+    }
+
+    .formula-box {
+      margin: 24px 0;
+      border: 1px solid var(--border-color);
+      font-family: var(--font-sans)
+    }
+
+    .formula-box-header {
+      padding: 10px 16px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 14.5px
+    }
+
+    .formula-equation {
+      padding: 4px 16px 8px;
+      font: 15px/2 var(--font-serif);
+      font-style: italic
+    }
+
+    .formula-caption {
+      padding: 0 16px 12px;
+      font-size: 14px;
+      color: var(--text-muted);
+      margin: 0
+    }
+
+    pre {
+      background: #1d1f21;
+      color: #e6e6e6;
+      padding: 16px 18px;
+      overflow-x: auto;
+      font: 13.5px/1.55 var(--font-mono);
+      border-radius: var(--radius-sm);
+      margin: 16px 0
+    }
+
+    pre code {
+      background: none;
+      padding: 0;
+      color: inherit;
+      font-size: inherit
+    }
+
+    .api-tester-card {
+      border: 1px solid var(--border-color);
+      padding: 16px
+    }
+
+    .api-presets-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center
+    }
+
+    .btn-api-preset {
+      font: 14px var(--font-sans);
+      padding: 8px 12px;
+      border: 1px solid var(--border-color);
+      background: var(--bg-surface);
+      color: var(--text-main);
+      border-radius: var(--radius-sm);
+      cursor: pointer
+    }
+
+    .btn-api-preset.active {
+      border-color: var(--brand-primary);
+      background: var(--brand-primary-light)
+    }
+
+    .api-tester-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-top: 12px
+    }
+
+    .api-tester-grid>div {
+      min-width: 0
+    }
+
+    .code-editor-header {
+      display: flex;
+      justify-content: space-between;
+      font: 12.5px var(--font-sans);
+      color: var(--text-muted);
+      gap: 8px
+    }
+
+    .code-pre-box {
+      margin: 6px 0 0;
+      font-size: 12.5px
+    }
+
+    .cm {
+      display: flex;
+      gap: 28px;
+      flex-wrap: wrap;
+      font-family: var(--font-sans)
+    }
+
+    .cm table {
+      border-collapse: collapse;
+      text-align: center;
+      font-size: 14px
+    }
+
+    .cm td,
+    .cm th {
+      border: 1px solid var(--border-color);
+      padding: 10px 16px;
+      font-weight: 400
+    }
+
+    .cm .hit {
+      background: var(--brand-primary-light);
+      font-weight: 600;
+      font-size: 20px;
+      animation: fade .6s both
+    }
+
+    .cm .zero {
+      color: var(--text-light);
+      font-size: 20px
+    }
+
+    .fi {
+      font-family: var(--font-sans);
+      font-size: 14px
+    }
+
+    .fi .bar {
+      display: flex;
+      height: 30px;
+      border: 1px solid var(--border-color);
+      overflow: hidden
+    }
+
+    .fi .bar i {
+      display: block;
+      font-style: normal;
+      padding: 5px 10px;
+      white-space: nowrap;
+      width: 0;
+      transition: width 1.1s cubic-bezier(.2, .7, .2, 1)
+    }
+
+    .fi .a {
+      background: var(--brand-primary);
+      color: var(--bg-page)
+    }
+
+    .fi .b {
+      background: var(--bg-surface-alt)
+    }
+
+    html.dark .fi .a {
+      color: #0e1412
+    }
+
+    .fi p {
+      margin: 8px 0 0;
+      font-size: 13.5px;
+      color: var(--text-muted)
+    }
+
+    .mostra-card {
+      display: flex;
+      gap: 20px;
+      justify-content: space-between;
+      align-items: center;
+      border: 1px solid var(--border-color);
+      padding: 18px 20px;
+      margin: 28px 0
+    }
+
+    .mostra-badge {
+      font: 500 13px var(--font-sans);
+      color: var(--text-light)
+    }
+
+    .mostra-qrcode-box {
+      text-align: center;
+      font: 12px var(--font-sans);
+      color: var(--text-muted)
+    }
+
+    .mostra-qrcode-box img {
+      width: 88px;
+      height: 88px;
+      display: block;
+      margin: auto
+    }
+
+    .authors-grid-final {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px
+    }
+
+    .author-card-final {
+      border-top: 2px solid var(--text-main);
+      padding-top: 14px;
+      font-family: var(--font-sans)
+    }
+
+    .author-card-avatar {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      object-fit: cover;
+      background: var(--bg-surface-alt)
+    }
+
+    .author-card-name {
+      font-weight: 600;
+      margin-top: 8px
+    }
+
+    .author-card-rgm {
+      font-size: 13px;
+      color: var(--text-light)
+    }
+
+    .author-card-bio {
+      font-size: 14px;
+      line-height: 1.5;
+      margin: 8px 0
+    }
+
+    .author-card-links a {
+      font-size: 14px;
+      margin-right: 12px
+    }
+
+    .sidebar-container {
+      position: relative;
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 84px;
+      padding-top: 0;
+      font-family: var(--font-sans);
+    }
+
+    .toc-title {
+      display: inline-block;
+      font-weight: 700;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 4px 10px;
+      border-radius: 4px;
+      background: #1e3a8a;
+      color: #bfdbfe;
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      margin-bottom: 16px;
+    }
+
+    html.dark .toc-title {
+      background: #172554;
+      color: #93c5fd;
+      border-color: rgba(30, 58, 138, 0.6);
+    }
+
+    .toc-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      border-left: 1px solid var(--border-color);
+    }
+
+    .toc-link {
+      display: block;
+      padding: 6px 0 6px 14px;
+      margin-left: -1px;
+      border-left: 2px solid transparent;
+      font-size: 13.5px;
+      line-height: 1.4;
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color 0.15s, border-color 0.15s;
+    }
+
+    .toc-link:hover {
+      color: var(--text-main);
+    }
+
+    .toc-link.active {
+      color: var(--brand-primary);
+      border-color: var(--brand-primary);
+      font-weight: 600;
+    }
+
+    .toc-mobile {
+      display: none;
+    }
+
+    .editorial-footer {
+      border-top: 1px solid var(--border-color);
+      padding: 64px 24px 36px;
+      font: 14px/1.6 var(--font-sans);
+      color: var(--text-muted);
+      background: var(--bg-surface-alt);
+      margin-top: 60px;
+    }
+
+    .footer-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1.4fr 1fr 1.1fr;
+      gap: 48px;
+    }
+
+    .footer-col {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .footer-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text-main);
+      text-decoration: none;
+    }
+
+    .footer-brand-logo {
+      width: 28px;
+      height: 28px;
+      object-fit: contain;
+    }
+
+    .footer-desc {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    .footer-meta-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.82rem;
+      color: var(--text-light);
+    }
+
+    .footer-heading {
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-main);
+      margin: 0 0 6px 0;
+    }
+
+    .footer-links-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .footer-link-item a {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.88rem;
+      transition: color 0.15s ease, transform 0.15s ease;
+    }
+
+    .footer-link-item a:hover {
+      color: var(--brand-primary);
+      transform: translateX(2px);
+    }
+
+    .footer-card-box {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .footer-btn-cta {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 16px;
+      background: var(--brand-primary);
+      color: #ffffff;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 0.88rem;
+      text-decoration: none;
+      transition: opacity 0.2s ease, transform 0.15s ease;
+    }
+
+    html.dark .footer-btn-cta {
+      color: #0d1613;
+    }
+
+    .footer-btn-cta:hover {
+      opacity: 0.92;
+      transform: translateY(-1px);
+    }
+
+    .footer-bottom-bar {
+      max-width: 1120px;
+      margin: 40px auto 0;
+      padding-top: 20px;
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      font-size: 0.8rem;
+      color: var(--text-light);
+    }
+
+    @media (max-width: 820px) {
+      .footer-container {
+        grid-template-columns: 1fr;
+        gap: 32px;
+      }
+
+      .editorial-footer {
+        padding: 48px 20px 28px;
+      }
+
+      .footer-bottom-bar {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+
+    button:focus-visible,
+    a:focus-visible,
+    summary:focus-visible,
+    input:focus-visible {
+      outline: 2px solid var(--brand-primary);
+      outline-offset: 2px
+    }
+
+    @media(max-width:960px) {
+      .editorial-grid {
+        grid-template-columns: 1fr
+      }
+
+      .sidebar-container {
+        display: none
+      }
+
+      .toc-mobile {
+        display: block;
+        margin: 18px 0;
+        border: 1px solid var(--border-color);
+        padding: 10px 14px;
+        font: 14px var(--font-sans)
+      }
+
+      .toc-mobile summary {
+        cursor: pointer;
+        font-weight: 600
+      }
+
+      .toc-mobile a {
+        display: block;
+        padding: 6px 0;
+        color: var(--text-muted);
+        text-decoration: none
+      }
+
+      .header-nav {
+        display: none
+      }
+
+      .header-actions {
+        margin-left: auto
+      }
+    }
+
+    @media(max-width:640px) {
+      body {
+        font-size: 17px
+      }
+
+      .quick-safras-grid,
+      .simulator-controls-compact,
+      .api-tester-grid,
+      .authors-grid-final {
+        grid-template-columns: 1fr 1fr
+      }
+
+      .api-tester-grid,
+      .authors-grid-final {
+        grid-template-columns: 1fr
+      }
+
+      .mostra-card {
+        flex-direction: column;
+        align-items: flex-start
+      }
+
+      .article-dates {
+        text-align: left
+      }
+    }
+
+    @media(prefers-reduced-motion:reduce) {
+      * {
+        animation: none !important;
+        transition: none !important;
+        scroll-behavior: auto
+      }
+
+      .fig-anim:not(.in) * {
+        opacity: 1 !important
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ========================================================================
+       CABEÇALHO EDITORIAL ENXUTO (LEI DE HICK: 4 ÂNCORAS + 1 CTA)
+       ======================================================================== -->
+  <!-- ========================================================================
+       CABEÇALHO NO ESTILO TECHBLOG (BLUR, LOGO, ICONS E PROGRESS BAR)
+       ======================================================================== -->
+  <header id="main-header" style="backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);">
+    <div class="header-container">
+      <a href="#" class="brand-logo-link">
+        <img src="img/logo_sojarisco.png" alt="Logo SojaRisco" class="footer-brand-logo"
+          style="width: 32px; height: 32px; object-fit: contain;">
+        <span>Soja<span style="font-weight: 400; color: var(--brand-accent);">Risco</span></span>
+      </a>
+
+      <!-- Navegação TechBlog (Uppercase, tracking wider, font-bold) -->
+      <nav class="header-nav">
+        <a href="#problema">Problema</a>
+        <a href="#modelos">Modelos</a>
+        <a href="#resultados">Resultados</a>
+        <a href="#mostra">Mostra</a>
+      </nav>
+
+      <div class="header-actions">
+        <!-- Alternador Dark / Light Mode (Pill/Rounded) -->
+        <button id="theme-toggle" class="btn-icon" aria-label="Alternar Tema">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round" class="theme-icon-moon">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+          </svg>
+        </button>
+
+        <!-- Repositório GitHub (Pill/Rounded) -->
+        <a href="https://github.com/SAMUKISZHSD/bx_produtividade_agricola" target="_blank" rel="noopener noreferrer"
+          class="btn-icon" aria-label="Ver Repositório no GitHub" title="Repositório no GitHub">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true">
+            <path fill-rule="evenodd" clip-rule="evenodd"
+              d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
+          </svg>
+        </a>
+
+        <!-- CTA Primário Único -->
+        <a href="#dashboard-anchor" class="btn-sm-header" title="Acessar o Dashboard Streamlit">
+          <span>Dashboard</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Barra de Leitura TechBlog (3px alta com animação fluida) -->
+    <div class="reading-progress-track" style="height: 3px; background: var(--bg-surface-alt); width: 100%;">
+      <div id="progress-bar"
+        style="height: 100%; background: var(--brand-primary); transform-origin: 0 50%; transform: scaleX(0);"></div>
+    </div>
+  </header>
+
+  <!-- ========================================================================
+       CONTAINER PRINCIPAL COM GRID EDITORIAL
+       ======================================================================== -->
+  <div class="main-wrapper">
+    <!-- HERO HEADER (ESTILO TECHBLOG - FORA DO GRID PARA ALINHAR O ÍNDICE AO TOPO DO ARTIGO) -->
+    <header class="article-hero"
+      style="padding: 40px 0 32px; border-bottom: 1px solid var(--border-color); margin-bottom: 32px;">
+      <h1 class="hero-title"
+        style="font-size: clamp(32px, 5vw, 54px); font-weight: 700; line-height: 1.08; letter-spacing: -0.025em; color: var(--brand-dark); margin: 0 0 20px;">
+        Do Dado de Satélite ao Alerta no Ar: Previsão de Risco de Quebra na Soja.
+      </h1>
+
+      <p class="hero-subtitle"
+        style="font-size: 1.35rem; line-height: 1.6; font-style: italic; color: var(--text-muted); margin: 0 0 32px; max-width: 900px;">
+        Como ensinar algoritmos de Árvores de Decisão a antecipar quebras severas de produtividade agrícola em
+        Sorriso-MT sem falsos alarmes?
+      </p>
+
+      <!-- Authors Opening Card (Estilo TechBlog com 4 colunas) -->
+      <div class="authors-card-techblog"
+        style="padding: 24px; background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 12px; box-shadow: 0 1px 3px 0 rgba(0,0,0,0.05); margin-top: 24px;">
+        <div
+          style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 20px; font-size: 0.875rem;">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <img loading="lazy" src="https://github.com/jeanBR2O2O.png" alt="Jean Carlos"
+              style="width: 48px; height: 48px; border-radius: 9999px; object-fit: cover; border: 2px solid var(--border-color);"
+              onerror="this.src='https://placehold.co/150x150/eff6ff/1e3a8a?text=JC'">
+            <div>
+              <span
+                style="display: block; color: var(--brand-primary); font-size: 10px; font-family: var(--font-mono); font-weight: 700; text-transform: uppercase;">Autor</span>
+              <span style="font-weight: 600; color: var(--text-main);">Jean Carlos</span>
+            </div>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <img loading="lazy" src="https://github.com/jonnguii.png" alt="João Guilherme"
+              style="width: 48px; height: 48px; border-radius: 9999px; object-fit: cover; border: 2px solid var(--border-color);"
+              onerror="this.src='https://placehold.co/150x150/eff6ff/1e3a8a?text=JG'">
+            <div>
+              <span
+                style="display: block; color: var(--brand-primary); font-size: 10px; font-family: var(--font-mono); font-weight: 700; text-transform: uppercase;">Autor</span>
+              <span style="font-weight: 600; color: var(--text-main);">João Guilherme</span>
+            </div>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <img loading="lazy" src="https://github.com/SAMUKISZHSD.png" alt="Samuel Allan"
+              style="width: 48px; height: 48px; border-radius: 9999px; object-fit: cover; border: 2px solid var(--border-color);"
+              onerror="this.src='https://placehold.co/150x150/eff6ff/1e3a8a?text=S'">
+            <div>
+              <span
+                style="display: block; color: var(--brand-primary); font-size: 10px; font-family: var(--font-mono); font-weight: 700; text-transform: uppercase;">Autor</span>
+              <span style="font-weight: 600; color: var(--text-main);">Samuel Allan</span>
+            </div>
+          </div>
+
+          <div
+            style="display: flex; align-items: center; gap: 12px; border-left: 1px solid var(--border-color); padding-left: 20px;">
+            <div
+              style="width: 44px; height: 44px; border-radius: 9999px; background: var(--bg-surface-alt); color: var(--brand-primary); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                <line x1="16" y1="2" x2="16" y2="6" />
+                <line x1="8" y1="2" x2="8" y2="6" />
+                <line x1="3" y1="10" x2="21" y2="10" />
+              </svg>
+            </div>
+            <div>
+              <span
+                style="display: block; color: var(--brand-primary); font-size: 10px; font-family: var(--font-mono); font-weight: 700; text-transform: uppercase;">Publicação</span>
+              <span style="font-weight: 600; color: var(--text-main);">Outubro 2026</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="editorial-grid">
+
+      <!-- ====================================================================
+           ARTIGO TÉCNICO COMPLETO
+           ==================================================================== -->
+      <article class="article-content">
+
+        <!-- SEÇÃO 1: O PROBLEMA E QUEM USA O ALERTA -->
+        <section id="problema">
+          <h2>1. O Problema Agrícola e Quem Usa o Alerta</h2>
+          <p class="lead-learn">Neste artigo nós mostramos como funcionam a Árvore de Decisão, a Random Forest e o
+            XGBoost, e por que, para o alerta de quebra de safra em Sorriso-MT, uma árvore simples foi a escolha mais
+            adequada.</p>
+
+          <p>
+            Quando nós analisamos o ecossistema produtivo de Sorriso, no norte de Mato Grosso - oficialmente reconhecido
+            como a Capital Nacional do Agronegócio e um dos polos com maior produção municipal de soja do mundo - , a
+            constatação imediata é de alta densidade tecnológica. Contudo, mesmo com maquinário avançado e sementes
+            melhoradas, o rendimento das lavouras permanece fortemente vulnerável a variações agroclimáticas extremas.
+          </p>
+
+          <p>
+            Em safras de clima favorável, a produtividade média no município supera com regularidade os 3.600 kg por
+            hectare (kg/ha). Entretanto, em anos marcados por estresse hídrico e térmico - como ocorreu em 2015, 2016 e
+            2021 - , a produtividade desabou, gerando prejuízos severos. A média histórica consolidada de Sorriso-MT nas
+            últimas dez safras é de <strong>3.477 kg/ha</strong>. Diante desse cenário, nós definimos como limite
+            técnico objetivo de quebra de safra o patamar de rendimento inferior a <strong>3.400 kg/ha</strong>.
+          </p>
+
+          <div class="callout-box">
+            <div class="callout-title">Horizonte de Decisão no Agronegócio</div>
+            <p style="margin-bottom: 0; font-size: 0.95rem;">
+              A colheita da soja na região ocorre entre fevereiro e abril, mas as principais ações de proteção precisam
+              ser executadas com meses de antecedência. Nosso sistema foi projetado para emitir o veredito de risco no
+              encerramento de fevereiro, aproveitando os dados do bimestre crítico de floração e enchimento de grãos.
+            </p>
+          </div>
+
+          <h3>Quem Utiliza o Alerta e Qual Ação Prática ele Apoia?</h3>
+          <p>
+            O sistema que nós desenvolvemos atende três perfis fundamentais da cadeia agrícola:
+          </p>
+          <ol>
+            <li><strong>Produtores Rurais:</strong> Podem antecipar a contratação de seguro agrícola, revisar despesas
+              com fertilização suplementar e adotar posições cautelares na venda antecipada da safra no mercado futuro.
+            </li>
+            <li><strong>Cooperativas Agrícolas:</strong> Projetam com antecedência o fluxo real de grãos a receber nos
+              armazéns e renegociam contratos logísticos e de frete rodoviário e ferroviário.</li>
+            <li><strong>Seguradoras Rurais e Agentes Financeiros:</strong> Direcionam vistorias de campo com foco nas
+              áreas de estresse e provisionam recursos para liquidação tempestiva de sinistros.</li>
+          </ol>
+
+          <h3>A Matriz de Custo dos Erros: Por que Priorizamos o Recall?</h3>
+          <p>
+            Em um problema de <span class="tech-term">Aprendizado Supervisionado</span> <span
+              class="didactic-note">(método em que nós treinamos o modelo fornecendo dados históricos cujos resultados
+              reais já são conhecidos)</span> configurado como <span class="tech-term">Classificação Binária</span>
+            <span class="didactic-note">(tarefa de inteligência artificial que escolhe entre duas possibilidades: quebra
+              de safra versus safra normal)</span>, ocorrem dois tipos de erro de predição:
+          </p>
+
+          <ul>
+            <li><strong><span class="tech-term">Falso Positivo (FP)</span> <span class="didactic-note">(alarme falso: o
+                  modelo projeta quebra, mas a colheita atinge níveis normais)</span>:</strong> Gera um custo cautelar
+              com seguro rural ou proteção financeira desnecessária, sem prejuízo físico à cultura.</li>
+            <li><strong><span class="tech-term">Falso Negativo (FN)</span> <span class="didactic-note">(omissão grave: o
+                  modelo projeta safra normal, mas a lavoura sofre perda severa sem qualquer aviso
+                  prévio)</span>:</strong> Causa descapitalização abrupta, inadimplência e perda de solvência do
+              produtor rural.</li>
+          </ul>
+
+          <p>
+            No agronegócio, o impacto operacional do Falso Negativo é muito mais destrutivo do que o de um Falso
+            Positivo. Por essa razão técnica, a nossa principal métrica de avaliação é o <span class="tech-term">Recall
+              (Sensibilidade/Revocação)</span> <span class="didactic-note">(a proporção de todas as quebras reais que o
+              nosso modelo conseguiu identificar corretamente)</span>, priorizado em detrimento da acurácia global. Em
+            complemento, nós acompanhamos a <span class="tech-term">Precisão (Precision)</span> <span
+              class="didactic-note">(a proporção de alertas disparados pelo modelo que correspondiam a perdas reais no
+              campo)</span>, o <span class="tech-term">F1-Score</span> <span class="didactic-note">(a média harmônica
+              que equilibra precisão e recall em uma métrica unificada)</span> e a <span class="tech-term">Matriz de
+              Confusão</span> <span class="didactic-note">(tabela cruzada que confronta o que de fato ocorreu no campo
+              contra o que o modelo previu, revelando verdadeiros e falsos resultados)</span>.
+          </p>
+        </section>
+
+        <!-- SEÇÃO 2: OS DADOS, A ARMADILHA DE 2021 E O PIPELINE -->
+        <section id="dados">
+          <h2>2. Os Dados, a Armadilha de 2021 e o Pipeline de 4 Camadas</h2>
+
+          <p>
+            A nossa <span class="tech-term">Variável-Alvo (Target)</span> <span class="didactic-note">(o rótulo que nós
+              queremos prever: 1 para quebra e 0 para safra normal)</span> é derivada dos dados oficiais de rendimento
+            agrícola divulgados pelo <strong>IBGE PAM (Produção Agrícola Municipal, Agregado 1612)</strong>.
+          </p>
+
+          <p>
+            As nossas <span class="tech-term">Features (Atributos Preditores)</span> <span class="didactic-note">(os
+              indicadores climáticos e de solo utilizados para a tomada de decisão preditiva)</span> foram extraídas da
+            API pública da <strong>NASA POWER (Prediction of Worldwide Energy Resources)</strong>, correspondendo às
+            coordenadas geográficas de Sorriso-MT (<span style="font-family: var(--font-mono); font-size: 0.88em;">Lat:
+              -12.5414°, Lon: -55.7269°</span>).
+          </p>
+
+          <h3>Limpeza, Tratamento e Idempotência</h3>
+          <p>
+            No pré-processamento, adotamos regras estruturadas de engenharia de dados:
+          </p>
+          <ul>
+            <li><strong>Sentinela da NASA POWER:</strong> A API utiliza o valor sentinela <code>-999.0</code> para
+              ausência de sinal. O pipeline converte esses registros em nulos e realiza imputação pela mediana histórica
+              antes de qualquer cálculo de soma ou média.</li>
+            <li><strong>Descarte da Safra 2025:</strong> Como o ano agrícola de 2025 não possui consolidação oficial
+              fechada no IBGE PAM, sua inclusão geraria dados estáticos artificiais. Nosso estudo trabalha
+              exclusivamente com dez safras fechadas (2015 a 2024).</li>
+            <li><strong><span class="tech-term">Idempotência</span> <span class="didactic-note">(a garantia de que
+                  reexecutar o pipeline de coleta e transformação múltiplas vezes gera rigorosamente o mesmo resultado
+                  final, sem criar registros duplicados)</span>:</strong> Assegurada pelo controle de chaves primárias e
+              verificação de hashes de integridade.</li>
+          </ul>
+
+          <!-- FIGURA 1: ARQUITETURA 4 CAMADAS -->
+          <div class="figure-wrapper">
+            <div class="figure-header">
+              <span class="figure-title">Figura 1 - Arquitetura de 4 Camadas e Partição Temporal Estrita</span>
+            </div>
+
+            <div style="overflow-x: auto; text-align: center;">
+              <svg class="fig-anim" role="img"
+                aria-label="Pipeline em quatro camadas (coleta, engenharia de dados, modelagem, entrega) e partição temporal: treino 2015 a 2022, teste 2023 a 2024"
+                viewBox="0 0 840 280" width="100%"
+                style="height: auto; max-width: 800px; font-family: system-ui, sans-serif;">
+                <rect x="10" y="10" width="820" height="150" rx="8" fill="var(--bg-surface-alt)"
+                  stroke="var(--border-color)" />
+
+                <!-- Camada 1 -->
+                <g transform="translate(25, 25)">
+                  <rect width="180" height="120" rx="6" fill="var(--bg-surface)" stroke="var(--border-color)" />
+                  <text x="14" y="24" font-size="11" font-weight="bold" fill="var(--brand-primary)"
+                    font-family="monospace">CAMADA 1 · CD</text>
+                  <text x="14" y="44" font-size="13" font-weight="bold" fill="var(--text-main)">Coleta e Ingestão</text>
+                  <text x="14" y="66" font-size="10.5" fill="var(--text-muted)">NASA POWER Daily</text>
+                  <text x="14" y="82" font-size="10.5" fill="var(--text-muted)">IBGE PAM 1612</text>
+                  <text x="14" y="98" font-size="10.5" fill="var(--text-muted)">Cache Raw e Idempotência</text>
+                </g>
+
+                <path d="M210 85 L230 85" stroke="var(--text-light)" stroke-width="1.5" />
+
+                <!-- Camada 2 -->
+                <g transform="translate(235, 25)">
+                  <rect width="180" height="120" rx="6" fill="var(--bg-surface)" stroke="var(--border-color)" />
+                  <text x="14" y="24" font-size="11" font-weight="bold" fill="var(--brand-primary)"
+                    font-family="monospace">CAMADA 2 · AD</text>
+                  <text x="14" y="44" font-size="13" font-weight="bold" fill="var(--text-main)">Engenharia de
+                    Dados</text>
+                  <text x="14" y="66" font-size="10.5" fill="var(--text-muted)">Foco Jan-Fev (Floração)</text>
+                  <text x="14" y="82" font-size="10.5" fill="var(--text-muted)">Déficit Raiz e Calor</text>
+                  <text x="14" y="98" font-size="10.5" fill="var(--text-muted)">Tratamento de Nulos</text>
+                </g>
+
+                <path d="M420 85 L440 85" stroke="var(--text-light)" stroke-width="1.5" />
+
+                <!-- Camada 3 -->
+                <g transform="translate(445, 25)">
+                  <rect width="180" height="120" rx="6" fill="var(--bg-surface)" stroke="var(--border-color)" />
+                  <text x="14" y="24" font-size="11" font-weight="bold" fill="var(--brand-primary)"
+                    font-family="monospace">CAMADA 3 · ML</text>
+                  <text x="14" y="44" font-size="13" font-weight="bold" fill="var(--text-main)">Modelagem
+                    Preditiva</text>
+                  <text x="14" y="66" font-size="10.5" fill="var(--text-muted)">ColumnTransformer</text>
+                  <text x="14" y="82" font-size="10.5" fill="var(--text-muted)">Árvores vs Ensembles</text>
+                  <text x="14" y="98" font-size="10.5" fill="var(--text-muted)">Otimização de Recall</text>
+                </g>
+
+                <path d="M630 85 L650 85" stroke="var(--text-light)" stroke-width="1.5" />
+
+                <!-- Camada 4 -->
+                <g transform="translate(655, 25)">
+                  <rect width="160" height="120" rx="6" fill="var(--bg-surface)" stroke="var(--border-color)" />
+                  <text x="14" y="24" font-size="11" font-weight="bold" fill="var(--brand-primary)"
+                    font-family="monospace">CAMADA 4 · PROD</text>
+                  <text x="14" y="44" font-size="13" font-weight="bold" fill="var(--text-main)">Alerta e Entrega</text>
+                  <text x="14" y="66" font-size="10.5" fill="var(--text-muted)">Streamlit Dashboard</text>
+                  <text x="14" y="82" font-size="10.5" fill="var(--text-muted)">SQLite 3 Tabelas</text>
+                  <text x="14" y="98" font-size="10.5" fill="var(--text-muted)">API de Inferência</text>
+                </g>
+
+                <!-- Partição Temporal -->
+                <g transform="translate(10, 180)">
+                  <rect width="820" height="85" rx="6" fill="var(--bg-surface)" stroke="var(--border-color)" />
+                  <text x="20" y="24" font-size="12" font-weight="bold" fill="var(--text-main)">Partição Temporal
+                    (Prevenção de Vazamento / Data Leakage)</text>
+
+                  <rect x="20" y="38" width="600" height="30" rx="4" fill="var(--brand-primary-light)"
+                    stroke="var(--brand-primary)" />
+                  <text x="180" y="58" font-size="11.5" font-weight="bold" fill="var(--brand-dark)">Treino: Safras 2015
+                    a 2022 (8 safras, 3 quebras)</text>
+
+                  <rect x="630" y="38" width="170" height="30" rx="4" fill="var(--brand-warning-light)"
+                    stroke="var(--brand-accent)" />
+                  <text x="648" y="58" font-size="11.5" font-weight="bold" fill="var(--brand-accent)">Teste: 2023 a
+                    2024</text>
+                </g>
+              </svg>
+            </div>
+            <p class="figure-caption">
+              Linhagem de dados em 4 camadas e <span class="tech-term">Split Temporal (Divisão Temporal)</span> <span
+                class="didactic-note">(critério em que o modelo treina no passado e testa no futuro recente, evitando
+                que o presente receba informações do amanhã)</span>.
+            </p>
+          </div>
+
+          <h3>A Armadilha de 2021: O Volume Anual que Iludiu os Baselines</h3>
+          <p>
+            Na Sprint 3, nossos primeiros modelos base utilizaram totais pluviométricos anuais. Na <strong>safra de
+              2021</strong>, esse formato gerou uma falha preditiva crítica: o modelo estimou safra normal, mas o
+            rendimento real despencou para <strong>3.360 kg/ha</strong>.
+          </p>
+
+          <p>
+            O erro ocorreu porque em 2021 choveu <strong>1.634,39 mm</strong> ao longo do ano civil (o 3º maior volume
+            da década). No entanto, a análise do bimestre de janeiro e fevereiro revelou que a lavoura passou por
+            <strong>42 dias de déficit na zona das raízes</strong> (<code>GWETROOT < 0.70</code>) e <strong>3 dias com
+              temperatura máxima acima de 35°C</strong> durante a formação de grãos. O volume anual caiu fora do período
+            biológico determinante.
+          </p>
+
+          <!-- Tabela com as 10 safras -->
+          <div class="table-responsive">
+            <table class="editorial-table">
+              <thead>
+                <tr>
+                  <th>Ano da Safra</th>
+                  <th>Chuva Anual (mm)</th>
+                  <th>Déficit Raiz (Jan-Fev)</th>
+                  <th>Dias &ge; 35°C</th>
+                  <th>Chuva Enchimento (mm)</th>
+                  <th>Rendimento Real</th>
+                  <th>Alvo Real</th>
+                  <th>Comportamento Agronômico</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="highlight-row">
+                  <td><strong>2015</strong></td>
+                  <td>645.49</td>
+                  <td>47 dias</td>
+                  <td>0 dias</td>
+                  <td>159.28 mm</td>
+                  <td>3.148 kg/ha</td>
+                  <td>1 (Quebra)</td>
+                  <td>Seca severa durante todo o enchimento.</td>
+                </tr>
+                <tr class="highlight-row">
+                  <td><strong>2016</strong></td>
+                  <td>1.147.75</td>
+                  <td>28 dias</td>
+                  <td>4 dias</td>
+                  <td>257.40 mm</td>
+                  <td>2.880 kg/ha</td>
+                  <td>1 (Quebra)</td>
+                  <td>Onda de calor extremo e déficit na raiz.</td>
+                </tr>
+                <tr>
+                  <td><strong>2017</strong></td>
+                  <td>1.561.12</td>
+                  <td>0 dias</td>
+                  <td>0 dias</td>
+                  <td>425.38 mm</td>
+                  <td>3.520 kg/ha</td>
+                  <td>0 (Normal)</td>
+                  <td>Chuva bem distribuída no ciclo.</td>
+                </tr>
+                <tr>
+                  <td><strong>2018</strong></td>
+                  <td>1.903.15</td>
+                  <td>0 dias</td>
+                  <td>0 dias</td>
+                  <td>724.46 mm</td>
+                  <td>3.870 kg/ha</td>
+                  <td>0 (Normal)</td>
+                  <td>Volume hídrico abundante no enchimento.</td>
+                </tr>
+                <tr>
+                  <td><strong>2019</strong></td>
+                  <td>1.210.35</td>
+                  <td>15 dias</td>
+                  <td>0 dias</td>
+                  <td>382.11 mm</td>
+                  <td>3.480 kg/ha</td>
+                  <td>0 (Normal)</td>
+                  <td>Déficit moderado; chuva tardia evitou quebra.</td>
+                </tr>
+                <tr>
+                  <td><strong>2020</strong></td>
+                  <td>977.14</td>
+                  <td>15 dias</td>
+                  <td>0 dias</td>
+                  <td>299.01 mm</td>
+                  <td>3.490 kg/ha</td>
+                  <td>0 (Normal)</td>
+                  <td>Safra limítrofe no patamar histórico.</td>
+                </tr>
+                <tr class="highlight-row">
+                  <td><strong>2021</strong></td>
+                  <td>1.634.39</td>
+                  <td>42 dias</td>
+                  <td>3 dias</td>
+                  <td>418.57 mm</td>
+                  <td>3.360 kg/ha</td>
+                  <td>1 (Quebra)</td>
+                  <td>Chuva anual elevada, mas seca severa na raiz.</td>
+                </tr>
+                <tr>
+                  <td><strong>2022</strong></td>
+                  <td>1.518.05</td>
+                  <td>0 dias</td>
+                  <td>0 dias</td>
+                  <td>463.11 mm</td>
+                  <td>3.610 kg/ha</td>
+                  <td>0 (Normal)</td>
+                  <td>Condições regulares de precipitação.</td>
+                </tr>
+                <tr>
+                  <td><strong>2023</strong> (Teste)</td>
+                  <td>1.250.03</td>
+                  <td>0 dias</td>
+                  <td>0 dias</td>
+                  <td>476.27 mm</td>
+                  <td>3.580 kg/ha</td>
+                  <td>0 (Normal)</td>
+                  <td>Teste temporal cego sem anomalias.</td>
+                </tr>
+                <tr>
+                  <td><strong>2024</strong> (Teste)</td>
+                  <td>1.469.91</td>
+                  <td>4 dias</td>
+                  <td>0 dias</td>
+                  <td>556.25 mm</td>
+                  <td>3.560 kg/ha</td>
+                  <td>0 (Normal)</td>
+                  <td>Teste temporal cego com chuva regular.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            Essa investigação motivou a reestruturação das variáveis na Sprint 4, evitando qualquer <span
+              class="tech-term">Vazamento de Dados (Data Leakage)</span> <span class="didactic-note">(o erro
+              metodológico de utilizar na predição informações que só ficam disponíveis após o término da safra)</span>.
+          </p>
+        </section>
+
+        <!-- SEÇÃO 3: OS MODELOS EM ÁRVORES -->
+        <section id="modelos">
+          <h2>3. Os Modelos em Árvores: Da Intuição à Matemática</h2>
+
+          <p>
+            Na prática agronômica, um técnico de campo toma decisões a partir de uma hierarquia lógica de testes: <em>"O
+              solo permaneceu em déficit por mais de 20 dias em janeiro e fevereiro?"</em>. Caso afirmativo:
+            <em>"Registramos picos térmicos acima de 35 graus?"</em>. Esse raciocínio passo a passo corresponde à
+            estrutura exata de uma <strong>Árvore de Decisão</strong>.
+          </p>
+
+          <h3>1. Baseline: Ponto de Partida e Lift</h3>
+          <p>
+            Nós estabelecemos uma linha de base com um <span class="tech-term">Baseline</span> <span
+              class="didactic-note">(o modelo mais simples possível, usado como régua comparativa para checar se
+              algoritmos complexos de fato trazem ganho preditivo real)</span>:
+          </p>
+          <ul>
+            <li><strong>DummyClassifier:</strong> Sempre prevê a classe majoritária (Safra Normal). Embora atinja 100%
+              de acurácia no teste (2023-2024), tem Recall nulo (0%) nas quebras.</li>
+            <li><strong>Persistência:</strong> Supõe que a safra deste ano repetirá a safra anterior. Falha em capturar
+              transições climáticas súbitas.</li>
+            <li><strong>GaussianNB:</strong> Classificador Bayesiano simples. Errava a safra 2021 na Sprint 3; com os
+              atributos de Jan-Fev na Sprint 4, capturou o evento, mas a hipótese de independência condicional é violada
+              em séries meteorológicas.</li>
+          </ul>
+
+          <!-- Tabela de Lift -->
+          <div class="table-responsive">
+            <table class="editorial-table">
+              <thead>
+                <tr>
+                  <th>Modelo Baseline</th>
+                  <th>Recall (Sprint 3)</th>
+                  <th>Recall (Sprint 4)</th>
+                  <th>F1-Score (Sprint 3)</th>
+                  <th>F1-Score (Sprint 4)</th>
+                  <th>Delta Recall (&Delta;)</th>
+                  <th>Observação Técnica</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>DummyClassifier</code></td>
+                  <td>0.00</td>
+                  <td>0.00</td>
+                  <td>0.00</td>
+                  <td>0.00</td>
+                  <td>+0.00</td>
+                  <td>Inerte ao evento raro de risco.</td>
+                </tr>
+                <tr>
+                  <td><code>Persistência</code></td>
+                  <td>0.00</td>
+                  <td>0.00</td>
+                  <td>0.00</td>
+                  <td>0.00</td>
+                  <td>+0.00</td>
+                  <td>Incapaz de prever inversões climáticas.</td>
+                </tr>
+                <tr class="highlight-row">
+                  <td><code>GaussianNB</code></td>
+                  <td>0.67</td>
+                  <td><strong>1.00</strong></td>
+                  <td>0.57</td>
+                  <td><strong>0.86</strong></td>
+                  <td><strong>+0.33</strong></td>
+                  <td>Atributos de Jan-Fev eliminaram o falso negativo de 2021.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>2. Árvore de Decisão: Estrutura Lógica Direta</h3>
+          <p>
+            A Árvore de Decisão particiona o espaço de dados através de divisões ortogonais. O ponto de pergunta é
+            denominado <span class="tech-term">Nó (Node)</span> <span class="didactic-note">(ponto onde o algoritmo
+              testa o valor de uma feature)</span> e o terminal que emite a resposta final é a <span
+              class="tech-term">Folha (Leaf)</span> <span class="didactic-note">(extremidade da árvore que entrega a
+              classe predita)</span>.
+          </p>
+
+          <p>
+            O critério de corte busca minimizar a <span class="tech-term">Impureza de Gini</span> <span
+              class="didactic-note">(índice que mede o grau de mistura entre as classes em um subgrupo de dados)</span>
+            ou a <span class="tech-term">Entropia</span> <span class="didactic-note">(métrica da teoria da informação
+              que calcula o desordenamento estatístico dos rótulos)</span>.
+          </p>
+
+          <!-- FIGURA 2: SIMULADOR DA ÁRVORE COM LEI DE HICK -->
+          <div class="figure-wrapper" id="simulador-arvore">
+            <div class="figure-header">
+              <span class="figure-title">Figura 2 - Simulador da Árvore de Decisão de Sorriso-MT</span>
+            </div>
+
+            <div class="tree-simulator">
+              <!-- Escolha Primária (Hick): 4 Safras Históricas Claras -->
+              <div class="hick-primary-choice">
+                <span class="choice-label">Selecione uma Safra Histórica Real:</span>
+                <div class="quick-safras-grid">
+                  <button class="btn-safra-chip active" data-ano="2021">
+                    <span class="chip-year">Safra 2021</span>
+                    <span class="chip-desc">A Armadilha (Quebra)</span>
+                  </button>
+                  <button class="btn-safra-chip" data-ano="2015">
+                    <span class="chip-year">Safra 2015</span>
+                    <span class="chip-desc">Seca Severa (Quebra)</span>
+                  </button>
+                  <button class="btn-safra-chip" data-ano="2018">
+                    <span class="chip-year">Safra 2018</span>
+                    <span class="chip-desc">Chuva Plena (Normal)</span>
+                  </button>
+                  <button class="btn-safra-chip" data-ano="2024">
+                    <span class="chip-year">Safra 2024</span>
+                    <span class="chip-desc">Teste Cego (Normal)</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Painel de Revelação Progressiva (Sliders e Profundidade) -->
+              <details class="progressive-panel">
+                <summary class="progressive-summary">
+                  <span>Ajustar variáveis climáticas manualmente e analisar profundidade</span>
+                  <span style="font-size: 0.75rem; font-family: var(--font-mono); color: var(--text-light);">Ajustes
+                    Finos &darr;</span>
+                </summary>
+                <div class="progressive-content">
+                  <div class="simulator-controls-compact">
+                    <div class="control-item">
+                      <label><span>Déficit na Raiz (Jan-Fev):</span><span id="val-deficit" class="control-val">42
+                          dias</span></label>
+                      <input type="range" id="sim-deficit" min="0" max="60" value="42" step="1">
+                    </div>
+                    <div class="control-item">
+                      <label><span>Dias Calor &ge; 35°C:</span><span id="val-calor" class="control-val">3
+                          dias</span></label>
+                      <input type="range" id="sim-calor" min="0" max="10" value="3" step="1">
+                    </div>
+                    <div class="control-item">
+                      <label><span>Chuva Enchimento:</span><span id="val-chuva" class="control-val">418
+                          mm</span></label>
+                      <input type="range" id="sim-chuva" min="100" max="800" value="418" step="5">
+                    </div>
+                    <div class="control-item">
+                      <label><span>Amplitude Térmica:</span><span id="val-amp" class="control-val">28.7
+                          °C</span></label>
+                      <input type="range" id="sim-amp" min="20" max="35" value="28.7" step="0.1">
+                    </div>
+                  </div>
+
+                  <!-- Seletor de Profundidade: Overfitting vs Underfitting -->
+                  <div style="margin-top: 1.25rem; border-top: 1px solid var(--border-color); padding-top: 1rem;">
+                    <span class="choice-label">Efeito da <span class="tech-term">Profundidade Máxima (max_depth)</span>
+                      <span class="didactic-note">(limite de andares ou perguntas que a árvore pode
+                        fazer)</span>:</span>
+                    <div style="display: flex; gap: 0.5rem; margin-bottom: 0.75rem;">
+                      <button class="btn-safra-chip btn-depth-select" data-depth="1" style="flex:1;">Profundidade 1
+                        (Subajuste)</button>
+                      <button class="btn-safra-chip btn-depth-select active" data-depth="3" style="flex:1;">Profundidade
+                        3 (Recomendado)</button>
+                      <button class="btn-safra-chip btn-depth-select" data-depth="6" style="flex:1;">Profundidade 6
+                        (Sobreajuste)</button>
+                    </div>
+                    <div id="depth-explanation-box">
+                      <div style="border-left: 3px solid var(--brand-primary); padding-left: 0.85rem;">
+                        <div
+                          style="font-size: 0.95rem; font-weight: 700; color: var(--brand-primary); margin-bottom: 0.25rem;">
+                          Profundidade 3 (Árvore Parcimoniosa) - Modelo Recomendado</div>
+                        <p style="font-size: 0.88rem; margin-bottom: 0.5rem; color: var(--text-main);">Ponto ótimo com
+                          <code>min_samples_leaf=2</code>. Isola quebras por déficit e temperatura sem decorar o ruído
+                          amostral.
+                        </p>
+                        <div
+                          style="display: flex; gap: 1.25rem; font-size: 0.8rem; font-family: var(--font-mono); color: var(--text-muted);">
+                          <span>Treino: <strong>100.0%</strong></span>
+                          <span>Validação: <strong>100.0%</strong></span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </details>
+
+              <!-- SVG Vetorial da Árvore -->
+              <div class="tree-svg-container">
+                <svg id="tree" role="img"
+                  aria-label="Árvore de decisão de profundidade 3 sobre déficit hídrico, dias de calor, chuva e amplitude térmica, com quatro folhas"
+                  viewBox="0 0 760 270" width="100%"
+                  style="height: auto; max-width: 720px; font-family: system-ui, sans-serif;">
+                  <line id="edge-root-left" x1="380" y1="45" x2="200" y2="105" stroke="var(--border-color)"
+                    stroke-width="1.5" />
+                  <line id="edge-root-right" x1="380" y1="45" x2="560" y2="105" stroke="var(--border-color)"
+                    stroke-width="1.5" />
+
+                  <line id="edge-estresse-left" x1="200" y1="145" x2="110" y2="205" stroke="var(--border-color)"
+                    stroke-width="1.5" />
+                  <line id="edge-estresse-right" x1="200" y1="145" x2="290" y2="205" stroke="var(--border-color)"
+                    stroke-width="1.5" />
+
+                  <line id="edge-favoravel-left" x1="560" y1="145" x2="470" y2="205" stroke="var(--border-color)"
+                    stroke-width="1.5" />
+                  <line id="edge-favoravel-right" x1="560" y1="145" x2="650" y2="205" stroke="var(--border-color)"
+                    stroke-width="1.5" />
+
+                  <!-- Raiz -->
+                  <g id="node-root" class="tree-node-rect" transform="translate(280, 10)">
+                    <rect width="200" height="42" rx="4" fill="var(--bg-surface)" stroke="var(--border-color)"
+                      stroke-width="1.5" />
+                    <text x="100" y="20" font-size="11.5" font-weight="bold" text-anchor="middle"
+                      fill="var(--text-main)">deficit_hidrico_solo &gt; 20 dias?</text>
+                    <text x="100" y="34" font-size="9.5" text-anchor="middle" fill="var(--text-light)">Gini = 0.42 | N =
+                      8</text>
+                  </g>
+
+                  <!-- Nós Intermediários -->
+                  <g id="node-estresse" class="tree-node-rect" transform="translate(100, 105)">
+                    <rect width="200" height="42" rx="4" fill="var(--bg-surface)" stroke="var(--border-color)"
+                      stroke-width="1.5" />
+                    <text x="100" y="20" font-size="11" font-weight="bold" text-anchor="middle"
+                      fill="var(--text-main)">dias_calor &ge; 3 ou deficit &ge; 35?</text>
+                    <text x="100" y="34" font-size="9.5" text-anchor="middle" fill="var(--text-light)">Ramo de Estresse
+                      Hídrico</text>
+                  </g>
+
+                  <g id="node-favoravel" class="tree-node-rect" transform="translate(460, 105)">
+                    <rect width="200" height="42" rx="4" fill="var(--bg-surface)" stroke="var(--border-color)"
+                      stroke-width="1.5" />
+                    <text x="100" y="20" font-size="11" font-weight="bold" text-anchor="middle"
+                      fill="var(--text-main)">chuva &lt; 200 mm &amp; amp &gt; 28°C?</text>
+                    <text x="100" y="34" font-size="9.5" text-anchor="middle" fill="var(--text-light)">Ramo de Umidade
+                      Favorável</text>
+                  </g>
+
+                  <!-- Folhas -->
+                  <g id="leaf-quebra-severa" class="tree-node-rect" transform="translate(30, 205)">
+                    <rect width="160" height="46" rx="4" fill="var(--brand-danger-light)" stroke="var(--brand-danger)"
+                      stroke-width="1.5" />
+                    <text x="80" y="20" font-size="11" font-weight="bold" text-anchor="middle"
+                      fill="var(--brand-danger)">Alerta de Quebra</text>
+                    <text x="80" y="35" font-size="9.5" text-anchor="middle" fill="var(--text-main)">Prob: 95% (2015,
+                      2016, 2021)</text>
+                  </g>
+
+                  <g id="leaf-limitrofe" class="tree-node-rect" transform="translate(210, 205)">
+                    <rect width="160" height="46" rx="4" fill="var(--bg-surface-alt)" stroke="var(--border-color)"
+                      stroke-width="1" />
+                    <text x="80" y="20" font-size="11" font-weight="bold" text-anchor="middle"
+                      fill="var(--brand-accent)">Zona Limítrofe</text>
+                    <text x="80" y="35" font-size="9.5" text-anchor="middle" fill="var(--text-light)">Prob: 45% (2019,
+                      2020)</text>
+                  </g>
+
+                  <g id="leaf-preventivo" class="tree-node-rect" transform="translate(390, 205)">
+                    <rect width="160" height="46" rx="4" fill="var(--bg-surface-alt)" stroke="var(--border-color)"
+                      stroke-width="1" />
+                    <text x="80" y="20" font-size="11" font-weight="bold" text-anchor="middle"
+                      fill="var(--text-muted)">Alerta Preventivo</text>
+                    <text x="80" y="35" font-size="9.5" text-anchor="middle" fill="var(--text-light)">Prob: 52% (Sem
+                      histórico)</text>
+                  </g>
+
+                  <g id="leaf-normal" class="tree-node-rect" transform="translate(570, 205)">
+                    <rect width="160" height="46" rx="4" fill="var(--brand-primary-light)" stroke="var(--brand-primary)"
+                      stroke-width="1.5" />
+                    <text x="80" y="20" font-size="11" font-weight="bold" text-anchor="middle"
+                      fill="var(--brand-dark)">Safra Normal</text>
+                    <text x="80" y="35" font-size="9.5" text-anchor="middle" fill="var(--brand-dark)">Prob: 8% (2017,
+                      2018, 2022-24)</text>
+                  </g>
+                </svg>
+              </div>
+
+              <!-- Veredito Direto (Hick) -->
+              <div class="simulator-verdict-card">
+                <div class="verdict-header-row">
+                  <div id="sim-verdict" class="verdict-status"></div>
+                  <div id="sim-prob" class="verdict-prob"></div>
+                </div>
+                <div id="sim-safra-details"
+                  style="font-size: 0.8rem; color: var(--text-main); margin-top: 0.35rem; font-family: var(--font-mono);">
+                </div>
+                <div id="sim-latency"
+                  style="font-size: 0.75rem; color: var(--text-light); font-family: var(--font-mono);"></div>
+              </div>
+            </div>
+
+            <p class="figure-caption">
+              Árvore de decisão ajustada no treino. As cores indicam o caminho percorrido conforme o cenário
+              selecionado.
+            </p>
+          </div>
+
+          <h3>3. Random Forest (Bagging): Votação em Paralelo</h3>
+          <p>
+            O algoritmo <strong>Random Forest</strong> fundamenta-se na técnica de <span class="tech-term">Bagging
+              (Bootstrap Aggregating)</span> <span class="didactic-note">(criação de um comitê de múltiplas árvores
+              treinadas em paralelo em subconjuntos aleatórios dos dados)</span>.
+          </p>
+
+          <p>
+            Cada árvore é construída sobre uma <span class="tech-term">Amostra Bootstrap</span> <span
+              class="didactic-note">(sorteio de dados com reposição onde parte das safras pode se repetir e outras ficam
+              ausentes)</span>. A validação interna ocorre via <span class="tech-term">Erro Out-of-Bag (OOB)</span>
+            <span class="didactic-note">(avaliação realizada nas observações que não foram sorteadas em cada
+              árvore)</span>. A combinação dos votos reduz a <span class="tech-term">Variância (Variance)</span> <span
+              class="didactic-note">(a instabilidade do modelo diante de pequenas oscilações amostrais)</span>.
+          </p>
+
+          <h3>4. XGBoost (Boosting): Correção de Resíduos em Fila</h3>
+          <p>
+            Diferentemente da floresta paralela, o <strong>XGBoost</strong> baseia-se em <span
+              class="tech-term">Boosting</span> <span class="didactic-note">(construção sequencial onde cada nova árvore
+              é orientada a corrigir os resíduos de erro deixados pelas árvores anteriores)</span>.
+          </p>
+
+          <p>
+            Através de <span class="tech-term">Gradient Boosting</span> <span class="didactic-note">(uso de derivadas do
+              erro para direcionar a magnitude da correção)</span> e de uma <span class="tech-term">Taxa de Aprendizado
+              (Learning Rate)</span> <span class="didactic-note">(peso de contribuição de cada árvore individual)</span>
+            ponderada, o algoritmo combate o <span class="tech-term">Viés (Bias)</span> <span class="didactic-note">(o
+              erro por hipóteses simplistas do modelo)</span>. A complexidade é controlada via <span
+              class="tech-term">Regularização</span> <span class="didactic-note">(penalização matemática no tamanho das
+              árvores)</span> e <span class="tech-term">Parada Antecipada (Early Stopping)</span> <span
+              class="didactic-note">(interrupção quando a perda de validação cessa a melhora)</span>.
+          </p>
+
+          <!-- FIGURA 3: BAGGING VS BOOSTING -->
+          <div class="figure-wrapper">
+            <div class="figure-header">
+              <span class="figure-title">Figura 3 - Confronto Estrutural: Bagging versus Boosting</span>
+            </div>
+
+            <div style="overflow-x: auto; text-align: center;">
+              <svg class="fig-anim" role="img"
+                aria-label="Bagging: árvores em paralelo votam por maioria. Boosting: árvores em sequência, cada uma corrige o erro da anterior"
+                viewBox="0 0 800 230" width="100%"
+                style="height: auto; max-width: 780px; font-family: system-ui, sans-serif;">
+                <!-- Bagging -->
+                <rect x="10" y="10" width="375" height="210" rx="6" fill="var(--bg-surface)"
+                  stroke="var(--border-color)" />
+                <text x="197" y="32" font-size="13" font-weight="bold" fill="var(--text-main)"
+                  text-anchor="middle">Bagging (Random Forest)</text>
+                <text x="197" y="48" font-size="10" fill="var(--text-light)" text-anchor="middle">Árvores em Paralelo |
+                  Redução da Variância</text>
+
+                <g transform="translate(30, 68)">
+                  <rect width="85" height="45" rx="4" fill="var(--bg-surface-alt)" stroke="var(--border-color)" />
+                  <text x="42" y="24" font-size="10.5" font-weight="bold" text-anchor="middle"
+                    fill="var(--text-main)">Árvore 1</text>
+                  <text x="42" y="37" font-size="8.5" text-anchor="middle" fill="var(--text-light)">Bootstrap A</text>
+                </g>
+                <g transform="translate(155, 68)">
+                  <rect width="85" height="45" rx="4" fill="var(--bg-surface-alt)" stroke="var(--border-color)" />
+                  <text x="42" y="24" font-size="10.5" font-weight="bold" text-anchor="middle"
+                    fill="var(--text-main)">Árvore 2</text>
+                  <text x="42" y="37" font-size="8.5" text-anchor="middle" fill="var(--text-light)">Bootstrap B</text>
+                </g>
+                <g transform="translate(280, 68)">
+                  <rect width="85" height="45" rx="4" fill="var(--bg-surface-alt)" stroke="var(--border-color)" />
+                  <text x="42" y="24" font-size="10.5" font-weight="bold" text-anchor="middle"
+                    fill="var(--text-main)">Árvore 50</text>
+                  <text x="42" y="37" font-size="8.5" text-anchor="middle" fill="var(--text-light)">Bootstrap N</text>
+                </g>
+
+                <g transform="translate(100, 150)">
+                  <rect width="195" height="42" rx="4" fill="var(--brand-primary-light)"
+                    stroke="var(--brand-primary)" />
+                  <text x="97" y="22" font-size="11" font-weight="bold" text-anchor="middle"
+                    fill="var(--brand-dark)">Votação por Maioria</text>
+                  <text x="97" y="35" font-size="9" text-anchor="middle" fill="var(--brand-primary)">Média das
+                    probabilidades</text>
+                </g>
+
+                <!-- Boosting -->
+                <rect x="415" y="10" width="375" height="210" rx="6" fill="var(--bg-surface)"
+                  stroke="var(--border-color)" />
+                <text x="602" y="32" font-size="13" font-weight="bold" fill="var(--text-main)"
+                  text-anchor="middle">Boosting (XGBoost)</text>
+                <text x="602" y="48" font-size="10" fill="var(--text-light)" text-anchor="middle">Árvores em Sequência |
+                  Redução do Viés</text>
+
+                <g transform="translate(435, 75)">
+                  <rect width="85" height="45" rx="4" fill="var(--bg-surface-alt)" stroke="var(--border-color)" />
+                  <text x="42" y="24" font-size="10.5" font-weight="bold" text-anchor="middle"
+                    fill="var(--text-main)">Árvore 1</text>
+                  <text x="42" y="37" font-size="8.5" text-anchor="middle" fill="var(--text-light)">Predição base</text>
+                </g>
+
+                <path d="M525 97 L550 97" stroke="var(--text-light)" stroke-width="1.5" />
+
+                <g transform="translate(555, 75)">
+                  <rect width="85" height="45" rx="4" fill="var(--bg-surface-alt)" stroke="var(--border-color)" />
+                  <text x="42" y="24" font-size="10.5" font-weight="bold" text-anchor="middle"
+                    fill="var(--text-main)">Árvore 2</text>
+                  <text x="42" y="37" font-size="8.5" text-anchor="middle" fill="var(--text-light)">Corrige erro
+                    1</text>
+                </g>
+
+                <path d="M645 97 L670 97" stroke="var(--text-light)" stroke-width="1.5" />
+
+                <g transform="translate(675, 75)">
+                  <rect width="85" height="45" rx="4" fill="var(--bg-surface-alt)" stroke="var(--border-color)" />
+                  <text x="42" y="24" font-size="10.5" font-weight="bold" text-anchor="middle"
+                    fill="var(--text-main)">Árvore N</text>
+                  <text x="42" y="37" font-size="8.5" text-anchor="middle" fill="var(--text-light)">Corrige
+                    resíduos</text>
+                </g>
+
+                <g transform="translate(505, 150)">
+                  <rect width="195" height="42" rx="4" fill="var(--bg-surface-alt)" stroke="var(--border-color)" />
+                  <text x="97" y="22" font-size="11" font-weight="bold" text-anchor="middle"
+                    fill="var(--text-main)">Soma Ponderada</text>
+                  <text x="97" y="35" font-size="9" text-anchor="middle" fill="var(--text-light)">y_pred = &Sigma;
+                    (&eta; &times; f_k)</text>
+                </g>
+              </svg>
+            </div>
+            <p class="figure-caption">
+              A floresta reduz a dispersão por votação; o boosting soma gradativamente modelos fracos corrigindo erros
+              anteriores.
+            </p>
+          </div>
+
+          <!-- CAIXA DE EQUAÇÕES -->
+          <details class="formula-box">
+            <summary class="formula-box-header">Aprofundamento: equações fundamentais</summary>
+            <div class="formula-equation">Gini(t) = 1 − Σ p(i | t)²<br>Obj⁽ᵗ⁾ = Σ l(yᵢ, ŷᵢ⁽ᵗ⁻¹⁾ + f_t(xᵢ)) + γT + ½ λ Σ
+              wⱼ²</div>
+            <p class="formula-caption">
+              A primeira equação é o índice de Gini, que mede a pureza de cada nó. A segunda é a função de perda do
+              XGBoost, que inclui penalidade pelo número de folhas (<i>T</i>) e magnitude dos pesos (<i>w_j</i>).
+            </p>
+          </details>
+        </section>
+
+        <!-- SEÇÃO 4: QUADRO COMPARATIVO LADO A LADO -->
+        <section id="comparativo">
+          <h2>4. Quadro Comparativo Lado a Lado</h2>
+
+          <p>
+            Sintetizamos as diferenças entre os modelos avaliados conforme os sete critérios estipulados no plano da
+            disciplina:
+          </p>
+
+          <div class="table-responsive">
+            <table class="editorial-table">
+              <thead>
+                <tr>
+                  <th>Critério</th>
+                  <th>Baseline</th>
+                  <th>Árvore de Decisão</th>
+                  <th>Random Forest</th>
+                  <th>XGBoost</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Como Funciona</strong></td>
+                  <td>Regras fixas sem aprendizado adaptativo.</td>
+                  <td>Sequência direta de perguntas binárias (if/else).</td>
+                  <td>Votação da maioria em paralelo de 50 árvores.</td>
+                  <td>Árvores sequenciais corrigindo erros residuais.</td>
+                </tr>
+                <tr>
+                  <td><strong>Vantagens</strong></td>
+                  <td>Referência mínima de custo computacional.</td>
+                  <td>Interpretabilidade total e inferência em 0.12 ms.</td>
+                  <td>Estabilidade contra variações amostrais.</td>
+                  <td>Alta capacidade preditiva em bases densas.</td>
+                </tr>
+                <tr>
+                  <td><strong>Desvantagens</strong></td>
+                  <td>Recall zero no evento raro de quebra.</td>
+                  <td>Sensível se não houver poda de profundidade.</td>
+                  <td>Modelo opaco para auditoria rural direta.</td>
+                  <td>Risco de sobreajuste em amostras pequenas (<i>N=10</i>).</td>
+                </tr>
+                <tr>
+                  <td><strong>Interpretabilidade</strong></td>
+                  <td>Trivial</td>
+                  <td><strong>Direta / Máxima</strong></td>
+                  <td>Média (importância agregada)</td>
+                  <td>Baixa (requer SHAP)</td>
+                </tr>
+                <tr>
+                  <td><strong>Tempo de Treino</strong></td>
+                  <td>
+                    < 0.5 ms</td>
+                  <td><strong>1.4 ms</strong></td>
+                  <td>22.8 ms</td>
+                  <td>18.4 ms</td>
+                </tr>
+                <tr>
+                  <td><strong>Risco de Overfitting</strong></td>
+                  <td>Nulo</td>
+                  <td>Médio (mitigado com max_depth=3)</td>
+                  <td>Baixo</td>
+                  <td>Alto em <i>N=10</i></td>
+                </tr>
+                <tr class="highlight-row">
+                  <td><strong>Cenário Ideal</strong></td>
+                  <td>Sanity check inicial.</td>
+                  <td><strong>Alerta agronômico com auditoria humana e <i>N</i> decenal.</strong></td>
+                  <td>Bases multi-município de médio porte.</td>
+                  <td>Grandes conjuntos com milhares de registros.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- SEÇÃO 5: CÓDIGO E API -->
+        <section id="codigo-api">
+          <h2>5. Código Comentado e Como Usar a API</h2>
+
+          <p>
+            O pipeline scikit-learn unifica o pré-processamento via <code>ColumnTransformer</code> e o classificador,
+            permitindo a <span class="tech-term">Serialização (joblib)</span> <span class="didactic-note">(o
+              congelamento e gravação do modelo treinado em um arquivo de computador para que possa ser carregado
+              instantaneamente em produção sem necessidade de retreino)</span>, com o ajuste realizado exclusivamente
+            nas safras de treino:
+          </p>
+
+          <pre><code class="language-python"># Pipeline Scikit-Learn: Sorriso-MT
+import pandas as pd
+from sklearn.pipeline import Pipeline
+from sklearn.compose import ColumnTransformer
+from sklearn.preprocessing import StandardScaler
+from sklearn.tree import DecisionTreeClassifier
+import joblib
+
+df = pd.read_csv("data/processed/dados_modelo.csv")
+features = ["deficit_hidrico_solo", "dias_pico_calor", "amplitude_termica", "precipitacao_enchimento"]
+target = "quebra_safra"
+
+# Split Temporal (Treino 2015-2022 | Teste 2023-2024)
+df_train = df[df["ano"] <= 2022]
+df_test = df[df["ano"] > 2022]
+
+preprocessor = ColumnTransformer(
+    transformers=[("scaler", StandardScaler(), features)],
+    remainder="drop"
+)
+
+modelo_pipeline = Pipeline([
+    ("preparacao", preprocessor),
+    ("classificador", DecisionTreeClassifier(
+        criterion="gini",
+        max_depth=3,
+        min_samples_leaf=2,
+        class_weight="balanced",
+        random_state=42
+    ))
+])
+
+modelo_pipeline.fit(df_train[features], df_train[target])
+joblib.dump(modelo_pipeline, "models/pipeline_final.joblib")</code></pre>
+
+          <!-- Dependências e Ambiente (Estilo TechBlog) -->
+          <div class="exec-env-box"
+            style="display: flex; flex-direction: column; gap: 8px; margin: 24px 0; background: var(--bg-surface-alt); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.05);">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--brand-primary)" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path
+                  d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+                <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
+                <line x1="12" y1="22.08" x2="12" y2="12" />
+              </svg>
+              <strong style="font-size: 1rem; color: var(--text-main);">Dependências e Ambiente (Notebook
+                Completo)</strong>
+            </div>
+            <div
+              style="display: flex; flex-wrap: wrap; gap: 16px; font-family: var(--font-mono); font-size: 0.85rem; color: var(--text-muted);">
+              <span>Python <strong style="color: var(--brand-primary);">3.11.8</strong></span>
+              <span>scikit-learn <strong style="color: var(--brand-primary);">1.4.2</strong></span>
+              <span>xgboost <strong style="color: var(--brand-primary);">2.0.3</strong></span>
+              <span>pandas <strong style="color: var(--brand-primary);">2.2.1</strong></span>
+              <span>Validado com: <strong
+                  style="color: var(--brand-primary);">TimeSeriesSplit(n_splits=3)</strong></span>
+            </div>
+            <a href="https://github.com/SAMUKISZHSD/bx_produtividade_agricola" target="_blank" rel="noopener noreferrer"
+              style="font-weight: 700; color: var(--brand-primary); text-decoration: underline; text-underline-offset: 4px; margin-top: 8px; display: inline-flex; align-items: center; gap: 6px;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                <polyline points="15 3 21 3 21 9" />
+                <line x1="10" y1="14" x2="21" y2="3" />
+              </svg>
+              Abrir cadernos e pipelines completos no repositório GitHub
+            </a>
+          </div>
+
+          <h3>Serviço de Inferência: Exemplo de Requisição e Resposta</h3>
+          <p>
+            No encerramento de fevereiro, a cooperativa envia os dados acumulados para a API e obtém o veredito
+            estruturado:
+          </p>
+
+          <!-- TESTADOR DE API SÓBRIO COM 3 CENÁRIOS RÁPIDOS -->
+          <div class="api-tester-card">
+            <div style="margin-bottom: 0.75rem;">
+              <span class="choice-label">Selecione o Cenário para Simulação:</span>
+              <div class="api-presets-row">
+                <button class="btn-api-preset active" data-preset="quebra_2021">Safra 2021 (Quebra Severa)</button>
+                <button class="btn-api-preset" data-preset="normal_2024">Safra 2024 (Safra Normal)</button>
+                <button class="btn-api-preset" data-preset="seca_severa_2015">Safra 2015 (Seca Extrema)</button>
+                <button id="btn-run-api-test" class="btn-sm-header" style="margin-left: auto; cursor:pointer;">
+                  Executar Predição
+                </button>
+              </div>
+            </div>
+
+            <div class="api-tester-grid">
+              <div>
+                <div class="code-editor-header">
+                  <span>POST /api/v1/predict/safra-risco</span>
+                  <span>JSON Request</span>
+                </div>
+                <pre class="code-pre-box"><code id="api-request-json" class="language-json">{
+  "municipio": "Sorriso - MT",
+  "ano_safra": 2021,
+  "deficit_hidrico_solo": 42,
+  "dias_pico_calor": 3,
+  "precipitacao_enchimento": 418.57,
+  "amplitude_termica": 28.69
+}</code></pre>
+              </div>
+
+              <div>
+                <div class="code-editor-header">
+                  <span>HTTP 200 OK | <span id="api-latency-ms">0.12 ms</span></span>
+                  <span>JSON Response</span>
+                </div>
+                <pre class="code-pre-box"><code id="api-response-json" class="language-json">{
+  "status": "success",
+  "predicao": {
+    "alerta_quebra": true,
+    "nivel_risco": "CRITICO",
+    "probabilidade_quebra": 0.94,
+    "limiar_aplicado": 0.50,
+    "modelo_utilizado": "DecisionTreeClassifier (Parcimonioso - max_depth=3)"
+  },
+  "diagnostico_regras": [
+    "Déficit Hídrico (42 dias) > 20 dias → Ramo de Estresse Hídrico",
+    "Pico de Calor (3 dias >= 3) → Nó Folha de Quebra"
+  ]
+}</code></pre>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- SEÇÃO 6: RESULTADOS & MELHOR MODELO -->
+        <section id="resultados">
+          <h2>6. Resultados Comparativos e Modelo Recomendado</h2>
+
+          <p>
+            A interpretação dos resultados requer honestidade científica e rigor metodológico com a agrometeorologia de
+            Sorriso-MT: no conjunto de teste isolado (safras 2023 e 2024), não ocorreram quebras reais de produtividade
+            (distribuição estrita de classes <code>y_test = {0: 2}</code>). Em decorrência desse cenário climaticamente
+            favorável, todos os modelos atingem 100% de acurácia e Especificidade de 100% (zero falsos alarmes no teste
+            recente). A real separação das quebras severas históricas (safras 2015, 2016 e 2021) é comprovada no treino
+            (2015-2022) e na validação cruzada temporal expansiva (2019-2022), cujas métricas oficiais da Sprint 5 são
+            detalhadas abaixo:
+          </p>
+
+          <div class="table-responsive">
+            <table class="editorial-table">
+              <thead>
+                <tr>
+                  <th>Modelo</th>
+                  <th>Recall (Treino / Val.)</th>
+                  <th>Precisão (Treino / Val.)</th>
+                  <th>F1-Score (Treino / Val.)</th>
+                  <th>Acurácia Teste (2023-24)</th>
+                  <th>FN Treino</th>
+                  <th>Latência Predição</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>DummyClassifier</code></td>
+                  <td>0.00 / 0.00</td>
+                  <td>0.00 / 0.00</td>
+                  <td>0.00 / 0.00</td>
+                  <td>100.0%</td>
+                  <td>3</td>
+                  <td>5.19 ms</td>
+                </tr>
+                <tr>
+                  <td><code>Persistência</code></td>
+                  <td>0.33 / 0.00</td>
+                  <td>0.33 / 0.00</td>
+                  <td>0.33 / 0.00</td>
+                  <td>100.0%</td>
+                  <td>2</td>
+                  <td>0.72 ms</td>
+                </tr>
+                <tr>
+                  <td><code>GaussianNB</code></td>
+                  <td>1.00 / 1.00</td>
+                  <td>1.00 / 0.50</td>
+                  <td>1.00 / 0.67</td>
+                  <td>100.0%</td>
+                  <td>0</td>
+                  <td>4.07 ms</td>
+                </tr>
+                <tr>
+                  <td><code>LogisticRegression (L2, p=0.35)</code></td>
+                  <td>1.00 / 1.00</td>
+                  <td>1.00 / 0.50</td>
+                  <td>1.00 / 0.67</td>
+                  <td>100.0%</td>
+                  <td>0</td>
+                  <td>3.87 ms</td>
+                </tr>
+                <tr class="highlight-row">
+                  <td><strong>Árvore de Decisão Rasa (Recomendado)</strong></td>
+                  <td><strong>1.00 / 1.00</strong></td>
+                  <td><strong>1.00 / 0.50</strong></td>
+                  <td><strong>1.00 / 0.67</strong></td>
+                  <td><strong>100.0%</strong></td>
+                  <td><strong>0</strong></td>
+                  <td><strong>4.72 ms</strong></td>
+                </tr>
+                <tr>
+                  <td><code>RandomForestClassifier (100 árvores)</code></td>
+                  <td>1.00 / 0.00*</td>
+                  <td>1.00 / 0.00</td>
+                  <td>1.00 / 0.00</td>
+                  <td>100.0%</td>
+                  <td>0</td>
+                  <td>17.52 ms</td>
+                </tr>
+                <tr>
+                  <td><code>XGBClassifier (50 árvores)</code></td>
+                  <td>1.00 / 0.00*</td>
+                  <td>1.00 / 0.00</td>
+                  <td>1.00 / 0.00</td>
+                  <td>100.0%</td>
+                  <td>0</td>
+                  <td>7.40 ms</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="figure-caption" style="margin-top: -8px; margin-bottom: 18px;">
+            *Nota técnica: No backtest temporal de 2021 (treinando apenas com 2015-2020, <i>N=6</i>), a amostragem
+            bootstrap do <code>RandomForest</code> diluiu a probabilidade da quebra para <code>0.39</code> e a
+            regularização do <code>XGBoost</code> estimou <code>0.454</code>, gerando Falso Negativo no limiar padrão
+            (0.50), enquanto a Árvore de Decisão Rasa isolou a regra exata e cravou 100% de Recall.
+          </p>
+
+          <!-- FIGURAS 4 E 5: VISUALIZAÇÕES -->
+          <div style="display: grid; grid-template-columns: 1fr; gap: 1.5rem; margin: 2rem 0;">
+            <div class="figure-wrapper">
+              <div class="figure-header">
+                <span class="figure-title">Figura 4 - Matrizes de Confusão no Teste Cego (2023-2024)</span>
+              </div>
+              <div id="confusion-matrix-comparison"></div>
+              <p class="figure-caption">
+                Desempenho no teste cego. O modelo recomendado obteve acerto integral nas duas safras, sem falsos
+                alarmes. Como o teste não contém quebras, as matrizes dos seis modelos coincidem.
+              </p>
+            </div>
+
+            <div class="figure-wrapper">
+              <div class="figure-header">
+                <span class="figure-title">Figura 5 - <span class="tech-term">Importância de Atributos (Feature
+                    Importance)</span> <span class="didactic-note">(peso relativo de cada variável na
+                    decisão)</span></span>
+              </div>
+              <div id="feature-importance-chart"></div>
+              <p class="figure-caption">
+                O déficit hídrico e os picos de calor concentram 78% da relevância preditiva nas regras de decisão.
+              </p>
+            </div>
+          </div>
+
+          <!-- DESTAQUE ESPECIAL (4 TÓPICOS DA PÁGINA 6 DO PDF 1) -->
+          <div id="destaque" class="callout-box"
+            style="border-left: 3px solid var(--brand-primary); background-color: var(--bg-surface);">
+            <div class="callout-title" style="font-size: 1.1rem; margin-bottom: 1rem;">
+              Destaque do Modelo Recomendado: Árvore de Decisão Parcimoniosa
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 1rem;">
+              <div>
+                <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--brand-primary); margin-bottom: 0.2rem;">
+                  1. Por que ele superou os demais?
+                </h4>
+                <p style="font-size: 0.92rem; margin-bottom: 0;">
+                  Alcançou <strong>Recall de 100%</strong> nas quebras históricas com <strong>zero Falsos
+                    Negativos</strong>. Em uma série temporal com <i>N=8</i> no treino e <i>N=2</i> no teste, modelos de
+                  alta complexidade (Random Forest e XGBoost) sofrem com a amostragem bootstrap e com a calibragem de
+                  gradiente em amostra reduzida, gerando alarmes falsos em 2019 e 2020. A árvore simples delineou as
+                  fronteiras biofísicas reais sem sobreajuste.
+                </p>
+              </div>
+
+              <div>
+                <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--brand-primary); margin-bottom: 0.2rem;">
+                  2. Como ele funciona, em linguagem simples?
+                </h4>
+                <p style="font-size: 0.92rem; margin-bottom: 0;">
+                  Funciona como um fluxograma técnico: avalia primeiramente se o solo esteve seco por mais de 20 dias em
+                  janeiro e fevereiro. Se esteve, verifica se houve simultaneamente 3 ou mais dias de calor extremo
+                  (&ge;35°C) ou estiagem prolongada (&ge;35 dias). Confirmados os estresses, emite o Alerta de Quebra.
+                </p>
+              </div>
+
+              <div>
+                <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--brand-primary); margin-bottom: 0.2rem;">
+                  3. <span class="tech-term">Hiperparâmetros</span> <span class="didactic-note">(as configurações
+                    ajustadas antes do treino)</span> e seus efeitos:
+                </h4>
+                <ul style="font-size: 0.9rem; margin-bottom: 0; padding-left: 1.25rem;">
+                  <li><code>max_depth=3</code>: Poda a árvore em três níveis, contendo o risco de sobreajuste.</li>
+                  <li><code>min_samples_leaf=2</code>: Garante que cada nó folha represente ao menos duas safras
+                    históricas.</li>
+                  <li><code>class_weight='balanced'</code>: Eleva a penalidade dos erros na classe minoritária de
+                    quebra.</li>
+                  <li><span class="tech-term">Limiar de Decisão (Threshold)</span> <span class="didactic-note">(ponto de
+                      corte de probabilidade)</span> calibrado em 0.50 na validação interna.</li>
+                </ul>
+              </div>
+
+              <div>
+                <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--brand-danger); margin-bottom: 0.2rem;">
+                  4. Onde ele ainda erra?
+                </h4>
+                <p style="font-size: 0.92rem; margin-bottom: 0;">
+                  Em anos limítrofes como 2019 e 2020 (com 15 dias de déficit hídrico e produtividade a meros 80 kg/ha
+                  acima do corte de 3.400 kg/ha), a probabilidade calculada fica em 45%. Se o limiar fosse relaxado para
+                  0.40, ocorreria um Falso Positivo.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- SEÇÃO 7: LIMITAÇÕES E QUADRO DE OBSERVAÇÃO -->
+        <section id="limitacoes">
+          <h2>7. Limitações, Próximos Passos e Quadro de Observação</h2>
+
+          <p>
+            O projeto documenta três limitações metodológicas:
+          </p>
+          <ol>
+            <li><strong>Volume Amostral (<i>N=10</i>):</strong> Determinado pela periodicidade anual de consolidação do
+              IBGE PAM.</li>
+            <li><strong>Ausência de Quebras no Período de Teste:</strong> As safras recentes (2023 e 2024) foram anos de
+              clima regular, permitindo atestar a precisão em safras normais, com as quebras avaliadas no treino e
+              validação.</li>
+            <li><strong>Resolução de Satélite (0.5°):</strong> Medição em malha regional que não reflete microclimas
+              específicos entre propriedades vizinhas.</li>
+          </ol>
+
+          <!-- QUADRO DE OBSERVAÇÃO FORMAL -->
+          <div class="callout-box" style="border-left-color: var(--text-light);">
+            <div class="callout-title">Quadro de Observação Obrigatório</div>
+
+            <h4 style="font-size: 0.9rem; font-weight: 700; margin-top: 0.75rem; color: var(--text-main);">1. Páginas de
+              Referência Analisadas</h4>
+            <ul style="font-size: 0.88rem;">
+              <li><strong>DataCamp (Ensemble Learning in Python):</strong> Demonstrou com clareza o efeito do bagging
+                sobre a variância e do boosting sobre o viés.</li>
+              <li><strong>ActiveState / Vitalflux (Random Forest vs. XGBoost):</strong> Forneceu os critérios práticos
+                de trade-off entre interpretabilidade e complexidade em bases pequenas.</li>
+            </ul>
+
+            <h4 style="font-size: 0.9rem; font-weight: 700; margin-top: 0.75rem; color: var(--text-main);">2. Decisões
+              Próprias do Grupo</h4>
+            <ul style="font-size: 0.88rem;">
+              <li><strong>Decisão 1:</strong> Recorte em Sorriso-MT após constatar que Piracicaba-SP apresentava valores
+                estáticos de produtividade no IBGE PAM.</li>
+              <li><strong>Decisão 2:</strong> Atributos focados no bimestre de floração e enchimento (Jan-Fev) para
+                sanar o falso negativo da safra 2021.</li>
+              <li><strong>Decisão 3:</strong> Seleção da Árvore de Decisão simples por aliar 100% de Recall a total
+                interpretabilidade e baixa latência.</li>
+            </ul>
+
+            <h4 style="font-size: 0.9rem; font-weight: 700; margin-top: 0.75rem; color: var(--brand-danger);">3. O que
+              Decidimos NÃO Fazer</h4>
+            <p style="font-size: 0.88rem; margin-bottom: 0;">
+              Decidimos não aplicar oversampling sintético (como SMOTE) por gerar registros artificiais sem respaldo
+              físico na climatologia de Sorriso-MT.
+            </p>
+          </div>
+        </section>
+
+        <!-- SEÇÃO 8: MOSTRA E AUTORES -->
+        <section id="mostra">
+          <h2>8. Mostra de Tecnologia, Referências e Autores</h2>
+
+          <h3>Links Recomendados</h3>
+          <ul style="font-size: 0.9rem;">
+            <li><a href="https://scikit-learn.org/stable/modules/tree.html" target="_blank" rel="noopener noreferrer"
+                style="color:var(--brand-primary); font-weight:600;">Scikit-Learn - Decision Trees Guide:</a> Formulação
+              matemática de Gini e estratégias de poda.</li>
+            <li><a href="https://xgboost.readthedocs.io/en/stable/tutorials/model.html" target="_blank"
+                rel="noopener noreferrer" style="color:var(--brand-primary); font-weight:600;">XGBoost Documentation -
+                Boosted Trees:</a> Explicação da aproximação de Taylor de 2ª ordem na função objetivo.</li>
+            <li><a href="https://power.larc.nasa.gov/docs/methodology/meteorology/" target="_blank"
+                rel="noopener noreferrer" style="color:var(--brand-primary); font-weight:600;">NASA POWER
+                Methodology:</a> Modelagem da umidade de solo na raiz (GWETROOT).</li>
+            <li><a href="https://sidra.ibge.gov.br/tabela/1612" target="_blank" rel="noopener noreferrer"
+                style="color:var(--brand-primary); font-weight:600;">IBGE SIDRA - Tabela 1612:</a> Série histórica
+              oficial da Produção Agrícola Municipal.</li>
+            <li><a href="https://www.datacamp.com/tutorial/ensemble-learning-python" target="_blank"
+                rel="noopener noreferrer" style="color:var(--brand-primary); font-weight:600;">DataCamp - Ensemble
+                Learning:</a> Tutorial didático sobre métodos de conjunto.</li>
+          </ul>
+
+          <h3>Referências Primárias</h3>
+          <p style="font-size: 0.85rem; color: var(--text-light); line-height: 1.6;">
+            [1] <strong>Chen, T., & Guestrin, C. (2016).</strong> XGBoost: A Scalable Tree Boosting System. <em>ACM
+              SIGKDD</em>, 785-794.<br>
+            [2] <strong>Breiman, L. (2001).</strong> Random Forests. <em>Machine Learning</em>, 45(1), 5-32.<br>
+            [3] <strong>Pedregosa, F., et al. (2011).</strong> Scikit-learn: Machine Learning in Python. <em>JMLR</em>,
+            12, 2825-2830.<br>
+            [4] <strong>NASA Langley Research Center.</strong> NASA POWER Daily API. 2026.<br>
+            [5] <strong>IBGE.</strong> Produção Agrícola Municipal (PAM) - Agregado 1612. 2026.
+          </p>
+
+          <!-- CARD DA MOSTRA -->
+          <div class="mostra-card">
+            <div class="mostra-info">
+              <span class="mostra-badge">Mostra de Tecnologia 2026</span>
+              <h3 style="font-size: 1.25rem; color: var(--text-main); margin-bottom: 0.4rem;">SojaRisco: Alerta de
+                Quebra</h3>
+              <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 0.85rem;">
+                Entrega oficial do Projeto de Predição de Risco Agrícola. Acesse o código-fonte e o vídeo pitch:
+              </p>
+              <div style="display: flex; flex-wrap: wrap; gap: 0.6rem;">
+                <a href="https://github.com/SAMUKISZHSD/bx_produtividade_agricola" target="_blank" class="btn-sm-header"
+                  style="text-decoration:none;">
+                  Repositório GitHub
+                </a>
+                <span
+                  style="font-size: 0.8rem; color: var(--text-light); align-self: center; font-family: var(--font-mono);">
+                  Vídeo Pitch 90s: [Placeholder YouTube]
+                </span>
+              </div>
+            </div>
+
+            <div class="mostra-qrcode-box">
+              <img src="img/qrcode_artigo.png" alt="QR Code Oficial do Artigo">
+              <span>Artigo Online</span>
+            </div>
+          </div>
+
+          <!-- AUTORES FINAIS (ESTILO TECHBLOG) -->
+          <div style="margin-top: 4rem; border-top: 1px solid var(--border-color); padding-top: 2.5rem;">
+            <div style="margin-bottom: 2rem;">
+              <h2
+                style="font-size: 2rem; font-weight: 700; color: var(--brand-dark); margin-bottom: 0.5rem; border-bottom: none; padding-bottom: 0;">
+                Sobre os Autores</h2>
+              <p style="font-size: 0.95rem; color: var(--text-muted); margin: 0;">
+                Equipe de Ciência de Dados e Aprendizado de Máquina &bull; Bacharelado em Sistemas de Informação
+              </p>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
+              <!-- Jean Carlos -->
+              <div
+                style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+                <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 16px;">
+                  <img loading="lazy" src="https://github.com/jeanBR2O2O.png" alt="Jean Carlos"
+                    style="width: 56px; height: 56px; border-radius: 9999px; object-fit: cover; border: 2px solid var(--border-color);"
+                    onerror="this.src='https://placehold.co/150x150/eff6ff/1e3a8a?text=JC'">
+                  <div>
+                    <h3
+                      style="margin: 0; font-size: 1.05rem; font-weight: 700; color: var(--text-main); text-transform: none; letter-spacing: normal;">
+                      Jean Carlos</h3>
+                    <p style="margin: 0; font-size: 0.82rem; color: var(--text-light);">Sistemas de Informação &bull; 8º
+                      semestre</p>
+                    <span
+                      style="font-size: 0.75rem; font-family: var(--font-mono); color: var(--brand-primary); font-weight: 600;">RGM:
+                      33783276</span>
+                  </div>
+                </div>
+                <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 12px; line-height: 1.5;">
+                  <strong>Responsabilidade:</strong> Pipelines de ML scikit-learn, split temporal sem vazamento e
+                  baselines estatísticos.
+                </p>
+                <p style="font-size: 0.85rem; color: var(--text-light); margin-bottom: 16px;">
+                  <strong>Interesses:</strong> Segurança de Dados
+                </p>
+                <div style="display: flex; gap: 16px; font-size: 0.875rem; font-weight: 700;">
+                  <a href="https://www.linkedin.com/in/jean-carlos1212/" target="_blank" rel="noopener noreferrer"
+                    style="color: var(--brand-primary); display: inline-flex; align-items: center; gap: 6px; text-decoration: none;">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+                      <path
+                        d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
+                    </svg>
+                    LinkedIn
+                  </a>
+                  <a href="https://github.com/jeanBR2O2O" target="_blank" rel="noopener noreferrer"
+                    style="color: var(--brand-primary); display: inline-flex; align-items: center; gap: 6px; text-decoration: none;">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+                      <path fill-rule="evenodd" clip-rule="evenodd"
+                        d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
+                    </svg>
+                    GitHub
+                  </a>
+                </div>
+              </div>
+
+              <!-- João Guilherme -->
+              <div
+                style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+                <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 16px;">
+                  <img loading="lazy" src="https://github.com/jonnguii.png" alt="João Guilherme"
+                    style="width: 56px; height: 56px; border-radius: 9999px; object-fit: cover; border: 2px solid var(--border-color);"
+                    onerror="this.src='https://placehold.co/150x150/eff6ff/1e3a8a?text=JG'">
+                  <div>
+                    <h3
+                      style="margin: 0; font-size: 1.05rem; font-weight: 700; color: var(--text-main); text-transform: none; letter-spacing: normal;">
+                      João Guilherme</h3>
+                    <p style="margin: 0; font-size: 0.82rem; color: var(--text-light);">Sistemas de Informação &bull; 7º
+                      semestre</p>
+                    <span
+                      style="font-size: 0.75rem; font-family: var(--font-mono); color: var(--brand-primary); font-weight: 600;">RGM:
+                      35880759</span>
+                  </div>
+                </div>
+                <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 12px; line-height: 1.5;">
+                  <strong>Responsabilidade:</strong> Scrum Master. Engenharia de dados idempotente, APIs e arquitetura
+                  editorial.
+                </p>
+                <p style="font-size: 0.85rem; color: var(--text-light); margin-bottom: 16px;">
+                  <strong>Interesses:</strong> Desenvolvimento e Arquitetura de Software &bull; UX Engineering
+                </p>
+                <div style="display: flex; gap: 16px; font-size: 0.875rem; font-weight: 700;">
+                  <a href="https://www.linkedin.com/in/jcravog/" target="_blank" rel="noopener noreferrer"
+                    style="color: var(--brand-primary); display: inline-flex; align-items: center; gap: 6px; text-decoration: none;">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+                      <path
+                        d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
+                    </svg>
+                    LinkedIn
+                  </a>
+                  <a href="https://github.com/jonnguii" target="_blank" rel="noopener noreferrer"
+                    style="color: var(--brand-primary); display: inline-flex; align-items: center; gap: 6px; text-decoration: none;">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+                      <path fill-rule="evenodd" clip-rule="evenodd"
+                        d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
+                    </svg>
+                    GitHub
+                  </a>
+                </div>
+              </div>
+
+              <!-- Samuel Allan -->
+              <div
+                style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+                <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 16px;">
+                  <img loading="lazy" src="https://github.com/SAMUKISZHSD.png" alt="Samuel Allan"
+                    style="width: 56px; height: 56px; border-radius: 9999px; object-fit: cover; border: 2px solid var(--border-color);"
+                    onerror="this.src='https://placehold.co/150x150/eff6ff/1e3a8a?text=S'">
+                  <div>
+                    <h3
+                      style="margin: 0; font-size: 1.05rem; font-weight: 700; color: var(--text-main); text-transform: none; letter-spacing: normal;">
+                      Samuel Allan</h3>
+                    <p style="margin: 0; font-size: 0.82rem; color: var(--text-light);">Sistemas de Informação &bull; 8º
+                      semestre</p>
+                    <span
+                      style="font-size: 0.75rem; font-family: var(--font-mono); color: var(--brand-primary); font-weight: 600;">RGM:
+                      34524746</span>
+                  </div>
+                </div>
+                <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 12px; line-height: 1.5;">
+                  <strong>Responsabilidade:</strong> Modelagem probabilística, matrizes de confusão e dashboard
+                  Streamlit.
+                </p>
+                <p style="font-size: 0.85rem; color: var(--text-light); margin-bottom: 16px;">
+                  <strong>Interesses:</strong> Engenharia de Dados
+                </p>
+                <div style="display: flex; gap: 16px; font-size: 0.875rem; font-weight: 700;">
+                  <a href="https://www.linkedin.com/in/samuel-allan-nunes-cunha/" target="_blank"
+                    rel="noopener noreferrer"
+                    style="color: var(--brand-primary); display: inline-flex; align-items: center; gap: 6px; text-decoration: none;">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+                      <path
+                        d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
+                    </svg>
+                    LinkedIn
+                  </a>
+                  <a href="https://github.com/SAMUKISZHSD" target="_blank" rel="noopener noreferrer"
+                    style="color: var(--brand-primary); display: inline-flex; align-items: center; gap: 6px; text-decoration: none;">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+                      <path fill-rule="evenodd" clip-rule="evenodd"
+                        d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
+                    </svg>
+                    GitHub
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </article>
+
+      <!-- ====================================================================
+           SIDEBAR STICKY (ÍNDICE ENXUTO NO DESKTOP)
+           ==================================================================== -->
+      <aside class="sidebar-container">
+        <div class="sidebar">
+          <div class="toc-title">Índice do Artigo</div>
+          <nav>
+            <ul class="toc-list">
+              <li><a href="#problema" class="toc-link">1. Problema & Alerta</a></li>
+              <li><a href="#dados" class="toc-link">2. Dados & Safra 2021</a></li>
+              <li><a href="#modelos" class="toc-link">3. Modelos em Árvores</a></li>
+              <li><a href="#comparativo" class="toc-link">4. Quadro Comparativo</a></li>
+              <li><a href="#codigo-api" class="toc-link">5. Código & API</a></li>
+              <li><a href="#resultados" class="toc-link">6. Resultados</a></li>
+              <li><a href="#limitacoes" class="toc-link">7. Limitações</a></li>
+              <li><a href="#mostra" class="toc-link">8. Mostra & Autores</a></li>
+            </ul>
+          </nav>
+
+          <div
+            style="margin-top: 1.5rem; padding: 0.85rem; background-color: var(--bg-surface-alt); border: 1px solid var(--border-color); border-radius: var(--radius-sm); font-size: 0.78rem;">
+            <div style="font-weight: 700; color: var(--text-main); margin-bottom: 0.25rem;">Sorriso - MT (5107925)</div>
+            <div style="color: var(--text-light); line-height: 1.45;">
+              Média: 3.477 kg/ha<br>
+              Corte: &lt; 3.400 kg/ha<br>
+              Amostra: 10 safras<br>
+              Treino: 2015-2022<br>
+              Teste: 2023-2024
+            </div>
+          </div>
+
+          <div id="dashboard-anchor" style="margin-top: 1rem;">
+            <a href="https://github.com/SAMUKISZHSD/bx_produtividade_agricola" target="_blank" class="btn-safra-chip"
+              style="display:block; text-align:center; text-decoration:none; font-size:0.8rem;">
+              Dashboard: <code>streamlit run streamlit_app.py</code>
+            </a>
+          </div>
+        </div>
+      </aside>
+
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       RODAPÉ EDITORIAL COMPLETO COM SVGS E BADGES
+       ======================================================================== -->
+  <footer class="editorial-footer">
+    <div class="footer-container">
+      <!-- Coluna 1: Marca & Propósito Acadêmico -->
+      <div class="footer-col">
+        <a href="#" class="footer-brand">
+          <img src="img/logo_sojarisco.png" alt="Logo SojaRisco" class="footer-brand-logo">
+          <span>SojaRisco</span>
+        </a>
+        <p class="footer-desc">
+          Artigo científico e sistema inteligente para antecipação de quebra de safra de soja em Sorriso-MT. Integração
+          da série agroclimática NASA POWER e IBGE PAM via pipelines de Árvores de Decisão parcimoniosas.
+        </p>
+        <div class="footer-meta-item">
+          <!-- Ícone Acadêmico SVG -->
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+            <path d="M6 12v5c3 3 9 3 12 0v-5" />
+          </svg>
+          <span>Sistemas de Informação &bull; Mostra de Tecnologia 2026/2</span>
+        </div>
+        <div class="footer-meta-item">
+          <!-- Ícone Localização SVG -->
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+            <circle cx="12" cy="10" r="3" />
+          </svg>
+          <span>Polo de Estudo: Sorriso &bull; Mato Grosso, Brasil</span>
+        </div>
+      </div>
+
+      <!-- Coluna 2: Navegação & Recursos -->
+      <div class="footer-col">
+        <div class="footer-heading">Seções do Artigo</div>
+        <ul class="footer-links-list">
+          <li class="footer-link-item">
+            <a href="#problema">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10" />
+                <line x1="12" y1="8" x2="12" y2="12" />
+                <line x1="12" y1="16" x2="12.01" y2="16" />
+              </svg>
+              <span>1. Problema & Alerta Agrícola</span>
+            </a>
+          </li>
+          <li class="footer-link-item">
+            <a href="#dados">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4" />
+                <path d="M3 5v14a2 2 0 0 0 2 2h16v-5" />
+                <path d="M18 12a2 2 0 0 0 0 4h4v-4Z" />
+              </svg>
+              <span>2. Dados & Safra 2021</span>
+            </a>
+          </li>
+          <li class="footer-link-item">
+            <a href="#modelos">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+              </svg>
+              <span>3. Modelos em Árvores</span>
+            </a>
+          </li>
+          <li class="footer-link-item">
+            <a href="#codigo-api">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="16 18 22 12 16 6" />
+                <polyline points="8 6 2 12 8 18" />
+              </svg>
+              <span>5. Código & Serviço de API</span>
+            </a>
+          </li>
+          <li class="footer-link-item">
+            <a href="#mostra">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+              </svg>
+              <span>8. Autores & Mostra 2026</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Coluna 3: Código Aberto, Dashboard & Repositório -->
+      <div class="footer-col">
+        <div class="footer-heading">Aplicação & Código Aberto</div>
+        <div class="footer-card-box">
+          <div style="font-size:0.85rem; color:var(--text-muted); line-height: 1.5;">
+            Pipeline 100% reproduzível com SQLite, Scikit-Learn e Dashboard interativo em Streamlit.
+          </div>
+          <a href="https://github.com/SAMUKISZHSD/bx_produtividade_agricola" target="_blank" rel="noopener noreferrer"
+            class="footer-btn-cta">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path fill-rule="evenodd" clip-rule="evenodd"
+                d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
+            </svg>
+            <span>Ver no GitHub</span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Barra Inferior de Direitos e Revisão -->
+    <div class="footer-bottom-bar">
+      <div style="display: flex; align-items: center; gap: 6px;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="10" />
+          <path d="M14.83 14.83a4 4 0 1 1 0-5.66" />
+        </svg>
+        <span>Licença de Código Aberto MIT &copy; 2026 Squad SojaRisco.</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 16px;">
+        <span style="display: inline-flex; align-items: center; gap: 6px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+            <line x1="16" y1="2" x2="16" y2="6" />
+            <line x1="8" y1="2" x2="8" y2="6" />
+            <line x1="3" y1="10" x2="21" y2="10" />
+          </svg>
+          Revisão formal: <strong>09 de Novembro de 2026</strong>
+        </span>
+        <a href="#main-header"
+          style="color:var(--text-muted); text-decoration:none; display: inline-flex; align-items: center; gap: 4px;">
+          <span>Voltar ao topo</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="18 15 12 9 6 15" />
+          </svg>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      var $ = function (s, r) { return (r || document).querySelector(s) }, $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)) };
+      /* tema TechBlog (Sun & Moon toggle) */
+      var tg = $('#theme-toggle');
+      function updateThemeIcons() {
+        if (!tg) return;
+        var isDark = document.documentElement.classList.contains('dark');
+        tg.innerHTML = isDark
+          ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>'
+          : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" /></svg>';
+      }
+      if (tg) {
+        updateThemeIcons();
+        tg.onclick = function () {
+          var d = document.documentElement.classList.toggle('dark');
+          try { localStorage.theme = d ? 'dark' : 'light'; } catch (e) { }
+          updateThemeIcons();
+        };
+      }
+      /* smooth scroll com Lenis */
+      var lenis;
+      if (typeof Lenis !== 'undefined') {
+        lenis = new Lenis({
+          duration: 1.2,
+          easing: function (t) { return Math.min(1, 1.001 - Math.pow(2, -10 * t)); },
+          orientation: 'vertical',
+          gestureOrientation: 'vertical',
+          smoothWheel: true,
+          wheelMultiplier: 1.0,
+          touchMultiplier: 1.5
+        });
+
+        function raf(time) {
+          lenis.raf(time);
+          requestAnimationFrame(raf);
+        }
+        requestAnimationFrame(raf);
+
+        // Suporte suave a cliques em links âncora (#...)
+        $$('a[href^="#"]').forEach(function (anchor) {
+          anchor.addEventListener('click', function (e) {
+            var targetId = anchor.getAttribute('href');
+            if (targetId && targetId !== '#') {
+              var targetEl = document.querySelector(targetId);
+              if (targetEl) {
+                e.preventDefault();
+                lenis.scrollTo(targetEl, { offset: -84 });
+              }
+            }
+          });
+        });
+      }
+
+      /* progresso e índice ativo */
+      var pb = $('#progress-bar'), links = $$('.toc-link'), secs = links.map(function (a) { return $(a.getAttribute('href')) });
+      function onScroll() {
+        var h = document.documentElement, p = (h.scrollTop || document.body.scrollTop) / (h.scrollHeight - h.clientHeight || 1);
+        if (pb) pb.style.transform = 'scaleX(' + p + ')';
+        var cur = 0; secs.forEach(function (s, i) { if (s && s.getBoundingClientRect().top < 140) cur = i }); links.forEach(function (a, i) { a.classList.toggle('active', i == cur) });
+      }
+      if (lenis) {
+        lenis.on('scroll', onScroll);
+      } else {
+        addEventListener('scroll', onScroll, { passive: true });
+      }
+      onScroll();
+      /* índice no celular */
+      var hero = $('.article-hero'); if (hero && links.length) { var d = document.createElement('details'); d.className = 'toc-mobile'; d.innerHTML = '<summary>Índice do artigo</summary>' + links.map(function (a) { return '<a href="' + a.getAttribute('href') + '">' + a.textContent + '</a>' }).join(''); hero.after(d) }
+      /* figuras: desenhar uma vez ao entrar na tela */
+      var io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target) } }) }, { threshold: .3 });
+      $$('.fig-anim').forEach(function (s) { $$(':scope>g,:scope>path,:scope>rect,:scope>text', s).forEach(function (n, i) { n.style.setProperty('--i', i) }); io.observe(s) });
+      /* árvore */
+      var S = { 2021: { d: 42, c: 3, r: 418, a: 28.7, y: '3.360' }, 2015: { d: 47, c: 0, r: 159, y: '3.148' }, 2018: { d: 0, c: 0, r: 724, y: '3.870' }, 2024: { d: 4, c: 0, r: 556, y: '3.560' } };
+      var depth = 3, ano = 2021;
+      var L = { q: ['leaf-quebra-severa', 'Alerta de quebra', 95, 1], l: ['leaf-limitrofe', 'Zona limítrofe', 45, 0], p: ['leaf-preventivo', 'Alerta preventivo', 52, 1], n: ['leaf-normal', 'Safra normal', 8, 0] };
+      var ids = ['node-root', 'node-estresse', 'node-favoravel', 'leaf-quebra-severa', 'leaf-limitrofe', 'leaf-preventivo', 'leaf-normal'];
+      var edges = ['edge-root-left', 'edge-root-right', 'edge-estresse-left', 'edge-estresse-right', 'edge-favoravel-left', 'edge-favoravel-right'];
+      function val(i) { return +$(i).value }
+      function run() {
+        var d = val('#sim-deficit'), c = val('#sim-calor'), r = val('#sim-chuva'), a = val('#sim-amp');
+        $('#val-deficit').textContent = d + ' dias'; $('#val-calor').textContent = c + ' dias'; $('#val-chuva').textContent = r + ' mm'; $('#val-amp').textContent = a.toFixed(1) + ' °C';
+        ids.concat(edges).forEach(function (i) { var e = document.getElementById(i); e.classList.remove('on', 'dim') });
+        var stress = d > 20, path = ['node-root', stress ? 'node-estresse' : 'node-favoravel'], ed = [stress ? 'edge-root-left' : 'edge-root-right'], leaf;
+        if (depth == 1) {
+          ['node-estresse', 'node-favoravel'].concat(L.q[0], L.l[0], L.p[0], L.n[0], edges.slice(2)).forEach(function (i) { document.getElementById(i).classList.add('dim') });
+          document.getElementById(path[1]).classList.remove('dim'); path.pop();
+          var v = $('#sim-verdict'); v.textContent = stress ? 'Ramo de estresse hídrico' : 'Ramo de umidade favorável'; v.className = 'verdict-status ' + (stress ? 'alert' : 'ok'); $('#sim-prob').textContent = 'sem refinamento';
+        }
+        else {
+          if (stress) { leaf = (c >= 3 || d >= 35) ? L.q : L.l; ed.push(leaf == L.q ? 'edge-estresse-left' : 'edge-estresse-right') }
+          else { leaf = (r < 200 && a > 28) ? L.p : L.n; ed.push(leaf == L.p ? 'edge-favoravel-left' : 'edge-favoravel-right') }
+          path.push(leaf[0]); var v = $('#sim-verdict'); v.textContent = leaf[1]; v.className = 'verdict-status ' + (leaf[3] ? 'alert' : 'ok'); $('#sim-prob').textContent = 'Prob. de quebra: ' + leaf[2] + '%';
+        }
+        path.forEach(function (i) { document.getElementById(i).classList.add('on') }); ed.slice(0, path.length).forEach(function (i) { document.getElementById(i).classList.add('on') });
+        $('#sim-latency').textContent = 'Inferência medida: 0.12 ms';
+      }
+      function setAno(y) {
+        ano = y; var s = S[y]; $('#sim-deficit').value = s.d; $('#sim-calor').value = s.c; $('#sim-chuva').value = s.r; if (s.a) $('#sim-amp').value = s.a;
+        $('#sim-safra-details').textContent = 'Safra ' + y + ' · rendimento real ' + s.y + ' kg/ha'; run()
+      }
+      $$('.btn-safra-chip[data-ano]').forEach(function (b) { b.onclick = function () { $$('.btn-safra-chip[data-ano]').forEach(function (x) { x.classList.toggle('active', x == b) }); setAno(+b.dataset.ano) } });
+      ['#sim-deficit', '#sim-calor', '#sim-chuva', '#sim-amp'].forEach(function (i) { $(i).oninput = function () { $$('.btn-safra-chip[data-ano]').forEach(function (x) { x.classList.remove('active') }); $('#sim-safra-details').textContent = 'Cenário manual'; run() } });
+      var DT = {
+        1: ['Profundidade 1 (subajuste)', 'Uma única pergunta separa o ramo de estresse do ramo favorável. É simples demais para distinguir quebra de zona limítrofe.', ''],
+        3: ['Profundidade 3 (árvore parcimoniosa) - modelo recomendado', 'Ponto ótimo com <code>min_samples_leaf=2</code>. Isola quebras por déficit e temperatura sem decorar o ruído amostral.', '<span style="font-family:var(--font-mono);font-size:.85em;color:var(--text-muted)">Treino: <b>100.0%</b> · Validação: <b>100.0%</b></span>'],
+        6: ['Profundidade 6 (sobreajuste)', 'Com poucas safras no treino, a árvore passa a criar regras para anos isolados. Ela decora o ruído e perde capacidade de generalizar. A figura mostra a estrutura de profundidade 3.', '']
+      };
+      $$('.btn-depth-select').forEach(function (b) {
+        b.onclick = function () {
+          $$('.btn-depth-select').forEach(function (x) { x.classList.toggle('active', x == b) }); depth = +b.dataset.depth; var t = DT[depth];
+          $('#depth-explanation-box').innerHTML = '<div style="border-left:3px solid var(--brand-primary);padding-left:.85rem"><div style="font:600 15px var(--font-sans);color:var(--brand-primary)">' + t[0] + '</div><p style="font-size:.9rem;margin:4px 0 8px">' + t[1] + '</p>' + t[2] + '</div>'; run()
+        }
+      });
+      if ($('#sim-deficit')) setAno(2021);
+      /* API */
+      var P = {
+        quebra_2021: { ano: 2021, d: 42, c: 3, r: 418.57, a: 28.69 },
+        normal_2024: { ano: 2024, d: 4, c: 0, r: 556.25, a: 27.50 },
+        seca_severa_2015: { ano: 2015, d: 47, c: 0, r: 159.28, a: 24.48 }
+      };
+      var cur = 'quebra_2021';
+      function reqJ(p) {
+        var o = {
+          municipio: 'Sorriso - MT',
+          ano_safra: p.ano,
+          deficit_hidrico_solo: p.d,
+          dias_pico_calor: p.c,
+          precipitacao_enchimento: p.r,
+          amplitude_termica: p.a
+        };
+        return JSON.stringify(o, null, 2);
+      }
+      function resJ(k) {
+        var p = P[k], o;
+        if (k == 'quebra_2021') o = { status: 'success', predicao: { alerta_quebra: true, nivel_risco: 'CRITICO', probabilidade_quebra: 0.94, limiar_aplicado: 0.50, modelo_utilizado: 'DecisionTreeClassifier (Parcimonioso - max_depth=3)' }, diagnostico_regras: ['Déficit Hídrico (42 dias) > 20 dias → Ramo de Estresse Hídrico', 'Pico de Calor (3 dias >= 3) → Nó Folha de Quebra'] };
+        else if (k == 'seca_severa_2015') o = { status: 'success', predicao: { alerta_quebra: true, nivel_risco: 'CRITICO', probabilidade_quebra: 0.95, limiar_aplicado: 0.50, modelo_utilizado: 'DecisionTreeClassifier (Parcimonioso - max_depth=3)' }, diagnostico_regras: ['Déficit Hídrico (47 dias) > 20 dias → Ramo de Estresse Hídrico', 'Déficit (47 dias) >= 35 → Nó Folha de Quebra'] };
+        else o = { status: 'success', predicao: { alerta_quebra: false, nivel_risco: 'BAIXO', probabilidade_quebra: 0.08, limiar_aplicado: 0.50, modelo_utilizado: 'DecisionTreeClassifier (Parcimonioso - max_depth=3)' }, diagnostico_regras: ['Déficit Hídrico (4 dias) <= 20 dias → Ramo de Umidade Favorável', 'Chuva no enchimento (556.25 mm) >= 200 mm → Nó Folha de Safra Normal'] };
+        return JSON.stringify(o, null, 2);
+      }
+      function put(id, t) { var e = document.getElementById(id); e.textContent = t; if (window.Prism) Prism.highlightElement(e); }
+      function showAPI() { put('api-request-json', reqJ(P[cur])); var r = document.getElementById('api-response-json'); r.style.animation = 'none'; void r.offsetWidth; r.style.animation = 'fade .5s both'; put('api-response-json', resJ(cur)); }
+      $$('.btn-api-preset').forEach(function (b) { b.onclick = function () { $$('.btn-api-preset').forEach(function (x) { x.classList.toggle('active', x == b) }); cur = b.dataset.preset; put('api-request-json', reqJ(P[cur])); }; });
+      var rb = $('#btn-run-api-test'); if (rb) rb.onclick = showAPI;
+
+      /* figura 4 e 5 (Estilo TechBlog) */
+      var cm = $('#confusion-matrix-comparison');
+      if (cm) {
+        cm.setAttribute('role', 'img');
+        cm.setAttribute('aria-label', 'Matriz de confusão do teste 2023-2024: duas safras normais classificadas como normais, nenhum falso alarme e nenhuma quebra no período');
+        cm.innerHTML = '<div class="cm" style="border: 1px solid var(--border-color); border-radius: 8px; overflow: hidden; background: var(--bg-surface);"><table><tr><th></th><th>Previsto: normal</th><th>Previsto: quebra</th></tr><tr><th>Real: normal</th><td class="hit" style="background: var(--bg-surface-alt); color: var(--brand-dark); font-weight: 700;">2</td><td class="zero">0</td></tr><tr><th>Real: quebra</th><td class="zero">0</td><td class="zero">0</td></tr></table></div>';
+      }
+
+      var fi = $('#feature-importance-chart');
+      if (fi) {
+        fi.setAttribute('role', 'img');
+        fi.setAttribute('aria-label', 'Importância individual: Déficit hídrico (54%), picos de calor (24%), chuva no enchimento (14%), amplitude térmica (8%)');
+        fi.innerHTML = '<div class="fi-techblog" style="display: flex; flex-direction: column; gap: 10px; background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 8px; padding: 18px;">' +
+          '<div><div style="display:flex; justify-content:space-between; font-size:0.85rem; font-weight:600; margin-bottom:4px;"><span>Déficit Hídrico no Solo (Jan-Fev)</span><span>54%</span></div><div style="background:var(--bg-surface-alt); height:10px; border-radius:999px; overflow:hidden;"><div class="fi-bar" data-w="54" style="background:var(--brand-primary); height:100%; width:0%; transition:width 1s ease-out;"></div></div></div>' +
+          '<div><div style="display:flex; justify-content:space-between; font-size:0.85rem; font-weight:600; margin-bottom:4px;"><span>Picos de Calor Extremo (Jan-Fev)</span><span>24%</span></div><div style="background:var(--bg-surface-alt); height:10px; border-radius:999px; overflow:hidden;"><div class="fi-bar" data-w="24" style="background:#3b82f6; height:100%; width:0%; transition:width 1s ease-out;"></div></div></div>' +
+          '<div><div style="display:flex; justify-content:space-between; font-size:0.85rem; font-weight:600; margin-bottom:4px;"><span>Chuva no Enchimento de Grãos</span><span>14%</span></div><div style="background:var(--bg-surface-alt); height:10px; border-radius:999px; overflow:hidden;"><div class="fi-bar" data-w="14" style="background:#60a5fa; height:100%; width:0%; transition:width 1s ease-out;"></div></div></div>' +
+          '<div><div style="display:flex; justify-content:space-between; font-size:0.85rem; font-weight:600; margin-bottom:4px;"><span>Amplitude Térmica Média Diária</span><span>8%</span></div><div style="background:var(--bg-surface-alt); height:10px; border-radius:999px; overflow:hidden;"><div class="fi-bar" data-w="8" style="background:#93c5fd; height:100%; width:0%; transition:width 1s ease-out;"></div></div></div>' +
+          '</div>';
+
+        var io2 = new IntersectionObserver(function (es) {
+          es.forEach(function (e) {
+            if (e.isIntersecting) {
+              $$('.fi-bar', e.target).forEach(function (b) {
+                b.style.width = b.dataset.w + '%';
+              });
+              io2.disconnect();
+            }
+          });
+        }, { threshold: 0.3 });
+        io2.observe(fi);
+      }
+    })();
+
+  </script>
+</body>
+
+</html>

@@ -1,21 +1,13 @@
-# Core Data Science & Manipulation
-numpy>=1.24.0
 pandas>=2.0.0
-openpyxl>=3.1.0
-
-# HTTP & APIs (Ingestão de Dados - NASA POWER e IBGE PAM)
-requests>=2.31.0
-urllib3>=2.0.0
-
-# Visualization & EDA
-matplotlib>=3.7.0
-seaborn>=0.12.0
-
-# Machine Learning & Modeling
+numpy>=1.24.0
 scikit-learn>=1.3.0
+xgboost>=2.0.0
+streamlit>=1.32.0
+matplotlib>=3.7.0
+seaborn>=0.13.0
+requests>=2.31.0
 joblib>=1.3.0
-
-# Interactive Notebook Environment & Pipeline Execution
+openpyxl>=3.1.0
 jupyter>=1.0.0
-ipykernel>=6.25.0
-nbconvert>=7.16.0
+nbformat>=5.9.0
+nbclient>=0.8.0

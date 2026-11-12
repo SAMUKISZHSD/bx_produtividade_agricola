@@ -1,6 +1,6 @@
-# Diário de Sprint 5 — Modelagem completa, limiar de decisão e seleção
+# Diário de Sprint 5 - Modelagem completa, limiar de decisão e seleção
 **Período:** 12/10/2026 a 08/11/2026
-**Trilha:** C — Risco de baixa produtividade agrícola
+**Trilha:** C - Risco de baixa produtividade agrícola
 
 **Equipe:** João Guilherme Cravo (RGM 35880759), Jean Carlos Silva de Almeida (RGM 33783276), Samuel Allan Nunes da Cunha (RGM 34524746)  
 **Scrum Master do Sprint:** Samuel Allan Nunes da Cunha  
@@ -14,14 +14,14 @@
 
 | | Artefato | Origem / destino |
 |---|---|---|
-| **Entra** | Split da Sprint 2 | Sprint 2 — **não mudar o teste** |
+| **Entra** | Split da Sprint 2 | Sprint 2 - **não mudar o teste** |
 | **Entra** | Features finais + `ColumnTransformer` congelado + baselines retreinados (lift) | Sprint 4 |
 | **Entra** | RFC (custo de FN), dicionário v0.3 e N depois da limpeza | Sprints 1, 2 e 4 |
 | **Sai** | Comparativo no pipeline final (baselines S4 + ≥2 modelos novos, mesma partição) | Entrega final |
 | **Sai** | Limiar de decisão justificado pelo RFC | Entrega final |
 | **Sai** | Modelo escolhido + caderno de experimentos + model card + dicionário v0.4 + `joblib` do Pipeline em `models/` | Entrega final / mostra |
 
-**Não há sprint seguinte.** Dashboard, se houver, é extra e lê estes artefatos — não gera outro split.
+**Não há sprint seguinte.** Dashboard, se houver, é extra e lê estes artefatos - não gera outro split.
 
 - [x] Confirmei transformer da Sprint 4, split da Sprint 2 e que nenhuma métrica da Sprint 3 entrou no quadro
 
@@ -49,18 +49,20 @@ A gente manteve 100% o compromisso assumido com a professora desde a Sprint 2:
 - [x] Dummy, persistência e Naive Bayes **do pipeline da Sprint 4** no quadro (reproduzidos aqui; não usar números da Sprint 3)
 - [x] No mínimo **dois** classificadores adicionais, com justificativa compatível com o N
 - [x] Todos avaliados na **mesma** partição de teste
-- [x] Hiperparâmetros documentados; se houver busca, ela usa só o treino (ou validação temporal dentro do treino) — nunca o teste
+- [x] Hiperparâmetros documentados; se houver busca, ela usa só o treino (ou validação temporal dentro do treino) - nunca o teste
 - [x] `class_weight="balanced"` (ou equivalente) é lícito; SMOTE / oversampling aleatório continua proibido
 - [x] Independência do Naive Bayes continua tratada como hipótese pedagógica
 
-**Modelos no comparativo (3 baselines da Sprint 4 + 2 novos):**
+**Modelos no comparativo (3 baselines da Sprint 4 + 4 classificadores adicionais):**
 1. **DummyClassifier:** Chuta sempre a classe majoritária ('Normal').
 2. **Persistência Temporal:** Chuta pro ano atual o resultado do ano anterior.
 3. **GaussianNB (Naive Bayes):** Baseline probabilístico da Sprint 4.
 4. **Logistic Regression (L2 Balanced):** Modelo linear com penalidade L2, $C=1.0$ e `class_weight='balanced'`. É parcimonioso e honesto com $N=8$, gerando probabilidades suaves para calibrar o limiar.
-5. **Decision Tree (Rasa):** Árvore de decisão com `max_depth=2`, `min_samples_leaf=1` e `class_weight='balanced'`, oferecendo regras diretas e fáceis de explicar pro produtor.
+5. **Decision Tree (Rasa - Campeã das Árvores):** Árvore de decisão com `max_depth=2`, `min_samples_leaf=1` e `class_weight='balanced'`, oferecendo regras diretas e fáceis de explicar pro produtor.
+6. **Random Forest (Bagging - 100 árvores):** Ensemble em paralelo com `max_depth=2` e `class_weight='balanced'`.
+7. **XGBoost (Gradient Boosting - 50 árvores):** Ensemble sequencial corrigindo resíduos com `max_depth=2` e `scale_pos_weight=5/3`.
 
-**Tabela Comparativa no Teste Oficial (2023–2024 — N=2):**
+**Tabela Comparativa no Teste Oficial (2023-2024 - N=2):**
 
 | Modelo | Acurácia Teste | TN | FP | FN | TP | Recall Quebra | Precisão Quebra | F1 Quebra |
 |---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
@@ -69,6 +71,8 @@ A gente manteve 100% o compromisso assumido com a professora desde a Sprint 2:
 | **GaussianNB (Naive Bayes)** | 1.00 | 2 | 0 | 0 | 0 | n/d | n/d | n/d |
 | **Logistic Regression (L2)** | 1.00 | 2 | 0 | 0 | 0 | n/d | n/d | n/d |
 | **Decision Tree (Rasa)** | 1.00 | 2 | 0 | 0 | 0 | n/d | n/d | n/d |
+| **Random Forest (Bagging)** | 1.00 | 2 | 0 | 0 | 0 | n/d | n/d | n/d |
+| **XGBoost (Boosting)** | 1.00 | 2 | 0 | 0 | 0 | n/d | n/d | n/d |
 
 *Por que deu n/d no teste:* Como as safras de 2023 e 2024 foram anos bons (sem nenhuma quebra), não houve nenhum evento da classe 1 no teste real. Todos os 5 modelos acertaram 100% das safras normais ($TN=2, FP=0$). Isso comprova que nenhum modelo fica disparando alarme falso à toa, mas não permite calcular o Recall da quebra no teste recente. Por isso, a avaliação real do comportamento dos modelos foi feita através do backtest temporal dentro do treino.
 
@@ -79,20 +83,22 @@ A gente manteve 100% o compromisso assumido com a professora desde a Sprint 2:
 - [x] Recall, precisão, F1 e matriz de confusão por classe para todos, no `predict` padrão **e** no limiar escolhido
 - [x] Recorte de **validação temporal no fim do treino** (safras finais do treino, ou `TimeSeriesSplit` só no treino)
 - [x] Tabela ou curva de limiar na **validação**; o melhor ponto pelo custo de FN do RFC é congelado
-- [x] Teste medido **uma vez** com esse limiar — não escolher o corte olhando o teste
+- [x] Teste medido **uma vez** com esse limiar - não escolher o corte olhando o teste
 - [x] Acurácia alta com recall baixo na classe positiva tratada como falha, se ocorrer
 - [x] FN/FP também em **contagem** (ex.: 3 FN em 8 eventos), não só em percentual
 
-**Caderno de experimentos (Backtest Temporal Expansivo 2019–2022 no Treino):**
+**Caderno de experimentos (Backtest Temporal Expansivo 2019-2022 no Treino):**
 
 | ID | Modelo | Features | Limiar | Recall Val. | Precisão Val. | F1 Val. | TP (Quebras) | FN (Perdidas) | FP (Alarmes Falsos) |
 |:---:|---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
 | EXP-01 | Dummy | S4 (4 feats) | 0.50 | 0,00 (0/1) | 0,00 | 0,00 | 0 | 1 | 0 |
 | EXP-02 | Persistência | Temporal | n/a | 0,00 (0/1) | 0,00 | 0,00 | 0 | 1 | 1 |
 | EXP-03 | GaussianNB | S4 (4 feats) | 0.50 | 1,00 (1/1) | 0,50 | 0,67 | 1 | 0 | 1 |
-| EXP-04 | Decision Tree | S4 (4 feats) | 0.50 | 1,00 (1/1) | 0,50 | 0,67 | 1 | 0 | 1 |
-| EXP-05 | Logistic Regression | S4 (4 feats) | 0.50 (padrão) | 0,00 (0/1) | 0,00 | 0,00 | 0 | 1 | 0 |
-| **EXP-06** | **Logistic Regression** | **S4 (4 feats)** | **0.35 (ótimo)** | **1,00 (1/1)** | **0,50** | **0,67** | **1** | **0** | **1** |
+| EXP-04 | **Decision Tree (Rasa - Campeã)** | S4 (4 feats) | 0.50 | **1,00 (1/1)** | **0,50** | **0,67** | **1** | **0** | **1** |
+| EXP-05 | Random Forest (100 árvores) | S4 (4 feats) | 0.50 | 0,00 (0/1) | 0,00 | 0,00 | 0 | 1 | 0 |
+| EXP-06 | XGBoost (50 árvores) | S4 (4 feats) | 0.50 | 0,00 (0/1) | 0,00 | 0,00 | 0 | 1 | 2 |
+| EXP-07 | Logistic Regression | S4 (4 feats) | 0.50 (padrão) | 0,00 (0/1) | 0,00 | 0,00 | 0 | 1 | 0 |
+| **EXP-08** | **Logistic Regression (Calibrada)** | **S4 (4 feats)** | **0.35 (ótimo)** | **1,00 (1/1)** | **0,50** | **0,67** | **1** | **0** | **1** |
 
 **Justificativa da Escolha do Limiar (0.35) pelo RFC:**
 No corte padrão de 0.50, a Regressão Logística estimou probabilidade de quebra de **42,6%** para a safra de 2021. Como o corte era 0.50, o modelo ficou em silêncio e gerou um **Falso Negativo (FN)**. Conforme documentado no RFC do projeto, o erro de Falso Negativo é o mais destrutivo para o agricultor (ele não contrata seguro e perde a safra inteira). Ao baixar o limiar para **$p = 0.35$**, a Regressão Logística passa a detectar a quebra de 2021 com **Recall de 100%**, atinge o melhor F1-Score ($0.67$) e mantém apenas 1 alarme falso em 2019. Esse limiar foi congelado em `models/limiar_congelado.json`.
@@ -106,13 +112,13 @@ No corte padrão de 0.50, a Regressão Logística estimou probabilidade de quebr
 - [x] Pipeline scikit-learn exportado em `models/`
 - [x] Model card preenchido em `docs/Model_Card.md`
 
-**Modelo Escolhido:** **Regressão Logística Regularizada L2 com Limiar Calibrado ($p = 0.35$)**
-- **Por que ele foi o escolhido:** Diferente da Árvore de Decisão (que divide o espaço em degraus rígidos) e do Naive Bayes (que assume independência irreal entre variáveis de clima), a Regressão Logística é um modelo linear suave e muito robusto contra overfitting para $N=8$.
-- **Desempenho Final no Teste Oficial (2023–2024):** No teste congelado, as probabilidades estimadas foram de **8,9% em 2023** e **8,7% em 2024**, ficando muito abaixo do limiar de 35% e acertando com precisão absoluta ambas as safras normais (0 alarmes falsos no teste).
+**Modelo Escolhido:** **Árvore de Decisão Rasa (`DecisionTreeClassifier`, `max_depth=2`) e Co-Campeão Linear (`LogisticRegression` L2 com Limiar Calibrado $p = 0.35$)**
+- **Por que eles foram os escolhidos frente ao Random Forest e XGBoost:** Com apenas $N=8$ safras no treino (e $N=6$ ao prever 2021 no backtest expansivo), ensembles complexos como `RandomForest` (100 árvores) e `XGBoost` (50 árvores) diluem o sinal da classe minoritária (estimando apenas 39% e 45,4% de risco em 2021, gerando Falso Negativo no corte padrão). A **Árvore de Decisão Rasa** cravou **Recall = 1,00** e **F1 = 0,67** nativamente com regra caixa-branca (`deficit_hidrico_solo > 21,5 dias`), empatando em eficácia com a **Regressão Logística L2 calibrada ($p = 0.35$)**.
+- **Desempenho Final no Teste Oficial (2023-2024):** No teste congelado, tanto a Árvore de Decisão (0,0% de risco) quanto a Regressão Logística (8,9% em 2023 e 8,7% em 2024) acertaram 100% das safras normais (0 alarmes falsos no teste, Especificidade = 100%).
 - **Artefatos Gerados:**
-  - Modelo serializado em: [`models/modelo_final.joblib`](../../models/modelo_final.joblib)
-  - Limiar ótimo registrado em: [`models/limiar_congelado.json`](../../models/limiar_congelado.json)
-  - Model Card completo em: [`docs/Model_Card.md`](../Model_Card.md)
+ - Pipeline de Árvore de Decisão serializado em: [`models/pipeline_final.joblib`](../../models/pipeline_final.joblib) e [`models/modelo_final.joblib`](../../models/modelo_final.joblib)
+ - Limiar ótimo registrado em: [`models/limiar_congelado.json`](../../models/limiar_congelado.json)
+ - Model Card completo em: [`docs/Model_Card.md`](../Model_Card.md)
 
 ---
 
@@ -148,7 +154,7 @@ Essa camada de banco serve de base para o backend do painel Streamlit e garante 
 
 ---
 
-## Rubrica de avaliação — Sprint 5 (nota de 0 a 4,0)
+## Rubrica de avaliação - Sprint 5 (nota de 0 a 4,0)
 
 | Critério | Peso | O que caracteriza nota máxima | Nota atribuída | Observações |
 |---|---|---|---|---|
