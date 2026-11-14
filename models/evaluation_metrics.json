@@ -1,0 +1,93 @@
+[
+  {
+    "Modelo": "Baseline Ingênuo (Dummy)",
+    "Recall (Treino)": "0.00",
+    "Precisão (Treino)": "0.00",
+    "F1-Score (Treino)": "0.00",
+    "FN (Treino)": 3,
+    "Recall (Val. Temporal)": "0.00",
+    "F1 (Val. Temporal)": "0.00",
+    "Acurácia (Teste 2023-24)": "100%",
+    "FP (Teste 2023-24)": 0,
+    "Treino (ms)": 4.24,
+    "Inferência (ms)": 5.19
+  },
+  {
+    "Modelo": "Baseline Temporal (Persistência)",
+    "Recall (Treino)": "0.33",
+    "Precisão (Treino)": "0.33",
+    "F1-Score (Treino)": "0.33",
+    "FN (Treino)": 2,
+    "Recall (Val. Temporal)": "0.00",
+    "F1 (Val. Temporal)": "0.00",
+    "Acurácia (Teste 2023-24)": "100%",
+    "FP (Teste 2023-24)": 0,
+    "Treino (ms)": 0.38,
+    "Inferência (ms)": 0.72
+  },
+  {
+    "Modelo": "Naive Bayes (GaussianNB)",
+    "Recall (Treino)": "1.00",
+    "Precisão (Treino)": "1.00",
+    "F1-Score (Treino)": "1.00",
+    "FN (Treino)": 0,
+    "Recall (Val. Temporal)": "1.00",
+    "F1 (Val. Temporal)": "0.67",
+    "Acurácia (Teste 2023-24)": "100%",
+    "FP (Teste 2023-24)": 0,
+    "Treino (ms)": 4.25,
+    "Inferência (ms)": 4.07
+  },
+  {
+    "Modelo": "Regressão Logística (L2)",
+    "Recall (Treino)": "1.00",
+    "Precisão (Treino)": "1.00",
+    "F1-Score (Treino)": "1.00",
+    "FN (Treino)": 0,
+    "Recall (Val. Temporal)": "0.00",
+    "F1 (Val. Temporal)": "0.00",
+    "Acurácia (Teste 2023-24)": "100%",
+    "FP (Teste 2023-24)": 0,
+    "Treino (ms)": 5.33,
+    "Inferência (ms)": 3.87
+  },
+  {
+    "Modelo": "Árvore de Decisão (Rasa)",
+    "Recall (Treino)": "1.00",
+    "Precisão (Treino)": "1.00",
+    "F1-Score (Treino)": "1.00",
+    "FN (Treino)": 0,
+    "Recall (Val. Temporal)": "1.00",
+    "F1 (Val. Temporal)": "0.67",
+    "Acurácia (Teste 2023-24)": "100%",
+    "FP (Teste 2023-24)": 0,
+    "Treino (ms)": 4.33,
+    "Inferência (ms)": 4.72
+  },
+  {
+    "Modelo": "Random Forest (Bagging)",
+    "Recall (Treino)": "1.00",
+    "Precisão (Treino)": "1.00",
+    "F1-Score (Treino)": "1.00",
+    "FN (Treino)": 0,
+    "Recall (Val. Temporal)": "0.00",
+    "F1 (Val. Temporal)": "0.00",
+    "Acurácia (Teste 2023-24)": "100%",
+    "FP (Teste 2023-24)": 0,
+    "Treino (ms)": 124.95,
+    "Inferência (ms)": 17.52
+  },
+  {
+    "Modelo": "XGBoost (Boosting)",
+    "Recall (Treino)": "1.00",
+    "Precisão (Treino)": "1.00",
+    "F1-Score (Treino)": "1.00",
+    "FN (Treino)": 0,
+    "Recall (Val. Temporal)": "0.00",
+    "F1 (Val. Temporal)": "0.00",
+    "Acurácia (Teste 2023-24)": "100%",
+    "FP (Teste 2023-24)": 0,
+    "Treino (ms)": 16.07,
+    "Inferência (ms)": 7.4
+  }
+]
