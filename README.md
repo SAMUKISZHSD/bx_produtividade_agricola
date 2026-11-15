@@ -12,7 +12,7 @@
 | :--- | :--- | :---: |
 | **Artigo Técnico Web (GitHub Pages)** | [https://samukiszhsd.github.io/bx_produtividade_agricola/](https://samukiszhsd.github.io/bx_produtividade_agricola/) (`docs/index.html`) | Publicado |
 | **Dashboard Interativo (Streamlit Cloud)** | `streamlit_app.py` *(link público no Streamlit Community Cloud)* | Pronto / Ativo |
-| **Vídeo Pitch (90 segundos - YouTube)** | *[Link Não Listado no YouTube - Placeholder Mostra]* | Estrutura Pronta |
+| **Vídeo Pitch (90 segundos - YouTube)** | [Assistir no YouTube (Não Listado)](https://youtu.be/gYtYT7U4eMA) | Concluído |
 | **QR Code do Artigo Técnico** | [`docs/img/qrcode_artigo.png`](docs/img/qrcode_artigo.png) / [`docs/img/qrcode_artigo.svg`](docs/img/qrcode_artigo.svg) | Gerado |
 | **Diário de Bordo Consolidado (S1-S5)** | [`DIARIO.md`](DIARIO.md) e [`docs/sprints/Sprint1..5_TrilhaC.md`](docs/sprints/) | Atualizado |
 | **Quadro de Tarefas Scrum (`tarefas.md`)** | [`tarefas.md`](tarefas.md) e [Quadro Oficial no Trello](https://trello.com/invite/b/6a975ab20fa3094b426c0c68/ATTI02cea94da7f784bcf30e1e3d24341426A34F2CE2/📊-projeto-de-ciencia-de-dados) | Atualizado |
