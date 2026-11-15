@@ -34,3 +34,6 @@ Thumbs.db
 scripts/
 .agents/
 .claude/
+
+# Editor de Vídeo & Remotion
+editor_de_video/
