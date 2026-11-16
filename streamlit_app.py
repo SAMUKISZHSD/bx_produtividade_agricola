@@ -62,21 +62,21 @@ st.set_page_config(
 )
 
 # -----------------------------------------------------------------------------
-# Helper para carregar e colorir SVGs
+# Helper para carregar e colorir SVGs com atributos a11y
 # -----------------------------------------------------------------------------
 @st.cache_data(show_spinner=False)
 def load_svg(icon_name: str, color: str | None = None, width: int = 24, height: int = 24) -> str:
-    """Lê um SVG da pasta assets/icons, ajusta dimensões e cor do stroke/fill."""
+    """Lê um SVG da pasta assets/icons, ajusta dimensões e atributos WCAG/a11y."""
     svg_path = ASSETS_DIR / f"{icon_name}.svg"
     if not svg_path.exists():
         return ""
     try:
         content = svg_path.read_text(encoding="utf-8")
-        # Substitui dimensões padrão
+        if "aria-hidden=" not in content:
+            content = content.replace("<svg ", '<svg aria-hidden="true" focusable="false" ', 1)
         if f'width="{width}"' not in content:
             content = content.replace("<svg ", f'<svg width="{width}" height="{height}" style="vertical-align: middle; flex-shrink: 0;" ', 1)
         if color:
-            # Substitui o stroke verde escuro padrão pelo color especificado
             content = content.replace('stroke="#153D2B"', f'stroke="{color}"')
         return content
     except Exception:
@@ -84,12 +84,24 @@ def load_svg(icon_name: str, color: str | None = None, width: int = 24, height: 
 
 
 # -----------------------------------------------------------------------------
-# Gerenciamento de Tema (Dark / Light) com WCAG 2.1 AA
+# Gerenciamento de Tema (Dark / Light) com WCAG 2.1 AA e st.session_state
 # -----------------------------------------------------------------------------
-if "dark_mode" not in st.session_state:
-    st.session_state["dark_mode"] = False
+def obter_tipo_tema() -> str:
+    """Detecta o tema ativo do Streamlit (dark ou light) com fallback seguro."""
+    try:
+        tema = getattr(st.context, "theme", None)
+        tipo = getattr(tema, "type", None)
+        if tipo in ("dark", "light"):
+            return tipo
+    except Exception:
+        pass
+    return "light"
 
-is_dark = st.session_state["dark_mode"]
+
+if "dark_mode" not in st.session_state:
+    st.session_state["dark_mode"] = obter_tipo_tema() == "dark"
+
+is_dark = bool(st.session_state["dark_mode"])
 
 # Tokens de cores com contraste auditado (WCAG 2.1 AA >= 4.5:1 para texto normal)
 if is_dark:
@@ -103,10 +115,11 @@ if is_dark:
         --text-muted: #a3b8ac;
         --border-color: #274233;
         --sidebar-bg: #091510;
+        --sidebar-bg-alt: #11241b;
         --sidebar-text: #e8f3ec;
         --sidebar-muted: #9eb5a7;
-        --brand-green: #4ade80;
-        --brand-green-dark: #22c55e;
+        --brand-green: #22c55e;
+        --brand-green-dark: #16a34a;
         --brand-accent: #fbbf24;
         --alert-danger: #f87171;
         --alert-danger-bg: #351616;
@@ -116,6 +129,11 @@ if is_dark:
         --alert-success-bg: #11301c;
         --icon-color: #4ade80;
         --kpi-shadow: 0 4px 20px rgba(0,0,0,0.35);
+        --btn-pri-bg: #22c55e;
+        --btn-pri-text: #091510;
+        --btn-sec-bg: #1a2e24;
+        --btn-sec-text: #f1f7f3;
+        --btn-sec-border: #274233;
     """
     svg_color_main = "#4ade80"
     svg_color_body = "#d8e5dc"
@@ -127,9 +145,10 @@ else:
         --bg-hero: linear-gradient(135deg, #153d2b 0%, #1f6b45 58%, #2e8b57 100%);
         --text-title: #0f1c15;
         --text-body: #1c2e24;
-        --text-muted: #4a5c52;
-        --border-color: #d1ded5;
+        --text-muted: #3d5045;
+        --border-color: #c6d4cb;
         --sidebar-bg: #102d20;
+        --sidebar-bg-alt: #163a29;
         --sidebar-text: #edf5ef;
         --sidebar-muted: #b0c7b8;
         --brand-green: #1b5e39;
@@ -143,6 +162,11 @@ else:
         --alert-success-bg: #f0fdf4;
         --icon-color: #1b5e39;
         --kpi-shadow: 0 4px 16px rgba(21,61,43,0.06);
+        --btn-pri-bg: #1b5e39;
+        --btn-pri-text: #ffffff;
+        --btn-sec-bg: #ffffff;
+        --btn-sec-text: #153d2b;
+        --btn-sec-border: #1b5e39;
     """
     svg_color_main = "#153d2b"
     svg_color_body = "#1c2e24"
@@ -150,22 +174,20 @@ else:
 st.markdown(
     f"""
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap');
-    
     :root {{
         {theme_vars}
     }}
 
-    /* Base da Aplicação */
+    /* Base da Aplicação - Fontes nativas de alta performance (sem @import) */
     .stApp {{
         background: var(--bg-app) !important;
         color: var(--text-body) !important;
-        font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     }}
 
     /* Tipografia de Alta Acessibilidade (WCAG AA) */
     h1, h2, h3, h4, h5, h6 {{
-        font-family: 'Manrope', 'DM Sans', sans-serif !important;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
         color: var(--text-title) !important;
         font-weight: 800 !important;
         letter-spacing: -0.025em;
@@ -174,25 +196,91 @@ st.markdown(
         color: var(--text-body);
     }}
 
-    /* Sidebar Acessível */
+    /* Sidebar Acessível - Estilização Específica sem Seletor Universal Destrutivo */
     [data-testid="stSidebar"] {{
         background: var(--sidebar-bg) !important;
         border-right: 1px solid var(--border-color);
     }}
-    [data-testid="stSidebar"] * {{
+    [data-testid="stSidebar"] h1,
+    [data-testid="stSidebar"] h2,
+    [data-testid="stSidebar"] h3,
+    [data-testid="stSidebar"] strong {{
         color: var(--sidebar-text) !important;
     }}
-    [data-testid="stSidebar"] p, [data-testid="stSidebar"] .stCaption {{
+    [data-testid="stSidebar"] p,
+    [data-testid="stSidebar"] .stCaption {{
         color: var(--sidebar-muted) !important;
+        font-size: 13px !important;
     }}
     [data-testid="stSidebar"] .stSelectbox label, 
     [data-testid="stSidebar"] .stToggle label,
     [data-testid="stSidebar"] .stCheckbox label {{
         color: var(--sidebar-text) !important;
         font-weight: 600 !important;
+        font-size: 14px !important;
     }}
     [data-testid="stSidebar"] hr {{
         border-color: rgba(255,255,255,0.15) !important;
+    }}
+
+    /* Botões nativos na área principal e sidebar com alto contraste WCAG AA */
+    .stButton > button,
+    .stDownloadButton > button {{
+        border-radius: 8px;
+        font-weight: 700;
+        font-size: 14px;
+        padding: 8px 18px;
+        transition: all 0.15s ease-in-out;
+        cursor: pointer;
+    }}
+
+    /* Botões primários */
+    .stButton > button[kind="primary"],
+    .stDownloadButton > button[kind="primary"] {{
+        background-color: var(--btn-pri-bg) !important;
+        color: var(--btn-pri-text) !important;
+        border: 1px solid var(--brand-green-dark) !important;
+    }}
+    .stButton > button[kind="primary"]:hover,
+    .stDownloadButton > button[kind="primary"]:hover {{
+        background-color: var(--brand-green-dark) !important;
+        border-color: var(--brand-green-dark) !important;
+        color: #ffffff !important;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }}
+
+    /* Botões secundários (área principal) */
+    .stButton > button[kind="secondary"],
+    .stDownloadButton > button[kind="secondary"] {{
+        background-color: var(--btn-sec-bg) !important;
+        color: var(--btn-sec-text) !important;
+        border: 1px solid var(--btn-sec-border) !important;
+    }}
+    .stButton > button[kind="secondary"]:hover,
+    .stDownloadButton > button[kind="secondary"]:hover {{
+        background-color: var(--bg-card-alt) !important;
+        color: var(--btn-sec-text) !important;
+    }}
+
+    /* Botões na sidebar */
+    [data-testid="stSidebar"] .stButton > button,
+    [data-testid="stSidebar"] .stDownloadButton > button {{
+        background-color: #1f6b45 !important;
+        color: #ffffff !important;
+        border: 1px solid #4ade80 !important;
+    }}
+    [data-testid="stSidebar"] .stButton > button:hover,
+    [data-testid="stSidebar"] .stDownloadButton > button:hover {{
+        background-color: #288355 !important;
+        border-color: #86efac !important;
+        color: #ffffff !important;
+    }}
+
+    /* Focus-visible para navegação por teclado e a11y */
+    .stButton > button:focus-visible,
+    .stDownloadButton > button:focus-visible {{
+        outline: 2px solid var(--brand-green) !important;
+        outline-offset: 2px !important;
     }}
 
     /* Container Principal */
@@ -219,9 +307,9 @@ st.markdown(
     }}
     .hero-kicker {{
         color: #d1fae5 !important;
-        font-size: 11px;
+        font-size: 13px;
         font-weight: 800;
-        letter-spacing: 1.6px;
+        letter-spacing: 1.2px;
         text-transform: uppercase;
         margin-bottom: 8px;
         display: flex;
@@ -229,23 +317,24 @@ st.markdown(
         gap: 8px;
     }}
     .hero-title {{
-        font-family: 'Manrope', sans-serif;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
         font-size: clamp(26px, 3.2vw, 38px);
         font-weight: 800;
-        letter-spacing: -1.2px;
+        letter-spacing: -1px;
         line-height: 1.15;
         margin: 0 0 10px;
     }}
     .hero-copy {{
         color: #e2f1e8 !important;
-        font-size: 14.5px;
+        font-size: 15px;
         max-width: 740px;
         line-height: 1.6;
+        margin: 0;
     }}
     .hero-meta {{
         margin-top: 18px;
         color: #d1fae5 !important;
-        font-size: 12.5px;
+        font-size: 13.5px;
         font-weight: 600;
         display: flex;
         gap: 20px;
@@ -278,14 +367,14 @@ st.markdown(
     }}
     .metric-label {{
         color: var(--text-muted);
-        font-size: 11.5px;
+        font-size: 13px;
         font-weight: 800;
-        letter-spacing: 1px;
+        letter-spacing: 0.8px;
         text-transform: uppercase;
     }}
     .metric-value {{
         color: var(--text-title);
-        font-family: 'Manrope', sans-serif;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         font-size: 32px;
         font-weight: 800;
         letter-spacing: -1px;
@@ -293,7 +382,7 @@ st.markdown(
     }}
     .metric-foot {{
         color: var(--text-muted);
-        font-size: 12px;
+        font-size: 13px;
         font-weight: 500;
         margin-top: 6px;
     }}
@@ -325,24 +414,25 @@ st.markdown(
     }}
     .risk-label {{
         color: var(--text-muted);
-        font-size: 11px;
+        font-size: 13px;
         font-weight: 800;
-        letter-spacing: 1px;
+        letter-spacing: 0.8px;
         text-transform: uppercase;
         display: flex;
         align-items: center;
         gap: 6px;
     }}
     .risk-title {{
-        font-family: 'Manrope', sans-serif;
-        font-size: 25px;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+        font-size: 24px;
         font-weight: 800;
         margin: 10px 0 6px;
         color: var(--text-title);
+        line-height: 1.25;
     }}
     .risk-description {{
         color: var(--text-body);
-        font-size: 13.5px;
+        font-size: 14.5px;
         line-height: 1.55;
     }}
 
@@ -370,16 +460,17 @@ st.markdown(
         margin: 26px 0 14px;
     }}
     .section-title {{
-        font-family: 'Manrope', sans-serif;
-        font-size: 19px;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+        font-size: 20px;
         font-weight: 800;
         letter-spacing: -0.4px;
         color: var(--text-title);
+        margin: 0;
     }}
     .section-sub {{
         color: var(--text-muted);
-        font-size: 12.5px;
-        margin-top: 2px;
+        font-size: 13.5px;
+        margin: 2px 0 0;
     }}
 
     /* Badges / Pills com contraste verificado */
@@ -387,9 +478,9 @@ st.markdown(
         display: inline-flex;
         align-items: center;
         gap: 6px;
-        padding: 5px 12px;
+        padding: 6px 14px;
         border-radius: 99px;
-        font-size: 11px;
+        font-size: 12.5px;
         font-weight: 700;
         background: var(--alert-success-bg);
         color: var(--alert-success);
@@ -411,7 +502,7 @@ st.markdown(
         border-radius: 12px;
         padding: 14px 18px;
         color: var(--text-title);
-        font-size: 12.5px;
+        font-size: 14px;
         line-height: 1.55;
     }}
     .notice strong {{
@@ -422,23 +513,17 @@ st.markdown(
         padding-top: 18px;
         margin-top: 32px;
         color: var(--text-muted);
-        font-size: 11.5px;
+        font-size: 13px;
         display: flex;
         justify-content: space-between;
         gap: 12px;
         flex-wrap: wrap;
     }}
 
-    /* Botões nativos e abas */
-    .stButton>button {{
-        border-radius: 10px;
-        font-weight: 700;
-        padding: 8px 18px;
-        transition: all 0.15s ease;
-    }}
+    /* Abas nativas */
     div[data-testid="stTabs"] button {{
         font-weight: 700;
-        font-size: 14.5px;
+        font-size: 15px;
         color: var(--text-muted) !important;
     }}
     div[data-testid="stTabs"] button[aria-selected="true"] {{
@@ -467,6 +552,7 @@ def get_db_connection() -> sqlite3.Connection:
     return conn
 
 
+@st.cache_resource(show_spinner=False)
 def inicializar_banco() -> None:
     with get_db_connection() as conn:
         conn.executescript(
@@ -619,7 +705,7 @@ def executar_predicao(features: dict[str, float], modo_simulacao: bool = False):
         classes = list(getattr(modelo, "classes_", [0, 1]))
         if 1 not in classes:
             raise ValueError("A classe positiva 1 não foi encontrada em model.classes_.")
-        prob = float(probas[classes.index(1)])
+        prob = float(np.clip(float(probas[classes.index(1)]), 0.0, 1.0))
         nome = modelo.__class__.__name__
         tipo = "REAL"
     else:
@@ -635,13 +721,13 @@ def executar_predicao(features: dict[str, float], modo_simulacao: bool = False):
 
 
 # -----------------------------------------------------------------------------
-# Sidebar com Logo Oficial, Botão Dark Mode e Navegação
+# Sidebar com Logo Oficial, Indicador de Tema WCAG e Navegação
 # -----------------------------------------------------------------------------
 with st.sidebar:
-    # Logo Oficial Vetorial dos Assets
+    # Logo Oficial Vetorial com atributo alt
     logo_svg_path = ASSETS_DIR / "sojarisco_logo.svg"
     if logo_svg_path.exists():
-        st.image(str(logo_svg_path), use_container_width=True)
+        st.image(str(logo_svg_path), width="stretch", alt="Logo Oficial SojaRisco - Assistente Agroclimático")
     else:
         st.markdown("### 🌱 SojaRisco")
 
@@ -650,21 +736,15 @@ with st.sidebar:
 
     st.divider()
 
-    # Botão de Dark Mode acessível (WCAG 2.1 AA)
-    col_mode_txt, col_mode_btn = st.columns([2, 1])
-    with col_mode_txt:
-        st.markdown(f"**Modo Escuro**")
-        st.caption("Alto contraste WCAG AA" if is_dark else "Padrão claro WCAG AA")
-    with col_mode_btn:
-        toggle_label = "☀️ Claro" if is_dark else "🌙 Escuro"
-        if st.button(toggle_label, key="dark_toggle", use_container_width=True):
-            st.session_state["dark_mode"] = not st.session_state["dark_mode"]
-            st.rerun()
+    # Alternância de Modo Claro / Modo Escuro (WCAG AA)
+    btn_theme_label = "☀️ Modo Claro" if is_dark else "🌙 Modo Escuro"
+    if st.button(btn_theme_label, key="theme_toggle", width="stretch"):
+        st.session_state["dark_mode"] = not is_dark
+        st.rerun()
 
     st.divider()
-    st.markdown(f"**{load_svg('calendar', '#b0c7b8', 16, 16)} Safra de referência**", unsafe_allow_html=True)
     anos_disponiveis = sorted(pd.to_numeric(df_visual.get("ano_safra", pd.Series([2024])), errors="coerce").dropna().astype(int).unique().tolist())
-    ano_atual = st.selectbox("Selecione o ano", anos_disponiveis, index=len(anos_disponiveis)-1, label_visibility="collapsed")
+    ano_atual = st.selectbox("Safra de referência", anos_disponiveis, index=len(anos_disponiveis)-1)
     mostrar_tecnico = st.toggle("Exibir detalhes técnicos de ML", value=False)
 
     st.divider()
@@ -684,7 +764,7 @@ with st.sidebar:
     st.caption("Estimativas de apoio à decisão para a lavoura. Não substituem assistência técnica agronômica presencial.")
 
 # -----------------------------------------------------------------------------
-# Cabeçalho Principal (Hero)
+# Cabeçalho Principal (Hero) com Hierarquia H1 Única
 # -----------------------------------------------------------------------------
 icon_loc = load_svg("location", "#d1fae5", 16, 16)
 icon_soy = load_svg("soybean", "#d1fae5", 16, 16)
@@ -695,8 +775,8 @@ st.markdown(
     f"""
     <div class="hero">
       <div class="hero-kicker">{icon_shield} PAINEL DE INTELIGÊNCIA DA SAFRA · {MUNICIPIO.upper()} / {UF}</div>
-      <div class="hero-title">Antecipe riscos climáticos.<br>Proteja a sua produtividade.</div>
-      <div class="hero-copy">Acompanhe indicadores agroclimáticos em tempo real e antecipe riscos severos de quebra de safra para a soja em Sorriso-MT através de inteligência analítica prática.</div>
+      <h1 class="hero-title">Antecipe riscos climáticos.<br>Proteja a sua produtividade.</h1>
+      <p class="hero-copy">Acompanhe indicadores agroclimáticos em tempo real e antecipe riscos severos de quebra de safra para a soja em Sorriso-MT através de inteligência analítica prática.</p>
       <div class="hero-meta">
         <span>{icon_loc} {MUNICIPIO}, {UF}</span>
         <span>{icon_soy} Soja em grão</span>
@@ -713,9 +793,9 @@ elif status_modelo == "ERRO":
     st.error(f"Não foi possível carregar o modelo de predição: {mensagem_modelo}")
 
 # Abas com ícones vetoriais
-tab_title_1 = f"Visão da safra"
-tab_title_2 = f"Histórico e desempenho"
-tab_title_3 = f"Sobre o assistente"
+tab_title_1 = "Visão da safra"
+tab_title_2 = "Histórico e desempenho"
+tab_title_3 = "Sobre o assistente"
 
 aba_previsao, aba_historico, aba_sistema = st.tabs([f"🌱 {tab_title_1}", f"📊 {tab_title_2}", f"ℹ️ {tab_title_3}"])
 
@@ -795,14 +875,14 @@ with aba_previsao:
             unsafe_allow_html=True,
         )
 
-    # Diagnóstico da Safra
+    # Diagnóstico da Safra com Hierarquia H2 -> H3
     st.markdown(
         f"""
         <div class='section-head'>
             {load_svg('dashboard', svg_color_main, 22, 22)}
             <div>
-                <div class='section-title'>Diagnóstico da Safra</div>
-                <div class='section-sub'>Leitura consolidada dos fatores determinantes para a produtividade</div>
+                <h2 class='section-title'>Diagnóstico da Safra</h2>
+                <p class='section-sub'>Leitura consolidada dos fatores determinantes para a produtividade</p>
             </div>
         </div>
         """,
@@ -816,12 +896,12 @@ with aba_previsao:
             f"""
             <div class='risk-card {risco_classe}'>
                 <div class='risk-label'>{icon_alert} Diagnóstico do Assistente · {tipo_predicao}</div>
-                <div class='risk-title'>{risco_texto}</div>
+                <h3 class='risk-title'>{risco_texto}</h3>
                 <div class='risk-description'>{risco_descricao}</div>
                 <div class='progress-track'>
                     <div class='progress-fill' style='width:{prob*100:.1f}%;'></div>
                 </div>
-                <div style='display:flex;justify-content:space-between;font-size:12px;font-weight:700;margin-top:6px;'>
+                <div style='display:flex;justify-content:space-between;font-size:13px;font-weight:700;margin-top:6px;'>
                     <span>Probabilidade calculada</span>
                     <span>{prob:.1%}</span>
                 </div>
@@ -850,8 +930,8 @@ with aba_previsao:
         <div class='section-head'>
             {load_svg('chart_line', svg_color_main, 22, 22)}
             <div>
-                <div class='section-title'>Evolução Histórica dos Indicadores</div>
-                <div class='section-sub'>Acompanhe chuva acumulada no enchimento e déficit hídrico ao longo das safras</div>
+                <h2 class='section-title'>Evolução Histórica dos Indicadores</h2>
+                <p class='section-sub'>Acompanhe chuva acumulada no enchimento e déficit hídrico ao longo das safras</p>
             </div>
         </div>
         """,
@@ -861,75 +941,91 @@ with aba_previsao:
     if chart_cols:
         chart_df = df_visual.set_index("ano_safra")[chart_cols].copy()
         chart_df.columns = ["Chuva Enchimento (mm)", "Déficit Hídrico (dias)"]
-        st.line_chart(chart_df, height=260, use_container_width=True)
+        st.line_chart(chart_df, height=260, width="stretch")
 
-    # Simulador de Cenários
-    with st.expander(f"🧪 Explorar cenários na fazenda - Simulador Agroclimático", expanded=False):
-        st.info("Altere as variáveis para simular como secas prolongadas ou ondas de calor impactam a probabilidade de risco.")
-        sc1, sc2 = st.columns(2)
-        with sc1:
-            sim_deficit = st.slider("Déficit hídrico estimado no solo (dias)", 0.0, 60.0, defaults["deficit_hidrico_solo"], 0.5)
-            sim_calor = st.slider("Dias com pico de calor (≥ 35 °C)", 0.0, 15.0, defaults["dias_pico_calor"], 1.0)
-        with sc2:
-            sim_chuva = st.slider("Precipitação na fase de enchimento (mm)", 0.0, 900.0, defaults["precipitacao_enchimento"], 10.0)
-            sim_amp = st.slider("Amplitude térmica diária (°C)", 15.0, 35.0, defaults["amplitude_termica"], 0.1)
+    # Simulador de Cenários isolado com @st.fragment para performance
+    @st.fragment
+    def render_simulador_cenarios(defaults_sim: dict[str, float]) -> None:
+        with st.expander("🧪 Explorar cenários na fazenda - Simulador Agroclimático", expanded=False):
+            st.info("Altere as variáveis para simular como secas prolongadas ou ondas de calor impactam a probabilidade de risco.")
+            sc1, sc2 = st.columns(2)
+            with sc1:
+                sim_deficit = st.slider("Déficit hídrico estimado no solo (dias)", 0.0, 60.0, defaults_sim["deficit_hidrico_solo"], 0.5)
+                sim_calor = st.slider("Dias com pico de calor (≥ 35 °C)", 0.0, 15.0, defaults_sim["dias_pico_calor"], 1.0)
+            with sc2:
+                sim_chuva = st.slider("Precipitação na fase de enchimento (mm)", 0.0, 900.0, defaults_sim["precipitacao_enchimento"], 10.0)
+                sim_amp = st.slider("Amplitude térmica diária (°C)", 15.0, 35.0, defaults_sim["amplitude_termica"], 0.1)
 
-        if st.button("Calcular Risco do Cenário", type="primary", use_container_width=True):
-            sim_features = {"deficit_hidrico_solo": sim_deficit, "dias_pico_calor": sim_calor,
-                            "precipitacao_enchimento": sim_chuva, "amplitude_termica": sim_amp}
-            sim_alerta, sim_prob, sim_ms, sim_nome, sim_tipo = executar_predicao(sim_features, modo_simulacao=False)
-            st.session_state["ultimo_cenario"] = {"alerta": sim_alerta, "prob": sim_prob, "features": sim_features}
+            if st.button("Calcular Risco do Cenário", type="primary", width="stretch"):
+                sim_features = {
+                    "deficit_hidrico_solo": sim_deficit,
+                    "dias_pico_calor": sim_calor,
+                    "precipitacao_enchimento": sim_chuva,
+                    "amplitude_termica": sim_amp,
+                }
+                sim_alerta, sim_prob, sim_ms, sim_nome, sim_tipo = executar_predicao(sim_features, modo_simulacao=False)
+                st.session_state["ultimo_cenario"] = {"alerta": sim_alerta, "prob": sim_prob, "features": sim_features}
 
-        if "ultimo_cenario" in st.session_state:
-            cenario = st.session_state["ultimo_cenario"]
-            nivel = "Risco ELEVADO de quebra" if cenario["alerta"] else "Risco MODERADO / BAIXO"
-            st.success(f"Resultado do Cenário: **{cenario['prob']:.1%} de probabilidade de quebra** ({nivel}).")
+            if "ultimo_cenario" in st.session_state:
+                cenario = st.session_state["ultimo_cenario"]
+                nivel = "Risco ELEVADO de quebra" if cenario["alerta"] else "Risco MODERADO / BAIXO"
+                st.success(f"Resultado do Cenário: **{cenario['prob']:.1%} de probabilidade de quebra** ({nivel}).")
 
-    # Consulta de Clima na NASA POWER
-    st.markdown(
-        f"""
-        <div class='section-head'>
-            {load_svg('weather', svg_color_main, 22, 22)}
-            <div>
-                <div class='section-title'>Consulta de Dados Agrometeorológicos Reais</div>
-                <div class='section-sub'>Conexão direta com a API pública da NASA POWER para Sorriso-MT</div>
+    render_simulador_cenarios(defaults)
+
+    # Consulta de Clima na NASA POWER isolada com @st.fragment
+    @st.fragment
+    def render_consulta_nasa(ano_padrao: int) -> None:
+        st.markdown(
+            f"""
+            <div class='section-head'>
+                {load_svg('weather', svg_color_main, 22, 22)}
+                <div>
+                    <h2 class='section-title'>Consulta de Dados Agrometeorológicos Reais</h2>
+                    <p class='section-sub'>Conexão direta com a API pública da NASA POWER para Sorriso-MT</p>
+                </div>
             </div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-    api_col, api_info = st.columns([1, 2])
-    with api_col:
-        ano_api = st.number_input("Ano da consulta", min_value=1985, max_value=date.today().year, value=ano_atual, step=1)
-        consultar = st.button("Consultar NASA POWER", use_container_width=True)
-    with api_info:
-        st.markdown("<div class='notice'><strong>Fonte Oficial:</strong> A consulta recupera a série histórica de radiação e precipitação medida por satélite e reanálise meteorológica para as coordenadas do município.</div>", unsafe_allow_html=True)
+            """,
+            unsafe_allow_html=True,
+        )
+        api_col, api_info = st.columns([1, 2])
+        with api_col:
+            ano_api = st.number_input("Ano da consulta", min_value=1985, max_value=date.today().year, value=ano_padrao, step=1)
+            consultar = st.button("Consultar NASA POWER", width="stretch")
+        with api_info:
+            st.markdown("<div class='notice'><strong>Fonte Oficial:</strong> A consulta recupera a série histórica de radiação e precipitação medida por satélite e reanálise meteorológica para as coordenadas do município.</div>", unsafe_allow_html=True)
 
-    if consultar:
-        try:
-            with st.spinner("Buscando dados agrometeorológicos na NASA POWER..."):
-                dados_api = consultar_nasa_power(int(ano_api))
-            st.success("Dados agroclimáticos recebidos com sucesso da NASA POWER.")
-            api1, api2, api3 = st.columns(3)
-            with api1:
-                st.metric("Chuva anual acumulada", f"{dados_api['precipitacao_anual_mm']:.0f} mm")
-            with api2:
-                st.metric("Temperatura máxima média", f"{dados_api['temperatura_max_media_c']:.1f} °C")
-            with api3:
-                st.metric("Dias com calor ≥ 35 °C", f"{dados_api['dias_calor_35c']} dias")
-            st.caption(f"Fonte: {dados_api['fonte']} · Período consultado: {dados_api['periodo']}")
-        except Exception as exc:
-            logging.exception("Erro ao consultar NASA POWER")
-            st.error(f"Não foi possível conectar com a API da NASA POWER no momento: {exc}")
+        if consultar:
+            try:
+                with st.spinner("Buscando dados agrometeorológicos na NASA POWER..."):
+                    dados_api = consultar_nasa_power(int(ano_api))
+                st.success("Dados agroclimáticos recebidos com sucesso da NASA POWER.")
+                api1, api2, api3 = st.columns(3)
+                with api1:
+                    st.metric("Chuva anual acumulada", f"{dados_api['precipitacao_anual_mm']:.0f} mm")
+                with api2:
+                    st.metric("Temperatura máxima média", f"{dados_api['temperatura_max_media_c']:.1f} °C")
+                with api3:
+                    st.metric("Dias com calor ≥ 35 °C", f"{dados_api['dias_calor_35c']} dias")
+                st.caption(f"Fonte: {dados_api['fonte']} · Período consultado: {dados_api['periodo']}")
+            except Exception as exc:
+                logging.exception("Erro ao consultar NASA POWER")
+                st.error(f"Não foi possível conectar com a API da NASA POWER no momento: {exc}")
 
-    # Registro de Histórico
-    st.markdown("---")
-    if st.button("Salvar Registro Desta Análise", use_container_width=False):
-        try:
-            salvar_previsao(ano_atual, alerta, prob, tempo_ms, nome_modelo, defaults, "dashboard")
-            st.success("Análise persistida com sucesso no banco de monitoramento local.")
-        except Exception as exc:
-            st.error(f"Erro ao salvar previsão no banco: {exc}")
+    render_consulta_nasa(ano_atual)
+
+    # Registro de Histórico isolado com @st.fragment
+    @st.fragment
+    def render_salvar_registro(ano_salvar: int, alerta_salvar: int, prob_salvar: float, tempo_salvar: float, modelo_salvar: str, defaults_salvar: dict[str, float]) -> None:
+        st.markdown("---")
+        if st.button("Salvar Registro Desta Análise", width="content"):
+            try:
+                salvar_previsao(ano_salvar, alerta_salvar, prob_salvar, tempo_salvar, modelo_salvar, defaults_salvar, "dashboard")
+                st.success("Análise persistida com sucesso no banco de monitoramento local.")
+            except Exception as exc:
+                st.error(f"Erro ao salvar previsão no banco: {exc}")
+
+    render_salvar_registro(ano_atual, alerta, prob, tempo_ms, nome_modelo, defaults)
 
 # -----------------------------------------------------------------------------
 # Aba 2 - Histórico e Desempenho
@@ -940,8 +1036,8 @@ with aba_historico:
         <div class='section-head'>
             {load_svg('database', svg_color_main, 22, 22)}
             <div>
-                <div class='section-title'>Base de Dados Agroclimática Consolidada</div>
-                <div class='section-sub'>Série histórica combinada (NASA POWER + PAM/IBGE) utilizada no projeto</div>
+                <h2 class='section-title'>Base de Dados Agroclimática Consolidada</h2>
+                <p class='section-sub'>Série histórica combinada (NASA POWER + PAM/IBGE) utilizada no projeto</p>
             </div>
         </div>
         """,
@@ -951,7 +1047,7 @@ with aba_historico:
         cols = [c for c in ["ano_safra", "precipitacao_enchimento", "deficit_hidrico_solo", "dias_pico_calor", "amplitude_termica", "quebra_safra"] if c in df_historico.columns]
         df_display = df_historico[cols].sort_values("ano_safra", ascending=False).copy()
         df_display.columns = ["Safra", "Chuva Enchimento (mm)", "Déficit Hídrico (dias)", "Picos de Calor (dias)", "Amplitude Térmica (°C)", "Quebra Observada"]
-        st.dataframe(df_display, use_container_width=True, hide_index=True)
+        st.dataframe(df_display, width="stretch", hide_index=True)
     else:
         st.info("Nenhum dado processado encontrado em data/processed/dados_modelo.csv. A visualização demonstrativa utiliza valores de referência.")
 
@@ -960,8 +1056,8 @@ with aba_historico:
         <div class='section-head'>
             {load_svg('chart_bar', svg_color_main, 22, 22)}
             <div>
-                <div class='section-title'>Desempenho e Validação dos Modelos</div>
-                <div class='section-sub'>Métricas reais da avaliação cruzada temporal (TimeSeriesSplit)</div>
+                <h2 class='section-title'>Desempenho e Validação dos Modelos</h2>
+                <p class='section-sub'>Métricas reais da avaliação cruzada temporal (TimeSeriesSplit)</p>
             </div>
         </div>
         """,
@@ -973,7 +1069,7 @@ with aba_historico:
             with open(metric_path, "r", encoding="utf-8") as f:
                 metricas = json.load(f)
             if metricas:
-                st.dataframe(pd.DataFrame(metricas), use_container_width=True, hide_index=True)
+                st.dataframe(pd.DataFrame(metricas), width="stretch", hide_index=True)
             else:
                 st.info("Arquivo de métricas disponível, aguardando gravação dos testes.")
         except Exception as exc:
@@ -984,7 +1080,7 @@ with aba_historico:
             <div class="panel">
                 <div class="pill pill-warn">{load_svg('alert', '#b45309', 14, 14)} Validação em andamento</div>
                 <h3 style="margin:14px 0 6px">Métricas dos Experimentos de Machine Learning</h3>
-                <p style="color:var(--text-body);font-size:13.5px;line-height:1.6;margin:0">
+                <p style="color:var(--text-body);font-size:14px;line-height:1.6;margin:0">
                     O pipeline final foi avaliado por divisão temporal para garantir generalização em safras futuras. 
                     Assim que as métricas forem salvas em <code>models/evaluation_metrics.json</code>, esta área apresentará precisão, recall, F1 e matrizes de confusão reais.
                 </p>
@@ -998,8 +1094,8 @@ with aba_historico:
         <div class='section-head'>
             {load_svg('history', svg_color_main, 22, 22)}
             <div>
-                <div class='section-title'>Histórico de Análises Realizadas</div>
-                <div class='section-sub'>Registro das últimas inferências executadas no painel</div>
+                <h2 class='section-title'>Histórico de Análises Realizadas</h2>
+                <p class='section-sub'>Registro das últimas inferências executadas no painel</p>
             </div>
         </div>
         """,
@@ -1015,7 +1111,7 @@ with aba_historico:
             st.caption("Nenhuma previsão persistida até o momento. Utilize o botão 'Salvar Registro Desta Análise' na primeira aba.")
         else:
             df_prev.columns = ["Safra", "Modelo", "Alerta", "Probabilidade", "Tempo (ms)", "Origem", "Data/Hora"]
-            st.dataframe(df_prev, use_container_width=True, hide_index=True)
+            st.dataframe(df_prev, width="stretch", hide_index=True)
     except Exception as exc:
         st.error(f"Falha ao consultar banco local: {exc}")
 
@@ -1028,8 +1124,8 @@ with aba_sistema:
         <div class='section-head'>
             {load_svg('info', svg_color_main, 22, 22)}
             <div>
-                <div class='section-title'>Como o SojaRisco Opera</div>
-                <div class='section-sub'>Metodologia simplificada para suporte diário ao produtor</div>
+                <h2 class='section-title'>Como o SojaRisco Opera</h2>
+                <p class='section-sub'>Metodologia simplificada para suporte diário ao produtor</p>
             </div>
         </div>
         """,
@@ -1050,8 +1146,8 @@ with aba_sistema:
                     {svg_badge}
                 </div>
                 <div>
-                    <div style='font-weight:800;color:var(--text-title);font-size:15.5px;'>{num}. {titulo}</div>
-                    <div style='font-size:13.5px;color:var(--text-body);margin-top:4px;line-height:1.55;'>{desc}</div>
+                    <div style='font-weight:800;color:var(--text-title);font-size:16px;'>{num}. {titulo}</div>
+                    <div style='font-size:14px;color:var(--text-body);margin-top:4px;line-height:1.55;'>{desc}</div>
                 </div>
             </div>
             """,
@@ -1063,8 +1159,8 @@ with aba_sistema:
         <div class='section-head'>
             {load_svg('shield', svg_color_main, 22, 22)}
             <div>
-                <div class='section-title'>Acessibilidade & Diretrizes WCAG 2.1 AA</div>
-                <div class='section-sub'>Compromisso com usabilidade e ergonomia visual</div>
+                <h2 class='section-title'>Acessibilidade & Diretrizes WCAG 2.1 AA</h2>
+                <p class='section-sub'>Compromisso com usabilidade e ergonomia visual</p>
             </div>
         </div>
         """,
