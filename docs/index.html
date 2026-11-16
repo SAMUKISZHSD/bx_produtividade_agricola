@@ -792,6 +792,125 @@
       font-size: 20px
     }
 
+    .cm-cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 16px;
+      margin-top: 8px;
+    }
+
+    .cm-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      font-family: var(--font-sans);
+    }
+
+    .cm-card-winner {
+      border-color: var(--brand-primary);
+      box-shadow: inset 0 0 0 1px var(--brand-primary);
+    }
+
+    .cm-card-header {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .cm-card-title {
+      font-weight: 700;
+      font-size: 13.5px;
+      color: var(--text-main);
+    }
+
+    .cm-card-sub {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .cm-card table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: center;
+      font-size: 12.5px;
+    }
+
+    .cm-card th,
+    .cm-card td {
+      border: 1px solid var(--border-color);
+      padding: 7px 6px;
+      font-weight: 400;
+    }
+
+    .cm-card th {
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .cm-card .hit {
+      background: var(--bg-surface-alt);
+      color: var(--brand-dark);
+      font-weight: 700;
+      font-size: 16px;
+      animation: fade .6s both;
+    }
+
+    .cm-card .miss {
+      background: var(--brand-danger-light);
+      color: var(--brand-danger);
+      font-weight: 700;
+      font-size: 13px;
+    }
+
+    .cm-card .zero {
+      color: var(--text-light);
+      font-size: 16px;
+    }
+
+    .cm-card-foot {
+      font-size: 12px;
+      font-family: var(--font-mono);
+      color: var(--text-muted);
+      margin-top: auto;
+      line-height: 1.4;
+    }
+
+    .winner-badge {
+      display: inline-block;
+      font: 700 11px var(--font-mono);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 3px 8px;
+      border-radius: 4px;
+      background: var(--brand-primary);
+      color: #ffffff;
+      margin-bottom: 6px;
+    }
+
+    html.dark .winner-badge {
+      color: #09090b;
+    }
+
+    .analysis-box {
+      margin: 14px 0 0;
+      padding: 14px 16px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-left: 3px solid var(--brand-accent);
+      border-radius: 6px;
+      font-size: 0.92rem;
+    }
+
+    .analysis-box-title {
+      font: 600 14px var(--font-sans);
+      color: var(--brand-dark);
+      margin: 0 0 8px;
+    }
+
     .fi {
       font-family: var(--font-sans);
       font-size: 14px
@@ -2448,13 +2567,23 @@ joblib.dump(modelo_pipeline, "models/pipeline_final.joblib")</code></pre>
           <div style="display: grid; grid-template-columns: 1fr; gap: 1.5rem; margin: 2rem 0;">
             <div class="figure-wrapper">
               <div class="figure-header">
-                <span class="figure-title">Figura 4 - Matrizes de Confusão no Teste Cego (2023-2024)</span>
+                <span class="figure-title">Figura 4 - Matrizes de Confusão e Backtest: Treino (2015-2022), Safra 2021 e Teste Cego (2023-2024)</span>
               </div>
               <div id="confusion-matrix-comparison"></div>
               <p class="figure-caption">
-                Desempenho no teste cego. O modelo recomendado obteve acerto integral nas duas safras, sem falsos
-                alarmes. Como o teste não contém quebras, as matrizes dos seis modelos coincidem.
+                Comparação entre a matriz de treino da Árvore Vencedora (<i>N=8</i>), o divisor de águas no backtest de 2021 (Árvore vs Ensembles) e o teste cego (2023-2024, <i>N=2</i>), onde as matrizes de todos os sete modelos coincidem por não haver quebras no biênio.
               </p>
+              <div class="analysis-box">
+                <div class="analysis-box-title">Análise da Figura 4 — O que as matrizes revelam sobre o modelo vencedor</div>
+                <p style="margin-bottom: 10px;">
+                  Os três painéis demonstram por que a <strong>Árvore de Decisão Rasa (Parcimoniosa)</strong> foi eleita o modelo vencedor do projeto:
+                </p>
+                <ul style="margin-bottom: 0; padding-left: 1.25rem;">
+                  <li><strong>Treino (2015–2022):</strong> A árvore separou com exatidão todas as 5 safras normais (<code>VN = 5</code>) e todas as 3 quebras históricas de 2015, 2016 e 2021 (<code>VP = 3</code>), com <strong>0 Falsos Negativos</strong> e <strong>0 Falsos Positivos</strong>.</li>
+                  <li><strong>Backtest da Safra 2021 (ponto decisivo):</strong> Treinando apenas com 2015–2020 (<i>N=6</i>), a Árvore Rasa manteve <code>Recall = 1.00</code> ao prever a quebra de 2021 com probabilidade de <strong>0.94</strong> (<code>VP</code>). Em contrapartida, a amostragem <em>bootstrap</em> do <code>RandomForest</code> diluiu a probabilidade para <strong>0.39</strong> e a regularização do <code>XGBoost</code> limitou a estimativa em <strong>0.454</strong> — ambos abaixo do corte <code>0.50</code>, resultando em <strong>Falso Negativo</strong> (<code>Recall Val = 0.00*</code>). Já <code>DummyClassifier</code> (<code>3 FN</code>) e <code>Persistência</code> (<code>2 FN</code>) falharam já no treino.</li>
+                  <li><strong>Teste Cego (2023–2024):</strong> Nas duas safras mais recentes, ambas normais (3.580 e 3.560 kg/ha), o modelo vencedor cravou <code>VN = 2</code> e <code>FP = 0</code> (Especificidade de 100%), provando que a alta sensibilidade a quebras não gera falsos alarmes em anos regulares.</li>
+                </ul>
+              </div>
             </div>
 
             <div class="figure-wrapper">
@@ -2465,30 +2594,41 @@ joblib.dump(modelo_pipeline, "models/pipeline_final.joblib")</code></pre>
               </div>
               <div id="feature-importance-chart"></div>
               <p class="figure-caption">
-                O déficit hídrico e os picos de calor concentram 78% da relevância preditiva nas regras de decisão.
+                O déficit hídrico e os picos de calor concentram 78% da relevância preditiva nas regras de decisão da Árvore Vencedora.
               </p>
+              <div class="analysis-box">
+                <div class="analysis-box-title">Análise da Figura 5 — Como o peso das variáveis estrutura a árvore vencedora</div>
+                <ul style="margin-bottom: 0; padding-left: 1.25rem;">
+                  <li><strong><code>deficit_hidrico_solo</code> (54%):</strong> Domina a redução de impureza de Gini e assume o nó raiz da árvore (<code>&gt; 20 dias</code> em Jan-Fev). É o indicador que desarmou a armadilha de 2021 (42 dias de solo seco na raiz apesar de 1.634 mm de chuva anual).</li>
+                  <li><strong><code>dias_pico_calor</code> (24%):</strong> Segundo corte crítico (<code>&ge; 3 dias &ge; 35°C</code>). Junto ao déficit hídrico, soma <strong>78% do poder de decisão</strong> e isola o estresse térmico severo que destruiu grãos em 2016 (4 dias) e 2021 (3 dias).</li>
+                  <li><strong><code>precipitacao_enchimento</code> (14%):</strong> Opera como salvaguarda no ramo de umidade favorável (<code>&lt; 200 mm</code>), validando safras regulares de boa chuva no enchimento como 2018 (724,46 mm) e 2024 (556,25 mm).</li>
+                  <li><strong><code>amplitude_termica</code> (8%):</strong> Atua apenas no refinamento térmico secundário (<code>&gt; 28°C</code>), permitindo à árvore manter profundidade baixa (<code>max_depth=3</code>) sem absorver ruído amostral.</li>
+                </ul>
+              </div>
             </div>
           </div>
 
-          <!-- DESTAQUE ESPECIAL (4 TÓPICOS DA PÁGINA 6 DO PDF 1) -->
+          <!-- DESTAQUE ESPECIAL: MODELO VENCEDOR -->
           <div id="destaque" class="callout-box"
-            style="border-left: 3px solid var(--brand-primary); background-color: var(--bg-surface);">
-            <div class="callout-title" style="font-size: 1.1rem; margin-bottom: 1rem;">
-              Destaque do Modelo Recomendado: Árvore de Decisão Parcimoniosa
+            style="border-left: 4px solid var(--brand-primary); background-color: var(--bg-surface);">
+            <span class="winner-badge">Modelo Vencedor</span>
+            <div class="callout-title" style="font-size: 1.15rem; margin-bottom: 1rem;">
+              Destaque Especial: Árvore de Decisão Parcimoniosa (<code>DecisionTreeClassifier</code>)
             </div>
 
             <div style="display: flex; flex-direction: column; gap: 1rem;">
               <div>
-                <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--brand-primary); margin-bottom: 0.2rem;">
-                  1. Por que ele superou os demais?
+                <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--brand-primary); margin-bottom: 0.35rem;">
+                  1. Por que ele superou os demais modelos?
                 </h4>
-                <p style="font-size: 0.92rem; margin-bottom: 0;">
-                  Alcançou <strong>Recall de 100%</strong> nas quebras históricas com <strong>zero Falsos
-                    Negativos</strong>. Em uma série temporal com <i>N=8</i> no treino e <i>N=2</i> no teste, modelos de
-                  alta complexidade (Random Forest e XGBoost) sofrem com a amostragem bootstrap e com a calibragem de
-                  gradiente em amostra reduzida, gerando alarmes falsos em 2019 e 2020. A árvore simples delineou as
-                  fronteiras biofísicas reais sem sobreajuste.
+                <p style="font-size: 0.92rem; margin-bottom: 0.5rem;">
+                  A <strong>Árvore de Decisão Rasa (<code>max_depth=3</code>)</strong> conquistou o primeiro lugar no projeto por alcançar <strong>Recall de 100%</strong> no treino e na validação temporal com <strong>zero Falsos Negativos (<code>0 FN</code>)</strong>, especificidade integral no teste cego (2023–2024) e inferência em apenas <strong>0.12 ms</strong> na árvore pura (<strong>4.72 ms</strong> no pipeline completo):
                 </p>
+                <ul style="font-size: 0.9rem; margin-bottom: 0; padding-left: 1.25rem;">
+                  <li><strong>Contra os Ensembles (<code>Random Forest</code> e <code>XGBoost</code>):</strong> Em uma série decenal reduzida (<i>N=8</i> no treino e <i>N=6</i> no backtest de 2021), o sorteio <em>bootstrap</em> com reposição do <code>Random Forest</code> (100 árvores) diluiu a probabilidade da quebra de 2021 para <code>0.39</code>, enquanto a regularização de pesos do <code>XGBoost</code> (50 árvores) segurou a estimativa em <code>0.454</code>. Ambos ficaram abaixo do corte (<code>0.50</code>) e sofreram <strong>Falso Negativo</strong> na validação (<code>Recall Val = 0.00*</code>). A árvore única aproveitou 100% da amostra sem diluição e preservou a regra biofísica real.</li>
+                  <li><strong>Contra os Baselines (<code>DummyClassifier</code> e <code>Persistência</code>):</strong> O <code>DummyClassifier</code> previu apenas safra normal (<code>Recall = 0.00</code>, <code>3 FN</code>), e a <code>Persistência</code> reagiu com atraso às viradas climáticas (<code>Recall = 0.33 / 0.00</code>, <code>2 FN</code>).</li>
+                  <li><strong>Contra <code>GaussianNB</code> e <code>LogisticRegression (L2, p=0.35)</code>:</strong> Embora empatem nas métricas quantitativas de validação (<code>Recall 1.00 / Precisão 0.50 / F1 0.67</code>), dependem de superfícies probabilísticas contínuas ou premissas de independência entre variáveis climáticas correlacionadas. A Árvore Rasa venceu por entregar <strong>regras explícitas (<code>se/então</code>) 100% auditáveis</strong> em campo por agrônomos, cooperativas e seguradoras.</li>
+                </ul>
               </div>
 
               <div>
@@ -2505,7 +2645,7 @@ joblib.dump(modelo_pipeline, "models/pipeline_final.joblib")</code></pre>
               <div>
                 <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--brand-primary); margin-bottom: 0.2rem;">
                   3. <span class="tech-term">Hiperparâmetros</span> <span class="didactic-note">(as configurações
-                    ajustadas antes do treino)</span> e seus efeitos:
+                    ajustadas antes do treino)</span> e o efeito de cada um:
                 </h4>
                 <ul style="font-size: 0.9rem; margin-bottom: 0; padding-left: 1.25rem;">
                   <li><code>max_depth=3</code>: Poda a árvore em três níveis, contendo o risco de sobreajuste.</li>
@@ -3134,9 +3274,48 @@ joblib.dump(modelo_pipeline, "models/pipeline_final.joblib")</code></pre>
       /* figura 4 e 5 (Estilo TechBlog) */
       var cm = $('#confusion-matrix-comparison');
       if (cm) {
-        cm.setAttribute('role', 'img');
-        cm.setAttribute('aria-label', 'Matriz de confusão do teste 2023-2024: duas safras normais classificadas como normais, nenhum falso alarme e nenhuma quebra no período');
-        cm.innerHTML = '<div class="cm" style="border: 1px solid var(--border-color); border-radius: 8px; overflow: hidden; background: var(--bg-surface);"><table><tr><th></th><th>Previsto: normal</th><th>Previsto: quebra</th></tr><tr><th>Real: normal</th><td class="hit" style="background: var(--bg-surface-alt); color: var(--brand-dark); font-weight: 700;">2</td><td class="zero">0</td></tr><tr><th>Real: quebra</th><td class="zero">0</td><td class="zero">0</td></tr></table></div>';
+        cm.setAttribute('role', 'region');
+        cm.setAttribute('aria-label', 'Comparação das matrizes de confusão: Treino 2015-2022 da Árvore Vencedora (5 VN, 3 VP, 0 FN), Backtest 2021 (Árvore 0.94 VP versus Random Forest 0.39 FN e XGBoost 0.454 FN) e Teste Cego 2023-2024 (2 VN, 0 FP)');
+        cm.innerHTML =
+          '<div class="cm-cards-grid">' +
+            '<div class="cm-card cm-card-winner">' +
+              '<div class="cm-card-header">' +
+                '<span class="cm-card-title">1. Treino (2015-2022, N=8) &middot; Vencedor</span>' +
+                '<span class="cm-card-sub">Árvore de Decisão Rasa (<code>max_depth=3</code>)</span>' +
+              '</div>' +
+              '<table>' +
+                '<tr><th></th><th>Prev: Normal</th><th>Prev: Quebra</th></tr>' +
+                '<tr><th>Real: Normal</th><td class="hit">5</td><td class="zero">0</td></tr>' +
+                '<tr><th>Real: Quebra</th><td class="zero">0</td><td class="hit">3</td></tr>' +
+              '</table>' +
+              '<div class="cm-card-foot">Recall = 1.00 &middot; Precisão = 1.00 &middot; 0 FN (2015, 2016, 2021)</div>' +
+            '</div>' +
+            '<div class="cm-card">' +
+              '<div class="cm-card-header">' +
+                '<span class="cm-card-title">2. Backtest Safra 2021 (Val. Temporal)</span>' +
+                '<span class="cm-card-sub">Treino 2015-2020 (N=6) &middot; Real: Quebra</span>' +
+              '</div>' +
+              '<table>' +
+                '<tr><th>Modelo</th><th>Prob.</th><th>Veredito</th></tr>' +
+                '<tr><td><strong>Árvore Rasa</strong></td><td class="hit">0.94</td><td class="hit">VP</td></tr>' +
+                '<tr><td>Random Forest</td><td class="miss">0.39</td><td class="miss">FN</td></tr>' +
+                '<tr><td>XGBoost</td><td class="miss">0.454</td><td class="miss">FN</td></tr>' +
+              '</table>' +
+              '<div class="cm-card-foot">Limiar = 0.50 &middot; Ensembles falharam (Recall Val = 0.00*)</div>' +
+            '</div>' +
+            '<div class="cm-card">' +
+              '<div class="cm-card-header">' +
+                '<span class="cm-card-title">3. Teste Cego (2023-2024, N=2)</span>' +
+                '<span class="cm-card-sub">Sem quebras no biênio (y_test = {0: 2})</span>' +
+              '</div>' +
+              '<table>' +
+                '<tr><th></th><th>Prev: Normal</th><th>Prev: Quebra</th></tr>' +
+                '<tr><th>Real: Normal</th><td class="hit">2</td><td class="zero">0</td></tr>' +
+                '<tr><th>Real: Quebra</th><td class="zero">0</td><td class="zero">0</td></tr>' +
+              '</table>' +
+              '<div class="cm-card-foot">Especificidade = 100% &middot; Zero falsos alarmes</div>' +
+            '</div>' +
+          '</div>';
       }
 
       var fi = $('#feature-importance-chart');
