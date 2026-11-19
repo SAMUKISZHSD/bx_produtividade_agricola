@@ -2,7 +2,9 @@
 
 O banco guarda a série município x safra e a inferência do pipeline campeão
 (regressão logística L2 em tmax_enchimento, limiar de probabilidade 0,45).
-Recriar as tabelas a cada execução evita misturar o esquema antigo.
+Por padrão preserva análises já salvas no esquema multi-município atual,
+recriando apenas quando o banco/esquema está ausente/desatualizado ou com
+`forcar_recriacao=True`.
 """
 
 from __future__ import annotations
@@ -27,6 +29,29 @@ DB_PATH = BASE_DIR / "data" / "monitoramento_safra.db"
 MODEL_PATH = BASE_DIR / "models" / "pipeline_final.joblib"
 LIMIAR_PATH = BASE_DIR / "models" / "limiar_congelado.json"
 MODELO_NOME = "LogisticRegression L2 (C=1.0, class_weight=balanced)"
+TABELAS_BANCO = ("dados_historicos", "previsoes_sistemicas", "logs_monitoramento")
+COLUNAS_HISTORICOS = {
+    "id_historico",
+    "municipio",
+    "codigo_ibge",
+    "ano_safra",
+    "quebra_safra",
+    "tmax_enchimento",
+    "split",
+}
+COLUNAS_PREVISOES = {
+    "id_previsao",
+    "ano_safra",
+    "municipio",
+    "modelo_utilizado",
+    "alerta_quebra",
+    "probabilidade_quebra",
+    "limiar_decisao",
+    "limiar_celsius",
+    "tempo_inferencia_ms",
+    "origem_execucao",
+}
+COLUNAS_LOGS = {"id_log", "id_previsao", "nivel_log", "mensagem", "payload_entrada"}
 
 
 def limiar_congelado() -> tuple[float, float]:
@@ -41,119 +66,170 @@ def get_connection() -> sqlite3.Connection:
     return conn
 
 
-def inicializar_e_popular_banco() -> dict[str, int]:
-    """Recria as três tabelas e grava a inferência do modelo campeão."""
+def _contar_tabelas(conn: sqlite3.Connection) -> dict[str, int]:
+    return {
+        tabela: int(conn.execute(f"SELECT COUNT(*) FROM {tabela}").fetchone()[0])
+        for tabela in TABELAS_BANCO
+    }
+
+
+def _banco_pronto(conn: sqlite3.Connection, min_historicos: int) -> dict[str, int] | None:
+    """Retorna as contagens se as 3 tabelas já existirem com o esquema atual e populadas."""
+    tabelas = {
+        row[0]
+        for row in conn.execute(
+            "SELECT name FROM sqlite_master WHERE type = 'table' "
+            "AND name IN ('dados_historicos', 'previsoes_sistemicas', 'logs_monitoramento')"
+        ).fetchall()
+    }
+    if tabelas != set(TABELAS_BANCO):
+        return None
+
+    cols_hist = {row[1] for row in conn.execute("PRAGMA table_info(dados_historicos)").fetchall()}
+    cols_prev = {row[1] for row in conn.execute("PRAGMA table_info(previsoes_sistemicas)").fetchall()}
+    cols_logs = {row[1] for row in conn.execute("PRAGMA table_info(logs_monitoramento)").fetchall()}
+
+    if not COLUNAS_HISTORICOS.issubset(cols_hist):
+        return None
+    if not COLUNAS_PREVISOES.issubset(cols_prev):
+        return None
+    if not COLUNAS_LOGS.issubset(cols_logs):
+        return None
+
+    contagens = _contar_tabelas(conn)
+    if contagens["dados_historicos"] < min_historicos:
+        return None
+    return contagens
+
+
+def inicializar_e_popular_banco(forcar_recriacao: bool = False) -> dict[str, int]:
+    """Garante o banco multi-município populado; recria apenas se necessário ou forçado."""
     if not DATA_PATH.exists() or not MODEL_PATH.exists():
         raise FileNotFoundError("Base processada ou pipeline_final.joblib ausente.")
 
     df = carregar_base()
+
+    if not forcar_recriacao and DB_PATH.exists():
+        conn = get_connection()
+        try:
+            contagens_atuais = _banco_pronto(conn, len(df))
+            if contagens_atuais is not None:
+                return contagens_atuais
+        finally:
+            conn.close()
+
     pipe = joblib.load(MODEL_PATH)
     limiar, limiar_c = limiar_congelado()
 
-    with get_connection() as conn:
-        conn.executescript(
-            """
-            DROP TABLE IF EXISTS logs_monitoramento;
-            DROP TABLE IF EXISTS previsoes_sistemicas;
-            DROP TABLE IF EXISTS dados_historicos;
-            CREATE TABLE dados_historicos (
-                id_historico INTEGER PRIMARY KEY AUTOINCREMENT,
-                municipio TEXT NOT NULL,
-                codigo_ibge TEXT NOT NULL,
-                ano_safra INTEGER NOT NULL,
-                quebra_safra INTEGER NOT NULL,
-                tmax_enchimento REAL NOT NULL,
-                split TEXT NOT NULL,
-                UNIQUE (codigo_ibge, ano_safra)
-            );
-            CREATE TABLE previsoes_sistemicas (
-                id_previsao INTEGER PRIMARY KEY AUTOINCREMENT,
-                id_historico INTEGER,
-                ano_safra INTEGER NOT NULL,
-                municipio TEXT NOT NULL,
-                modelo_utilizado TEXT NOT NULL,
-                alerta_quebra INTEGER NOT NULL,
-                probabilidade_quebra REAL NOT NULL,
-                limiar_decisao REAL NOT NULL,
-                limiar_celsius REAL NOT NULL,
-                tempo_inferencia_ms REAL NOT NULL,
-                origem_execucao TEXT NOT NULL,
-                data_previsao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY (id_historico) REFERENCES dados_historicos (id_historico)
-            );
-            CREATE TABLE logs_monitoramento (
-                id_log INTEGER PRIMARY KEY AUTOINCREMENT,
-                id_previsao INTEGER,
-                nivel_log TEXT NOT NULL,
-                mensagem TEXT NOT NULL,
-                payload_entrada TEXT,
-                data_log TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY (id_previsao) REFERENCES previsoes_sistemicas (id_previsao)
-            );
-            """
-        )
-
-        X = df[[FEATURE]]
-        t0 = time.perf_counter()
-        probas = pipe.predict_proba(X)[:, 1]
-        tempo_lote_ms = (time.perf_counter() - t0) * 1000
-        tempo_linha = round(tempo_lote_ms / max(len(df), 1), 3)
-
-        for (_, row), prob in zip(df.iterrows(), probas, strict=True):
-            alerta = int(float(prob) >= limiar)
-            cur_hist = conn.execute(
-                """INSERT INTO dados_historicos
-                (municipio, codigo_ibge, ano_safra, quebra_safra, tmax_enchimento, split)
-                VALUES (?, ?, ?, ?, ?, ?)""",
-                (
-                    row["municipio"],
-                    str(int(row["cod_municipio"])),
-                    int(row["safra"]),
-                    int(row[TARGET]),
-                    float(row[FEATURE]),
-                    row["split"],
-                ),
-            )
-            cur_prev = conn.execute(
-                """INSERT INTO previsoes_sistemicas
-                (id_historico, ano_safra, municipio, modelo_utilizado, alerta_quebra,
-                 probabilidade_quebra, limiar_decisao, limiar_celsius, tempo_inferencia_ms, origem_execucao)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
-                (
-                    cur_hist.lastrowid,
-                    int(row["safra"]),
-                    row["municipio"],
-                    MODELO_NOME,
-                    alerta,
-                    float(prob),
-                    limiar,
-                    limiar_c,
-                    tempo_linha,
-                    "teste" if row["split"] == "teste" else "treino",
-                ),
-            )
-            conn.execute(
-                """INSERT INTO logs_monitoramento
-                (id_previsao, nivel_log, mensagem, payload_entrada)
-                VALUES (?, ?, ?, ?)""",
-                (
-                    cur_prev.lastrowid,
-                    "INFO",
-                    f"Inferência {row['municipio']} {int(row['safra'])}: alerta={alerta}",
-                    json.dumps({FEATURE: float(row[FEATURE])}, ensure_ascii=False),
-                ),
+    conn = get_connection()
+    try:
+        with conn:
+            conn.executescript(
+                """
+                DROP TABLE IF EXISTS logs_monitoramento;
+                DROP TABLE IF EXISTS previsoes_sistemicas;
+                DROP TABLE IF EXISTS dados_historicos;
+                CREATE TABLE dados_historicos (
+                    id_historico INTEGER PRIMARY KEY AUTOINCREMENT,
+                    municipio TEXT NOT NULL,
+                    codigo_ibge TEXT NOT NULL,
+                    ano_safra INTEGER NOT NULL,
+                    quebra_safra INTEGER NOT NULL,
+                    tmax_enchimento REAL NOT NULL,
+                    split TEXT NOT NULL,
+                    UNIQUE (codigo_ibge, ano_safra)
+                );
+                CREATE TABLE previsoes_sistemicas (
+                    id_previsao INTEGER PRIMARY KEY AUTOINCREMENT,
+                    id_historico INTEGER,
+                    ano_safra INTEGER NOT NULL,
+                    municipio TEXT NOT NULL,
+                    modelo_utilizado TEXT NOT NULL,
+                    alerta_quebra INTEGER NOT NULL,
+                    probabilidade_quebra REAL NOT NULL,
+                    limiar_decisao REAL NOT NULL,
+                    limiar_celsius REAL NOT NULL,
+                    tempo_inferencia_ms REAL NOT NULL,
+                    origem_execucao TEXT NOT NULL,
+                    data_previsao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY (id_historico) REFERENCES dados_historicos (id_historico)
+                );
+                CREATE TABLE logs_monitoramento (
+                    id_log INTEGER PRIMARY KEY AUTOINCREMENT,
+                    id_previsao INTEGER,
+                    nivel_log TEXT NOT NULL,
+                    mensagem TEXT NOT NULL,
+                    payload_entrada TEXT,
+                    data_log TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY (id_previsao) REFERENCES previsoes_sistemicas (id_previsao)
+                );
+                """
             )
 
-        contagens = {}
-        for tabela in ("dados_historicos", "previsoes_sistemicas", "logs_monitoramento"):
-            contagens[tabela] = conn.execute(f"SELECT COUNT(*) FROM {tabela}").fetchone()[0]
-        return contagens
+            X = df[[FEATURE]]
+            t0 = time.perf_counter()
+            probas = pipe.predict_proba(X)[:, 1]
+            tempo_lote_ms = (time.perf_counter() - t0) * 1000
+            tempo_linha = round(tempo_lote_ms / max(len(df), 1), 3)
+
+            if len(df) != len(probas):
+                raise ValueError("Quantidade de previsões diverge do número de linhas da base.")
+
+            for (_, row), prob in zip(df.iterrows(), probas):
+                alerta = int(float(prob) >= limiar)
+                cur_hist = conn.execute(
+                    """INSERT INTO dados_historicos
+                    (municipio, codigo_ibge, ano_safra, quebra_safra, tmax_enchimento, split)
+                    VALUES (?, ?, ?, ?, ?, ?)""",
+                    (
+                        row["municipio"],
+                        str(int(row["cod_municipio"])),
+                        int(row["safra"]),
+                        int(row[TARGET]),
+                        float(row[FEATURE]),
+                        row["split"],
+                    ),
+                )
+                cur_prev = conn.execute(
+                    """INSERT INTO previsoes_sistemicas
+                    (id_historico, ano_safra, municipio, modelo_utilizado, alerta_quebra,
+                     probabilidade_quebra, limiar_decisao, limiar_celsius, tempo_inferencia_ms, origem_execucao)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                    (
+                        cur_hist.lastrowid,
+                        int(row["safra"]),
+                        row["municipio"],
+                        MODELO_NOME,
+                        alerta,
+                        float(prob),
+                        limiar,
+                        limiar_c,
+                        tempo_linha,
+                        "teste" if row["split"] == "teste" else "treino",
+                    ),
+                )
+                conn.execute(
+                    """INSERT INTO logs_monitoramento
+                    (id_previsao, nivel_log, mensagem, payload_entrada)
+                    VALUES (?, ?, ?, ?)""",
+                    (
+                        cur_prev.lastrowid,
+                        "INFO",
+                        f"Inferência {row['municipio']} {int(row['safra'])}: alerta={alerta}",
+                        json.dumps({FEATURE: float(row[FEATURE])}, ensure_ascii=False),
+                    ),
+                )
+
+            return _contar_tabelas(conn)
+    finally:
+        conn.close()
 
 
 if __name__ == "__main__":
-    totais = inicializar_e_popular_banco()
+    totais = inicializar_e_popular_banco(forcar_recriacao=True)
     limiar, limiar_c = limiar_congelado()
-    with get_connection() as conn:
+    conn = get_connection()
+    try:
         sorriso = pd.read_sql_query(
             """
             SELECT h.ano_safra, h.quebra_safra, h.tmax_enchimento, h.split,
@@ -165,6 +241,8 @@ if __name__ == "__main__":
             """,
             conn,
         )
+    finally:
+        conn.close()
     print("Banco atualizado:", totais)
     print(f"Limiar: probabilidade {limiar:.2f} = {limiar_c:.2f} °C")
     print(sorriso.to_string(index=False))

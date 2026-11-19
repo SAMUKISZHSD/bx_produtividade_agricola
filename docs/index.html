@@ -4,9 +4,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>Avaliação temporal de risco de quebra da soja | SojaRisco</title>
+  <title>Risco de Quebra de Safra na Soja: Da Estatística ao Protótipo Experimental | SojaRisco</title>
   <meta name="description"
-    content="Artigo sobre avaliação temporal de modelos de risco de quebra de safra de soja com dados agroclimáticos NASA POWER e produtividade IBGE/PAM.">
+    content="Como combinar dados de satélite da NASA POWER e produtividade do IBGE PAM em 9 municípios do Alto Teles Pires-MT para criar e auditar um índice experimental de risco térmico na soja.">
   <link rel="icon" type="image/png" href="img/logo_sojarisco.png">
   <script>try { if (localStorage.theme === 'dark' || (!('theme' in localStorage) && matchMedia('(prefers-color-scheme: dark)').matches)) document.documentElement.classList.add('dark') } catch (e) { }</script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -895,6 +895,27 @@
       color: #09090b;
     }
 
+    .status-warning-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: 999px;
+      background: #fffbeb;
+      border: 1px solid #f59e0b;
+      color: #b45309;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+
+    html.dark .status-warning-badge {
+      background: #33260c;
+      border-color: rgba(251, 191, 36, 0.45);
+      color: #fbbf24;
+    }
+
     .analysis-box {
       margin: 14px 0 0;
       padding: 14px 16px;
@@ -1340,10 +1361,10 @@
 
       <!-- Navegação TechBlog (Uppercase, tracking wider, font-bold) -->
       <nav class="header-nav">
-        <a href="#problema">Resumo</a>
-        <a href="#dados">Dados</a>
-        <a href="#metodo">Método</a>
+        <a href="#problema">Problema</a>
+        <a href="#modelos">Modelos</a>
         <a href="#resultados">Resultados</a>
+        <a href="#mostra">Mostra</a>
       </nav>
 
       <div class="header-actions">
@@ -1382,17 +1403,27 @@
        CONTAINER PRINCIPAL COM GRID EDITORIAL
        ======================================================================== -->
   <div class="main-wrapper">
-    <!-- HERO HEADER (ESTILO TECHBLOG - FORA DO GRID PARA ALINHAR O ÍNDICE AO TOPO DO ARTIGO) -->
+    <!-- HERO HEADER (ESTILO TECHBLOG) -->
     <header class="article-hero"
       style="padding: 40px 0 32px; border-bottom: 1px solid var(--border-color); margin-bottom: 32px;">
+      <div class="status-warning-badge">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" style="flex-shrink: 0;">
+          <path d="M32 7 59 54H5Z"/>
+          <path d="M32 23v14m0 8v1"/>
+        </svg>
+        <span>PROTÓTIPO EXPERIMENTAL | NÃO APROVADO PARA DECISÃO OPERACIONAL</span>
+      </div>
+
       <h1 class="hero-title"
         style="font-size: clamp(32px, 5vw, 54px); font-weight: 700; line-height: 1.08; letter-spacing: -0.025em; color: var(--brand-dark); margin: 0 0 20px;">
-        Avaliação temporal de risco de quebra de safra da soja com dados agroclimáticos
+        Do Dado de Satélite ao Alerta no Ar: Risco de Quebra de Safra na Soja.
       </h1>
 
       <p class="hero-subtitle"
         style="font-size: 1.35rem; line-height: 1.6; font-style: italic; color: var(--text-muted); margin: 0 0 32px; max-width: 900px;">
-        Estudo de classificação em nove municípios de Mato Grosso: definição do alvo, regressão logística, backtest temporal, erros de decisão e limites de generalização.
+        Um guia passo a passo para estudantes e iniciantes em Ciência de Dados: como medir perdas relativas à tendência,
+        testar modelos lineares e árvores de decisão em 9 municípios de Mato Grosso, e por que a honestidade científica
+        nos fez reprovar o uso operacional do próprio protótipo.
       </p>
 
       <!-- Authors Opening Card (Estilo TechBlog com 4 colunas) -->
@@ -1447,8 +1478,8 @@
             </div>
             <div>
               <span
-                style="display: block; color: var(--brand-primary); font-size: 10px; font-family: var(--font-mono); font-weight: 700; text-transform: uppercase;">Publicação</span>
-              <span style="font-weight: 600; color: var(--text-main);">Outubro 2026</span>
+                style="display: block; color: var(--brand-primary); font-size: 10px; font-family: var(--font-mono); font-weight: 700; text-transform: uppercase;">Atualização</span>
+              <span style="font-weight: 600; color: var(--text-main);">Novembro 2026</span>
             </div>
           </div>
         </div>
@@ -1458,141 +1489,1030 @@
     <div class="editorial-grid">
 
       <!-- ====================================================================
-           ARTIGO TÉCNICO COMPLETO
+           ARTIGO DIDÁTICO COMPLETO (PÚBLICO: ESTUDANTES E INICIANTES EM DS)
            ==================================================================== -->
       <article class="article-content">
-  <section id="problema">
-    <h2>Resumo</h2>
-    <p class="lead-learn">Este estudo avalia modelos de classificação para identificar safras de soja cuja produtividade municipal ficou abaixo de sua tendência recente, usando indicadores agroclimáticos do período de enchimento dos grãos. A análise combina produtividade oficial do IBGE/PAM e séries meteorológicas diárias NASA POWER para nove municípios do norte de Mato Grosso.</p>
-    <p>O pipeline de referência é uma regressão logística regularizada, com uma única entrada: a temperatura máxima média diária de dezembro a fevereiro. No teste temporal de 2019–2024, o modelo obteve acurácia de 40,7%, recall de 75%, precisão de 23,7% e AUC de 0,728. Detectou 9 das 12 observações positivas, mas produziu 29 falsos alertas. O desempenho agregado depende fortemente da safra 2024. Assim, os resultados indicam um sinal estatístico exploratório, não evidência suficiente para uso operacional.</p>
-    <p><strong>Palavras-chave:</strong> soja; risco agroclimático; classificação; validação temporal; regressão logística; NASA POWER.</p>
-    <div class="callout-box">
-      <div class="callout-title">Pergunta e resposta em poucas linhas</div>
-      <p>É possível identificar risco de quebra a partir do clima do enchimento? Há associação preditiva em alguns períodos, mas a generalização entre safras é instável. O modelo ativo funciona como um índice de alerta térmico, não como previsão confiável de produtividade nem como probabilidade calibrada de perda.</p>
-    </div>
-  </section>
 
-  <section id="contexto">
-    <h2>1. Problema e motivação</h2>
-    <p>A produtividade de uma cultura resulta da interação entre genética, solo, manejo, calendário, pragas e clima. Na soja, temperaturas elevadas e disponibilidade insuficiente de água durante fases reprodutivas podem afetar a formação e o enchimento dos grãos. Entretanto, uma perda de rendimento não tem necessariamente uma única causa climática: excesso de chuva, doença, decisões de manejo e outros fatores também podem contribuir.</p>
-    <p>O objetivo deste trabalho é mais restrito: avaliar se dados agroclimáticos agregados por município e safra ajudam a identificar uma queda relativa de produtividade. Não se pretende estimar toneladas por hectare, atribuir causalidade a uma variável isolada, nem substituir avaliação agronômica local.</p>
-    <p>O problema é formulado como classificação binária. Uma observação positiva representa rendimento inferior ao esperado segundo uma tendência construída apenas com safras anteriores do mesmo município. Essa definição permite comparar municípios com níveis produtivos distintos, mas não equivale a uma definição universal de quebra ou a um critério de seguro agrícola.</p>
-  </section>
+        <!-- SEÇÃO 1: O PROBLEMA AGRÍCOLA E QUEM USA O ALERTA -->
+        <section id="problema">
+          <h2>1. O Problema Agrícola e Quem Usa o Alerta</h2>
+          <p class="lead-learn">Neste artigo nós mostramos como construir um sistema de alerta agroclimático do zero (desde os dados brutos de satélite até o teste rigoroso no tempo) e explicamos por que uma simples
+            <span class="tech-term">Regressão Logística</span> <span class="didactic-note">(modelo estatístico simples que transforma medidas numéricas em um escore de risco entre 0 e 1)</span> com uma única temperatura (<code>tmax_enchimento &ge; 28,34 &deg;C</code>) foi mais honesta e estável do que florestas de árvores complexas <span class="didactic-note">(conjuntos de várias regras combinadas)</span>, mas ainda insuficiente para operar sozinha
+            no mundo real.</p>
 
-  <section id="dados">
-    <h2>2. Dados e definição do desfecho</h2>
-    <h3>2.1 Fontes e unidade de análise</h3>
-    <p>A produtividade municipal de soja em grão vem da Pesquisa Agrícola Municipal (PAM), disponibilizada pelo IBGE. As variáveis meteorológicas diárias vêm da NASA POWER. Cada linha da base representa um par <strong>município × safra</strong>. O recorte contém nove municípios da região de Alto Teles Pires, em Mato Grosso, e 192 observações: 138 no treino (2001–2018) e 54 no teste temporal (2019–2024).</p>
-    <p>A safra é tratada como período agrícola, e não simplesmente como ano civil. Para as variáveis do enchimento analisadas aqui, dezembro pertence à safra que termina no ano seguinte; janeiro e fevereiro pertencem ao mesmo número de safra. O teste possui seis safras compartilhadas entre os nove municípios. Por isso, 54 linhas não devem ser interpretadas como 54 safras independentes.</p>
-    <h3>2.2 Rótulo de quebra relativa</h3>
-    <p>Para município <em>i</em> e safra <em>t</em>, seja <em>Y</em><sub>i,t</sub> o rendimento observado e <em>T</em><sub>i,t</sub> a tendência estimada com até dez rendimentos anteriores do mesmo município, exigindo pelo menos cinco observações passadas. O rótulo é:</p>
-    <p class="figure-wrapper" style="text-align:center"><strong>quebra<sub>i,t</sub> = 1 se Y<sub>i,t</sub> &lt; 0,92 × T<sub>i,t</sub>; caso contrário, quebra<sub>i,t</sub> = 0.</strong></p>
-    <p>Usar apenas o passado evita construir o alvo com dados futuros. O limiar de 92% expressa uma queda relativa à trajetória estimada; ele não deve ser confundido com um corte fixo de produtividade em kg/ha. No treino existem 24 rótulos positivos; no teste, 12.</p>
-    <h3>2.3 Preditores agroclimáticos</h3>
-    <p>O modelo ativo usa somente <code>tmax_enchimento</code>: média das temperaturas máximas diárias em dezembro–fevereiro. Outros sinais foram avaliados como candidatos, não como entradas do pipeline ativo:</p>
-    <ul>
-      <li><code>deficit_hidrico_solo</code>: número de dias com <code>GWETROOT &lt; 0,70</code>, indicador de umidade da zona radicular da NASA POWER;</li>
-      <li><code>dias_pico_calor</code>: número de dias com temperatura máxima diária ≥ 35 °C;</li>
-      <li><code>precipitacao_enchimento</code>: precipitação acumulada no período, em milímetros;</li>
-      <li><code>veranico_max_dias</code>: maior sequência diária com precipitação inferior a 1 mm.</li>
-    </ul>
-    <p>Essas agregações resumem o período e podem perder informação sobre distribuição espacial, estádio fenológico real, intensidade intradiária e manejo. As comparações multivariáveis são exploratórias e não alteram a especificação do modelo ativo.</p>
-  </section>
+          <p>
+            Imagine que você acompanha a produção de soja no norte de Mato Grosso, na microrregião do <strong>Alto Teles
+            Pires</strong>, que reúne nove polos agrícolas de peso: <em>Ipiranga do Norte, Itanhangá, Lucas do Rio Verde,
+            Nobres, Nova Mutum, Nova Ubiratã, Santa Rita do Trivelato, Tapurah</em> e <strong>Sorriso-MT</strong> (nosso
+            município de referência e maior produtor nacional). Mesmo com sementes modernas e alto investimento em
+            tecnologia, o campo continua exposto aos extremos do clima.
+          </p>
 
-  <section id="metodo">
-    <h2>3. Fundamentos e método de modelagem</h2>
-    <h3>3.1 Regressão logística</h3>
-    <p>A regressão logística estima um escore linear <em>z = β<sub>0</sub> + β<sup>T</sup>x</em> e o transforma por meio da função sigmoide:</p>
-    <p class="figure-wrapper" style="text-align:center"><strong>p(y = 1 | x) = 1 / (1 + e<sup>−z</sup>)</strong></p>
-    <p>O pipeline ativo padroniza a temperatura com média e escala calculadas no conjunto de ajuste e, em seguida, aplica uma regressão logística com regularização L2, <code>C=1.0</code> e <code>class_weight="balanced"</code>. A padronização torna a escala numérica adequada ao ajuste; a regularização L2 penaliza coeficientes muito grandes. O balanceamento dá maior peso à classe minoritária durante o treinamento.</p>
-    <p>O valor emitido por esse classificador não é uma probabilidade calibrada: o balanceamento de classes altera a relação entre a saída do modelo e a frequência real do evento. Por isso, neste estudo ele deve ser interpretado como <strong>índice de risco</strong>, não como “X% de chance de quebra”.</p>
-    <h3>3.2 Regra de decisão e custo dos erros</h3>
-    <p>Uma probabilidade estimada precisa de um corte para produzir a decisão binária. O corte congelado do modelo ativo é 0,45, equivalente aproximadamente a <code>tmax_enchimento ≥ 28,34 °C</code>. A escolha reflete uma função de custo que penaliza uma quebra não alertada cinco vezes mais do que um alerta falso:</p>
-    <p class="figure-wrapper" style="text-align:center"><strong>Custo = 5 × FN + FP</strong></p>
-    <p><strong>Falso negativo (FN)</strong> é uma quebra observada sem alerta; <strong>falso positivo (FP)</strong> é um alerta sem quebra observada. Essa razão de custos é uma hipótese de negócio, não uma medida monetária validada.</p>
-    <h3>3.3 Separação e validação temporal</h3>
-    <p>As safras de 2001–2018 formam o treino e 2019–2024 constituem o bloco temporal posterior de teste. Na validação expansiva, cada previsão histórica de validação é gerada ajustando o pipeline apenas com safras anteriores; exigem-se pelo menos oito safras anteriores. O procedimento produz 88 previsões município-safra para 2009–2018.</p>
-    <p>O corte de 0,45 do modelo ativo foi selecionado anteriormente com validação do período de treino e é mantido fixo no backtest expansivo. Portanto, esse backtest não é totalmente aninhado para avaliar a política de corte: ele é um diagnóstico temporal do ajuste do classificador. O bloco 2019–2024 também já foi consultado em comparações exploratórias posteriores; seus números são apresentados com transparência, mas não devem mais ser tratados como um teste cego intocado.</p>
-    <h3>3.4 Métricas</h3>
-    <p>Acurácia é a proporção de classificações corretas. Recall é a fração das quebras observadas que recebeu alerta; precisão é a fração dos alertas que correspondeu a uma quebra. F1 combina precisão e recall por média harmônica. AUC mede a ordenação dos positivos acima dos negativos em diferentes cortes. Nenhuma dessas métricas, isoladamente, resume a utilidade agronômica. Por isso, também se relata a matriz de confusão, a frequência de alertas e o custo assimétrico.</p>
-  </section>
+          <p>
+            Durante a fase em que a planta está formando e enchendo os grãos (entre <strong>dezembro e fevereiro</strong>),
+            ondas de calor intenso e falta de chuva podem derrubar o rendimento por hectare. Mas há um desafio que todo
+            iniciante em Ciência de Dados precisa enxergar logo de início: <strong>nem toda perda na lavoura vem de uma
+            única causa</strong>. Excesso de chuva na colheita, doenças fúngicas e decisões de manejo também derrubam a
+            produção. Por isso, o objetivo deste projeto é restrito e claro: investigar se dados climáticos regionais
+            ajudam a emitir um <strong>índice de risco térmico</strong> após o enchimento dos grãos.
+          </p>
 
-  <section id="resultados">
-    <h2>4. Resultados</h2>
-    <h3>4.1 Modelo ativo no teste temporal</h3>
-    <p>Com o corte oficial de 0,45, o pipeline ativo obteve os resultados abaixo nas 54 observações de 2019–2024:</p>
-    <div class="table-responsive"><table class="editorial-table">
-      <thead><tr><th>Métrica</th><th>Resultado</th><th>Interpretação</th></tr></thead>
-      <tbody>
-        <tr><td>Acurácia</td><td>40,7%</td><td>22 das 54 linhas classificadas corretamente</td></tr>
-        <tr><td>Recall</td><td>75,0%</td><td>9 das 12 quebras foram alertadas</td></tr>
-        <tr><td>Precisão</td><td>23,7%</td><td>9 dos 38 alertas corresponderam a quebra</td></tr>
-        <tr><td>F1</td><td>0,360</td><td>Equilíbrio limitado entre recall e precisão</td></tr>
-        <tr><td>AUC</td><td>0,728</td><td>Separação moderada, com grande incerteza amostral</td></tr>
-        <tr><td>Custo (5×FN+FP)</td><td>44</td><td>3 falsos negativos e 29 falsos positivos</td></tr>
-      </tbody>
-    </table></div>
-    <p>A matriz de confusão pode ser lida como: 13 verdadeiros negativos, 29 falsos positivos, 3 falsos negativos e 9 verdadeiros positivos. O modelo alertou em 70,4% das linhas, embora 22,2% fossem positivas. Assim, o recall razoável vem acompanhado de muitos falsos alarmes.</p>
-    <p>O custo 44 é inferior ao baseline “nunca alertar” (60), mas superior ao baseline “alertar sempre” (42). Sem a safra 2024, o modelo tem recall de 25%, AUC de 0,341 e custo 43; nesse subconjunto, “nunca alertar” custa 20 e “alertar sempre” custa 41. A safra 2024 concentra oito das doze observações positivas do teste e influencia fortemente o resultado agregado.</p>
-    <h3>4.2 Backtest expansivo</h3>
-    <p>No backtest do treino (88 previsões; corte ativo 0,45), houve 28 verdadeiros negativos, 47 falsos positivos, 2 falsos negativos e 11 verdadeiros positivos. A acurácia foi 44,3%, o recall 84,6%, a precisão 19,0% e o custo 57. O backtest ilustra o comportamento histórico, mas não oferece evidência independente sobre a escolha do corte, que já havia sido feita com validação do período.</p>
-    <h3>4.3 Outros classificadores e sinais multivariáveis</h3>
-    <p>Foram comparados nove algoritmos usando as cinco variáveis agroclimáticas. Para manter um corte comum entre esses candidatos, o ranking OOF usa limiar 0,50; ordena-se por menor custo, depois AUC e recall. A comparação do primeiro colocado com o pipeline ativo não é perfeitamente isolada, pois o ativo usa seu corte oficial de 0,45. O teste é apenas diagnóstico e não participou do ranking:</p>
-    <div class="table-responsive"><table class="editorial-table">
-      <thead><tr><th>Classificador</th><th>Custo OOF</th><th>AUC OOF</th><th>Recall OOF</th><th>Precisão OOF</th><th>Custo teste diagnóstico</th><th>AUC teste diagnóstico</th></tr></thead>
-      <tbody>
-        <tr class="highlight-row"><td>Extra Trees raso</td><td>39</td><td>0,721</td><td>76,9%</td><td>29,4%</td><td>44</td><td>0,627</td></tr>
-        <tr><td>Random Forest raso</td><td>47</td><td>0,683</td><td>61,5%</td><td>26,7%</td><td>44</td><td>0,605</td></tr>
-        <tr><td>Árvore, profundidade 2</td><td>54</td><td>0,472</td><td>61,5%</td><td>21,6%</td><td>44</td><td>0,699</td></tr>
-        <tr><td>Árvore, profundidade 1</td><td>56</td><td>0,683</td><td>84,6%</td><td>19,3%</td><td>44</td><td>0,530</td></tr>
-        <tr><td>SVC RBF balanceado</td><td>65</td><td>0,277</td><td>0,0%</td><td>0,0%</td><td>60</td><td>0,325</td></tr>
-        <tr><td>LDA</td><td>68</td><td>0,374</td><td>0,0%</td><td>0,0%</td><td>27</td><td>0,778</td></tr>
-        <tr><td>GaussianNB</td><td>68</td><td>0,350</td><td>7,7%</td><td>11,1%</td><td>31</td><td>0,700</td></tr>
-        <tr><td>KNN (k=7)</td><td>69</td><td>0,557</td><td>0,0%</td><td>0,0%</td><td>39</td><td>0,604</td></tr>
-        <tr><td>Regressão logística L2</td><td>70</td><td>0,402</td><td>30,8%</td><td>13,8%</td><td>44</td><td>0,778</td></tr>
-      </tbody>
-    </table></div>
-    <p>Extra Trees foi o melhor candidato no critério OOF desse conjunto, mas não mostrou superioridade clara no teste diagnóstico: teve o mesmo custo 44 do ativo e AUC menor (0,627 contra 0,728). Uma regressão logística de cinco sinais também teve melhor custo no teste completo em experimento separado, mas custo muito pior na validação expansiva e sensibilidade à safra 2024. Nenhuma alternativa foi promovida.</p>
-  </section>
+          <div class="callout-box">
+            <div class="callout-title">Quando o Alerta Acontece (e para o que ele NÃO serve)</div>
+            <p style="margin-bottom: 0; font-size: 0.95rem;">
+              O alerta é emitido em <strong>março</strong>, logo após o término do enchimento de grãos (dez–fev) e antes
+              da conclusão da colheita. Como o ciclo biológico de formação do grão já acabou, esse aviso <strong>não serve
+              para aplicar defensivos ou mudar o manejo na lavoura</strong>. Ele foi desenhado para apoiar decisões
+              financeiras e logísticas antecipadas: gestão de caixa, estratégia de comercialização e comunicação prévia
+              com seguradoras.
+            </p>
+          </div>
 
-  <section id="discussao">
-    <h2>5. Discussão</h2>
-    <p>O desempenho evidencia o compromisso entre detectar perdas e limitar falsos alarmes. Em uma base desbalanceada, a acurácia pode favorecer uma regra trivial; a análise conjunta de recall, precisão, AUC, matriz de confusão e custo é mais informativa. Ainda assim, a função de custo escolhida precisa ser confirmada com usuários e quantificada em termos de consequências reais.</p>
-    <p>A queda das métricas quando 2024 é removida mostra instabilidade diante de poucos anos e alerta contra conclusões baseadas em uma única agregação. Municípios no mesmo ano compartilham condições climáticas regionais; portanto, a unidade independente mais relevante para generalização temporal é, em grande parte, a safra. Seis safras de teste oferecem evidência limitada para um fenômeno agrícola variável.</p>
-    <p>A temperatura no enchimento é biologicamente plausível como sinal de estresse, mas não representa todo o sistema causal da lavoura. Incluir mais variáveis não garante melhoria: com poucos anos, cada preditor pode aumentar a variância e produzir regras que se ajustam a eventos específicos. O resultado de Extra Trees deve ser entendido como hipótese para novos dados, não como vencedor operacional.</p>
-  </section>
+          <h3>Quem Utiliza o Alerta na Cadeia Agrícola?</h3>
+          <ol>
+            <li><strong>Produtores Rurais:</strong> Podem revisar compromissos financeiros, planejar o fluxo de caixa e
+              evitar vender antecipadamente grãos que podem faltar na entrega.</li>
+            <li><strong>Cooperativas Agrícolas:</strong> Ajustam a projeção de recebimento nos armazéns e renegociam
+              capacidade de frete e escoamento com antecedência.</li>
+            <li><strong>Seguradoras e Agentes de Crédito:</strong> Direcionam vistorias técnicas com base em evidências,
+              <em>sabendo explicitamente que o índice nunca deve ser usado sozinho para negar crédito ou seguro</em>.</li>
+          </ol>
 
-  <section id="limitacoes">
-    <h2>6. Limitações e validade</h2>
-    <ul>
-      <li><strong>Amostra temporal pequena:</strong> 18 safras no treino e 6 no teste; as linhas municipais do mesmo ano não são independentes.</li>
-      <li><strong>Rótulo relativo:</strong> depende da janela de tendência e do corte de 92%; outras definições de quebra podem gerar alvos distintos.</li>
-      <li><strong>Resolução espacial:</strong> clima agregado por município não representa diferenças entre propriedades, talhões, solos e práticas.</li>
-      <li><strong>Preditores incompletos:</strong> o pipeline ativo usa somente Tmax média e não contempla explicitamente precipitação, umidade do solo, doenças, pragas ou manejo.</li>
-      <li><strong>Probabilidades sem calibração:</strong> <code>class_weight="balanced"</code> faz a saída não equivaler diretamente à frequência real de quebra.</li>
-      <li><strong>Teste consultado em experiências posteriores:</strong> as métricas reportadas são referências exploratórias, não uma estimativa cega final.</li>
-      <li><strong>Deriva climática:</strong> o período de teste é mais quente que o de treino, o que pode elevar alertas com um corte térmico absoluto.</li>
-    </ul>
-    <p>Não se recomenda utilizar o alerta isoladamente para concessão de crédito, contratação de seguro, atribuição de causa ou decisões de manejo. A aplicação adequada exige validação em safras futuras e acompanhamento por profissionais agronômicos.</p>
-  </section>
+          <h3>A Matriz de Custo dos Erros: Por que Nem Todo Erro Custa Igual?</h3>
+          <p>
+            Em um problema de <span class="tech-term">Aprendizado Supervisionado</span> <span
+              class="didactic-note">(quando ensinamos o computador usando exemplos históricos cuja resposta real nós já
+              conhecemos)</span> tratado como <span class="tech-term">Classificação Binária</span> <span
+              class="didactic-note">(uma decisão de "sim ou não": houve quebra de safra = 1, ou safra normal = 0)</span>,
+            existem dois tipos de erro, e na vida real eles têm pesos completamente diferentes:
+          </p>
 
-  <section id="conclusao">
-    <h2>7. Conclusão</h2>
-    <p>A regressão logística de uma variável identifica parte das quebras no teste temporal, mas apresenta baixa precisão, muitos falsos positivos e forte dependência de 2024. O backtest expansivo reforça que a escolha do modelo e do limiar é incerta. Candidatos com múltiplos sinais e algoritmos não demonstraram vantagem consistente entre validação e teste. Portanto, a principal conclusão não é que se encontrou um previsor pronto, mas que o sinal térmico pode apoiar investigação adicional enquanto a evidência permanece insuficiente para uso operacional.</p>
-    <p>O avanço metodológico prioritário é obter mais safras rotuladas e dados em escala mais próxima da lavoura, definir previamente os custos de erro, avaliar calibração e manter uma validação temporal realmente futura. Até lá, o sistema deve ser apresentado como protótipo experimental de pesquisa.</p>
-  </section>
+          <ul>
+            <li><strong><span class="tech-term">Falso Positivo (FP)</span> <span class="didactic-note">(alarme falso: o
+                  modelo acende o sinal vermelho, mas a safra colhida é normal)</span>:</strong> Gera um custo de
+              precaução (uma revisão de caixa ou vistoria extra), sem perda física da colheita. No projeto, atribuímos
+              <strong>peso 1</strong> a esse erro.</li>
+            <li><strong><span class="tech-term">Falso Negativo (FN)</span> <span class="didactic-note">(quebra silenciosa:
+                  o modelo diz que está tudo bem, mas a lavoura sofre queda severa)</span>:</strong> Pega o produtor e a
+              cooperativa desprevenidos, causando endividamento e rupturas contratuais. Por ser muito mais grave,
+              atribuímos <strong>peso 5</strong> a cada Falso Negativo (<code>Custo = 5 &times; FN + FP</code>).</li>
+          </ul>
 
-  <section id="referencias">
-    <h2>Referências</h2>
-    <ol>
-      <li>IBGE. <em>Pesquisa Agrícola Municipal — PAM, tabela 1612</em>. Sistema IBGE de Recuperação Automática (SIDRA). <a href="https://sidra.ibge.gov.br/tabela/1612" target="_blank" rel="noopener noreferrer">sidra.ibge.gov.br/tabela/1612</a>.</li>
-      <li>NASA POWER Project. <em>Prediction of Worldwide Energy Resources: Data Access Viewer and API</em>. <a href="https://power.larc.nasa.gov/" target="_blank" rel="noopener noreferrer">power.larc.nasa.gov</a>.</li>
-      <li>Pedregosa, F. et al. Scikit-learn: Machine Learning in Python. <em>Journal of Machine Learning Research</em>, 12, 2825–2830, 2011.</li>
-      <li>Saito, T.; Rehmsmeier, M. The Precision-Recall Plot Is More Informative than the ROC Plot When Evaluating Binary Classifiers on Imbalanced Datasets. <em>PLoS ONE</em>, 10(3), e0118432, 2015. <a href="https://doi.org/10.1371/journal.pone.0118432" target="_blank" rel="noopener noreferrer">doi:10.1371/journal.pone.0118432</a>.</li>
-    </ol>
-    <p><strong>Materiais de reprodutibilidade:</strong> <a href="Model_Card.md">Model Card</a>, <a href="../notebooks/14_backtest_regressao_logistica.ipynb">notebook de backtest</a> e os arquivos CSV de resultados em <code>models/</code>.</p>
-  </section>
-</article>
+          <p>
+            É por causa dessa assimetria que um iniciante não pode olhar apenas para a <span
+              class="tech-term">Acurácia</span> <span class="didactic-note">(porcentagem total de acertos)</span>! Se
+            houver quebra em apenas 22% das safras, um modelo preguiçoso que responde sempre "Safra Normal" acerta 78%
+            das vezes, mas tem utilidade zero porque perde 100% das quebras. Por isso, acompanhamos:
+            <span class="tech-term">Recall (Sensibilidade)</span> <span class="didactic-note">(de todas as quebras reais,
+              quantas o modelo conseguiu capturar?)</span>,
+            <span class="tech-term">Precisão</span> <span class="didactic-note">(dos alertas disparados, quantos eram
+              quebras verdadeiras?)</span>,
+            <span class="tech-term">F1-Score</span> <span class="didactic-note">(equilíbrio entre Recall e Precisão)</span>,
+            <span class="tech-term">AUC-ROC</span> <span class="didactic-note">(capacidade do modelo de ranquear dias/safras
+              de quebra acima dos normais; 0,50 equivale a jogar moeda)</span> e a
+            <span class="tech-term">Matriz de Confusão</span> <span class="didactic-note">(quadro 2&times;2 que separa
+              Verdadeiros Positivos, Verdadeiros Negativos, Falsos Positivos e Falsos Negativos)</span>.
+          </p>
+        </section>
+
+        <!-- SEÇÃO 2: OS DADOS, O ALVO DINÂMICO E O PIPELINE -->
+        <section id="dados">
+          <h2>2. Os Dados, o Alvo Dinâmico e o Pipeline sem Vazamento</h2>
+
+          <p>
+            Um erro clássico de quem começa em projetos de <span class="tech-term">série temporal</span> <span class="didactic-note">(dados organizados em sequência ao longo dos anos)</span> agrícola é definir "quebra de safra" usando um
+            valor fixo em quilos por hectare (por exemplo, "abaixo de 3.400 kg/ha"). Pense bem: entre 2001 e 2024, a
+            genética das sementes e o manejo evoluíram muito, elevando a produtividade média ao longo do tempo. Além disso,
+            cada um dos nove municípios tem solo e histórico próprios. Um corte fixo trataria safras antigas excelentes
+            como "quebras" e mascararia quedas bruscas em municípios muito produtivos!
+          </p>
+
+          <h3>Como Definimos o Alvo (<code>quebra_safra</code>) Usando Apenas o Passado</h3>
+          <p>
+            Para resolver isso, combinamos os rendimentos oficiais da <strong>PAM/IBGE (Tabela 1612)</strong> com o clima
+            diário de satélite da <strong>NASA POWER</strong> em uma <span class="tech-term">matriz de dados</span> <span class="didactic-note">(tabela estruturada onde cada linha é um caso analisado)</span> com <strong>192 observações</strong>
+            (<code>município &times; safra</code>, de 2001 a 2024). Para cada município <em>i</em> e safra <em>t</em>,
+            calculamos a <span class="tech-term">Tendência Linear Histórica</span> <span class="didactic-note">(uma reta
+              que resume o ritmo de crescimento da produtividade daquele município)</span> usando <strong>somente entre 5 e
+              10 safras anteriores</strong>, nunca safras futuras!
+          </p>
+
+          <div class="callout-box" style="text-align: center; background: var(--bg-surface);">
+            <div class="callout-title" style="justify-content: center;">Regra Oficial do Alvo</div>
+            <p style="font-family: var(--font-mono); font-size: 1rem; font-weight: 700; color: var(--brand-dark); margin: 8px 0;">
+              quebra<sub>i,t</sub> = 1 &nbsp;se&nbsp; Rendimento<sub>i,t</sub> &lt; 0,92 &times; Tendência<sub>i,t</sub>
+            </p>
+            <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 0;">
+              Ou seja: consideramos quebra quando a lavoura entrega pelo menos <strong>8% menos</strong> do que sua
+              própria tendência passada previa. No treino (2001–2018, 138 linhas) há <strong>24 quebras (17,4%)</strong>;
+              no teste (2019–2024, 54 linhas) há <strong>12 quebras (22,2%)</strong>.
+            </p>
+          </div>
+
+          <h3>Por que 54 Linhas no Teste NÃO São 54 Experimentos Independentes?</h3>
+          <p>
+            Aqui está uma armadilha estatística sutil, mas fundamental: o conjunto de teste tem 54 linhas porque
+            observamos <strong>6 safras (2019 a 2024) em 9 municípios vizinhos</strong>. Quando faz calor extremo no norte
+            de Mato Grosso em 2024, praticamente todos os 9 municípios sentem o mesmo evento climático juntos! Isso
+            significa que as linhas de uma mesma safra são <span class="tech-term">correlacionadas</span> <span class="didactic-note">(ligadas entre si: quando faz calor em um município, os vizinhos sentem o mesmo evento ao mesmo tempo)</span>. Na prática, nosso teste tem
+            <strong>apenas 6 safras independentes</strong> (e o treino tem 18), uma lição de ouro para não tirar
+            conclusões apressadas com poucos anos de histórico.
+          </p>
+
+          <ul>
+            <li><strong>Calendário Agrícola Real:</strong> Dezembro de um ano pertence à safra colhida no início do ano
+              seguinte. Assim, o enchimento da safra 2024 junta dezembro de 2023 + janeiro e fevereiro de 2024.</li>
+            <li><strong>Limpeza e <span class="tech-term">Valor Sentinela</span> <span class="didactic-note">(código numérico especial, aqui <code>-999.0</code>, usado pela fonte para indicar falha de leitura naquele dia)</span>:</strong> Falhas da NASA POWER são limpas antes de qualquer agregação, e colunas de produção ou área colhida são banidas dos <span class="tech-term">preditores</span> <span class="didactic-note">(variáveis de entrada usadas para prever)</span> para evitar
+              <span class="tech-term">Vazamento de Dados (Data Leakage)</span> <span class="didactic-note">(quando o
+                modelo "cola" usando informações que só existem depois da colheita)</span>.</li>
+          </ul>
+
+          <!-- FIGURA 1: ARQUITETURA 4 CAMADAS E SPLIT TEMPORAL 2001-2018 / 2019-2024 -->
+          <div class="figure-wrapper">
+            <div class="figure-header">
+              <span class="figure-title">Figura 1 - Pipeline de 4 Camadas e Split Temporal Congelado (9 Municípios)</span>
+            </div>
+
+            <div style="overflow-x: auto; text-align: center;">
+              <svg class="fig-anim" role="img"
+                aria-label="Pipeline em quatro camadas (coleta, engenharia de alvo e clima, seleção estatística e modelagem, entrega) e partição temporal: treino 2001 a 2018 (138 linhas), teste 2019 a 2024 (54 linhas)"
+                viewBox="0 0 840 280" width="100%"
+                style="height: auto; max-width: 800px; font-family: system-ui, sans-serif;">
+                <rect x="10" y="10" width="820" height="150" rx="8" fill="var(--bg-surface-alt)"
+                  stroke="var(--border-color)" />
+
+                <!-- Camada 1 -->
+                <g transform="translate(25, 25)">
+                  <rect width="180" height="120" rx="6" fill="var(--bg-surface)" stroke="var(--border-color)" />
+                  <text x="14" y="24" font-size="11" font-weight="bold" fill="var(--brand-primary)"
+                    font-family="monospace">CAMADA 1 · DADOS</text>
+                  <text x="14" y="44" font-size="13" font-weight="bold" fill="var(--text-main)">Coleta e Ingestão</text>
+                  <text x="14" y="66" font-size="10.5" fill="var(--text-muted)">NASA POWER Diário</text>
+                  <text x="14" y="82" font-size="10.5" fill="var(--text-muted)">IBGE PAM 1612 (9 mun.)</text>
+                  <text x="14" y="98" font-size="10.5" fill="var(--text-muted)">2001–2024 (192 linhas)</text>
+                </g>
+
+                <path d="M210 85 L230 85" stroke="var(--text-light)" stroke-width="1.5" />
+
+                <!-- Camada 2 -->
+                <g transform="translate(235, 25)">
+                  <rect width="180" height="120" rx="6" fill="var(--bg-surface)" stroke="var(--border-color)" />
+                  <text x="14" y="24" font-size="11" font-weight="bold" fill="var(--brand-primary)"
+                    font-family="monospace">CAMADA 2 · ALVO</text>
+                  <text x="14" y="44" font-size="13" font-weight="bold" fill="var(--text-main)">Tendência &amp; Clima</text>
+                  <text x="14" y="66" font-size="10.5" fill="var(--text-muted)">Alvo &lt; 0,92 &times; Tendência</text>
+                  <text x="14" y="82" font-size="10.5" fill="var(--text-muted)">Enchimento Dez–Fev</text>
+                  <text x="14" y="98" font-size="10.5" fill="var(--text-muted)">Zero dados futuros</text>
+                </g>
+
+                <path d="M420 85 L440 85" stroke="var(--text-light)" stroke-width="1.5" />
+
+                <!-- Camada 3 -->
+                <g transform="translate(445, 25)">
+                  <rect width="180" height="120" rx="6" fill="var(--bg-surface)" stroke="var(--border-color)" />
+                  <text x="14" y="24" font-size="11" font-weight="bold" fill="var(--brand-primary)"
+                    font-family="monospace">CAMADA 3 · ML</text>
+                  <text x="14" y="44" font-size="13" font-weight="bold" fill="var(--text-main)">Seleção &amp; Protótipo</text>
+                  <text x="14" y="66" font-size="10.5" fill="var(--text-muted)">Teste vs Referência Nula</text>
+                  <text x="14" y="82" font-size="10.5" fill="var(--text-muted)">Sinal: tmax_enchimento</text>
+                  <text x="14" y="98" font-size="10.5" fill="var(--text-muted)">LogReg L2 + Corte 0,45</text>
+                </g>
+
+                <path d="M630 85 L650 85" stroke="var(--text-light)" stroke-width="1.5" />
+
+                <!-- Camada 4 -->
+                <g transform="translate(655, 25)">
+                  <rect width="160" height="120" rx="6" fill="var(--bg-surface)" stroke="var(--border-color)" />
+                  <text x="14" y="24" font-size="11" font-weight="bold" fill="var(--brand-primary)"
+                    font-family="monospace">CAMADA 4 · ENTREGA</text>
+                  <text x="14" y="44" font-size="13" font-weight="bold" fill="var(--text-main)">Índice de Risco</text>
+                  <text x="14" y="66" font-size="10.5" fill="var(--text-muted)">Streamlit + SQLite</text>
+                  <text x="14" y="82" font-size="10.5" fill="var(--text-muted)">Model Card Transparente</text>
+                  <text x="14" y="98" font-size="10.5" fill="var(--text-muted)">Status: Experimental</text>
+                </g>
+
+                <!-- Partição Temporal -->
+                <g transform="translate(10, 180)">
+                  <rect width="820" height="85" rx="6" fill="var(--bg-surface)" stroke="var(--border-color)" />
+                  <text x="20" y="24" font-size="12" font-weight="bold" fill="var(--text-main)">Partição Temporal Estrita
+                    (9 Municípios &times; 24 Safras)</text>
+
+                  <rect x="20" y="38" width="540" height="30" rx="4" fill="var(--brand-primary-light)"
+                    stroke="var(--brand-primary)" />
+                  <text x="120" y="58" font-size="11.5" font-weight="bold" fill="var(--brand-dark)">Treino: 2001–2018
+                    (138 linhas, 24 quebras | Média Tmax: 28,46 &deg;C)</text>
+
+                  <rect x="570" y="38" width="230" height="30" rx="4" fill="var(--brand-warning-light)"
+                    stroke="var(--brand-accent)" />
+                  <text x="582" y="58" font-size="11" font-weight="bold" fill="var(--brand-accent)">Teste: 2019–2024
+                    (54 l., 12 q.)</text>
+                </g>
+              </svg>
+            </div>
+            <p class="figure-caption">
+              O <span class="tech-term">Split Temporal</span> <span class="didactic-note">(separar passado para treinar e
+                futuro para testar, sem embaralhar os anos)</span> garante que o modelo nunca espie o clima de 2021 ou
+              2024 ao aprender as regras em 2001–2018.
+            </p>
+          </div>
+
+          <h3>O que a Série Histórica de Sorriso-MT Ensina Sobre Calor vs. Outras Causas</h3>
+          <p>
+            Abaixo estão marcos reais de <strong>Sorriso-MT</strong> extraídos da base oficial
+            (<code>dados_modelo_s4.csv</code>). Repare como o histórico mostra exatamente o poder e o limite do sinal
+            térmico no enchimento de grãos (<code>tmax_enchimento</code>):
+          </p>
+
+          <div class="table-responsive">
+            <table class="editorial-table">
+              <thead>
+                <tr>
+                  <th>Safra</th>
+                  <th>Split</th>
+                  <th>Tmax Ench. (&deg;C)</th>
+                  <th>Chuva Ench. (mm)</th>
+                  <th>Dias &ge; 35&deg;C</th>
+                  <th>Alvo Real</th>
+                  <th>Leitura Agronômica e do Modelo</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>2002</strong></td>
+                  <td>Treino</td>
+                  <td>27,67 &deg;C</td>
+                  <td>860,1 mm</td>
+                  <td>0</td>
+                  <td>1 (Quebra)</td>
+                  <td>Quebra <strong>sem calor</strong> (chuva alta ou doenças, fora do alcance térmico).</td>
+                </tr>
+                <tr>
+                  <td><strong>2003</strong></td>
+                  <td>Treino</td>
+                  <td>28,49 &deg;C</td>
+                  <td>798,1 mm</td>
+                  <td>2</td>
+                  <td>1 (Quebra)</td>
+                  <td>Acima de 28,34 &deg;C com 6 dias de <span class="tech-term">veranico</span> <span class="didactic-note">(sequência de dias secos no meio do período chuvoso)</span>; capturada pelo limiar.</td>
+                </tr>
+                <tr>
+                  <td><strong>2006</strong></td>
+                  <td>Treino</td>
+                  <td>27,58 &deg;C</td>
+                  <td>931,9 mm</td>
+                  <td>0</td>
+                  <td>1 (Quebra)</td>
+                  <td>Outra quebra com temperatura amena e muita chuva (doença/excesso hídrico).</td>
+                </tr>
+                <tr>
+                  <td><strong>2015</strong></td>
+                  <td>Treino</td>
+                  <td>29,52 &deg;C</td>
+                  <td>429,7 mm</td>
+                  <td>0</td>
+                  <td>0 (Normal)</td>
+                  <td><strong>Contraexemplo clássico:</strong> quente e seca, mas sem queda &ge; 8%.</td>
+                </tr>
+                <tr class="highlight-row">
+                  <td><strong>2016</strong></td>
+                  <td>Treino</td>
+                  <td><strong>31,69 &deg;C</strong></td>
+                  <td>408,2 mm</td>
+                  <td>14</td>
+                  <td>1 (Quebra)</td>
+                  <td>Onda de calor extrema no enchimento; principal âncora do sinal no treino.</td>
+                </tr>
+                <tr>
+                  <td><strong>2019</strong></td>
+                  <td>Teste</td>
+                  <td>29,04 &deg;C</td>
+                  <td>547,6 mm</td>
+                  <td>0</td>
+                  <td>0 (Normal)</td>
+                  <td><strong>Falso alarme:</strong> média do teste subiu (+1,42 &deg;C), gerando FP.</td>
+                </tr>
+                <tr class="highlight-row">
+                  <td><strong>2021</strong></td>
+                  <td>Teste</td>
+                  <td><strong>31,42 &deg;C</strong></td>
+                  <td>546,8 mm</td>
+                  <td>9</td>
+                  <td>1 (Quebra)</td>
+                  <td>Calor severo no enchimento; detectada com índice de risco de 82,3%.</td>
+                </tr>
+                <tr>
+                  <td><strong>2022</strong></td>
+                  <td>Teste</td>
+                  <td>27,53 &deg;C</td>
+                  <td>823,6 mm</td>
+                  <td>0</td>
+                  <td>0 (Normal)</td>
+                  <td>Temperatura amena e chuva regular; corretamente sem alerta.</td>
+                </tr>
+                <tr class="highlight-row">
+                  <td><strong>2024</strong></td>
+                  <td>Teste</td>
+                  <td><strong>31,19 &deg;C</strong></td>
+                  <td>692,7 mm</td>
+                  <td>18</td>
+                  <td>1 (Quebra)</td>
+                  <td>18 dias &ge; 35&deg;C no enchimento; quebra detectada (concentrou 8 das 12 quebras do teste).</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- SEÇÃO 3: OS MODELOS: DA REGRESSÃO LOGÍSTICA ÀS ÁRVORES E ENSEMBLES -->
+        <section id="modelos">
+          <h2>3. Os Modelos Testados: Da Intuição à Matemática</h2>
+
+          <p>
+            Para responder com segurança se existe padrão preditivo nos dados, nós não saímos usando o algoritmo mais
+            sofisticado de cara. Em Ciência de Dados, você começa por réguas simples, testa modelos interpretáveis e só
+            promove um modelo complexo se ele provar valor fora da amostra de treino.
+          </p>
+
+          <h3>1. Os Baselines: A Régua da Realidade</h3>
+          <p>
+            Antes de comemorar qualquer resultado, criamos três <span class="tech-term">Baselines</span> <span
+              class="didactic-note">(estratégias ingênuas que servem de piso mínimo: se o seu modelo de Machine Learning
+              não vencer até uma regra boba, ele não está pronto)</span>:
+          </p>
+          <ul>
+            <li><strong>DummyClassifier (Nunca alertar):</strong> <span class="didactic-note">(classificador bobo de referência que chuta sempre a mesma resposta)</span> Responde sempre "Safra Normal". Acerta 77,8% das vezes
+              no teste, mas tem <strong>Recall 0%</strong> e <strong>Custo = 60</strong> (12 quebras perdidas &times; 5).</li>
+            <li><strong>Persistência (<code>y<sub>t-1</sub></code>):</strong> <span class="didactic-note">(regra que apenas repete o resultado da safra imediatamente anterior)</span> Supõe que este ano vai repetir o ano passado.
+              Como eventos climáticos extremos não se repetem em sequência fixa, teve <strong>Recall 0%</strong> e
+              <strong>Custo = 64</strong>.</li>
+            <li><strong>Alertar Sempre (Piso de Cautela):</strong> Liga o alerta em todos os municípios e safras. Erra
+              42 vezes por alarme falso, mas não perde nenhuma quebra (0 FN), somando <strong>Custo = 42</strong>.
+              <em>Esse número (42) virou o grande desafio que o nosso modelo precisava bater!</em></li>
+          </ul>
+
+          <h3>2. Regressão Logística L2: Transformando Temperatura em Índice de Risco</h3>
+          <p>
+            A <span class="tech-term">Regressão Logística</span> <span class="didactic-note">(apesar do nome "regressão",
+              é um algoritmo de classificação que desenha uma curva em forma de "S" para transformar números em um escore
+              entre 0 e 1)</span> foi o coração do nosso protótipo ativo. Como ela funciona em 3 passos simples?
+          </p>
+          <ol>
+            <li><strong><span class="tech-term">Padronização</span> (<code>StandardScaler</code>) <span class="didactic-note">(ajuste que coloca medidas em uma mesma régua)</span>:</strong> Subtrai a média do treino (28,46 &deg;C) e
+              divide pelo <span class="tech-term">desvio-padrão</span> <span class="didactic-note">(medida de quanto os valores variam em torno da média)</span> (1,04 &deg;C), mostrando quantos degraus a temperatura fugiu do normal histórico.</li>
+            <li><strong><span class="tech-term">Curva Sigmoide</span> <span class="didactic-note">(fórmula matemática em formato de "S" que esmaga qualquer número para o intervalo de 0 a 1)</span> + <span class="tech-term">Regularização L2</span> (<code>C=1.0</code>) <span class="didactic-note">(freio matemático que impede o modelo de dar pesos exagerados e decorar casos isolados)</span>:</strong> Multiplica o valor padronizado por
+              um peso positivo (<code>0,633</code>) e aplica a sigmoide.</li>
+            <li><strong><span class="tech-term">Balanceamento</span> (<code>class_weight="balanced"</code>) <span class="didactic-note">(ajuste que aumenta o peso dos eventos raros durante o treino)</span>:</strong> Como há bem menos quebras (17%) do
+              que safras normais (83%), damos peso maior às quebras no treino. <strong>Atenção de ouro para
+              estudantes:</strong> esse truque <em>infla</em> o escore de saída! Por isso, um escore de <code>0,45</code>
+              não significa "45% de chance real de perda", e sim um <strong>índice de risco térmico</strong> acima do
+              ponto de corte congelado (equivalente a <code>tmax_enchimento &ge; 28,34 &deg;C</code>).</li>
+          </ol>
+
+          <!-- FIGURA 2: SIMULADOR INTERATIVO DO ÍNDICE DE RISCO TÉRMICO (BASEADO EM PROJECT_DATA) -->
+          <div class="figure-wrapper" id="simulador-risco">
+            <div class="figure-header">
+              <span class="figure-title">Figura 2 - Simulador Interativo do Protótipo Ativo (Regressão Logística L2)</span>
+            </div>
+
+            <div class="tree-simulator">
+              <div class="hick-primary-choice">
+                <span class="choice-label">Escolha uma Safra Real de Sorriso-MT para Inspecionar:</span>
+                <div class="quick-safras-grid">
+                  <button class="btn-safra-chip active" data-ano="2016">
+                    <span class="chip-year">Safra 2016 (31,69 &deg;C)</span>
+                    <span class="chip-desc">Calor Extremo &bull; Quebra</span>
+                  </button>
+                  <button class="btn-safra-chip" data-ano="2021">
+                    <span class="chip-year">Safra 2021 (31,42 &deg;C)</span>
+                    <span class="chip-desc">Teste &bull; Quebra</span>
+                  </button>
+                  <button class="btn-safra-chip" data-ano="2024">
+                    <span class="chip-year">Safra 2024 (31,19 &deg;C)</span>
+                    <span class="chip-desc">Teste &bull; Quebra</span>
+                  </button>
+                  <button class="btn-safra-chip" data-ano="2015">
+                    <span class="chip-year">Safra 2015 (29,52 &deg;C)</span>
+                    <span class="chip-desc">Contraexemplo &bull; Normal</span>
+                  </button>
+                  <button class="btn-safra-chip" data-ano="2022">
+                    <span class="chip-year">Safra 2022 (27,53 &deg;C)</span>
+                    <span class="chip-desc">Teste &bull; Normal</span>
+                  </button>
+                </div>
+              </div>
+
+              <div class="simulator-controls-compact" style="margin-top: 1rem;">
+                <div class="control-item" style="grid-column: 1 / -1;">
+                  <label><span>Temperatura Máxima Média Dez–Fev (<code>tmax_enchimento</code>):</span>
+                    <span id="val-tmax" class="control-val">31.69 °C</span></label>
+                  <input type="range" id="sim-tmax" min="26.0" max="33.0" value="31.69" step="0.05">
+                </div>
+              </div>
+
+              <!-- Barra visual de risco e limiar 28.34 °C -->
+              <div style="margin: 1.25rem 0 0.75rem; padding: 16px; background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 8px;">
+                <div style="display:flex; justify-content:space-between; font-size:0.82rem; font-family:var(--font-mono); color:var(--text-muted); margin-bottom: 6px;">
+                  <span>Índice de Risco (não calibrado)</span>
+                  <span>Limiar congelado: <strong>45,0% (&ge; 28,34 &deg;C)</strong></span>
+                </div>
+                <div style="position:relative; height:14px; background:var(--bg-surface-alt); border-radius:999px; overflow:hidden; border:1px solid var(--border-color);">
+                  <div id="sim-risk-bar" style="height:100%; width:84%; background:var(--brand-danger); transition: width .25s ease, background .25s ease;"></div>
+                  <div title="Corte 45%" style="position:absolute; top:0; bottom:0; left:45%; width:2px; background:var(--text-main); opacity:0.85;"></div>
+                </div>
+                <div id="sim-steps" style="margin-top: 12px; font-family: var(--font-mono); font-size: 0.78rem; color: var(--text-muted); line-height: 1.6;"></div>
+              </div>
+
+              <div class="simulator-verdict-card">
+                <div class="verdict-header-row">
+                  <div id="sim-verdict" class="verdict-status"></div>
+                  <div id="sim-prob" class="verdict-prob"></div>
+                </div>
+                <div id="sim-safra-details"
+                  style="font-size: 0.82rem; color: var(--text-main); margin-top: 0.35rem; font-family: var(--font-mono);">
+                </div>
+                <div style="font-size: 0.76rem; color: var(--text-light); margin-top: 4px;">
+                  Nota: Valores inflados por <code>class_weight="balanced"</code>; representam intensidade do risco térmico, não chance real de perda.
+                </div>
+              </div>
+            </div>
+
+            <p class="figure-caption">
+              Simulador conectado diretamente à equação oficial do arquivo <code>models/pipeline_final.joblib</code>.
+              Experimente clicar na <strong>Safra 2015</strong> para ver um falso positivo real ou arrastar abaixo de
+              <code>28,34 &deg;C</code>.
+            </p>
+          </div>
+
+          <h3>3. Árvores de Decisão, Random Forest e Extra Trees: Por que Mais Complexo Não Foi Melhor?</h3>
+          <p>
+            Na etapa comparativa do projeto, testamos também famílias baseadas em árvores usando 5 sinais climáticos (temperatura máxima,
+            dias com <span class="tech-term">déficit na raiz</span> (<code>GWETROOT &lt; 0,70</code>) <span class="didactic-note">(umidade do solo abaixo de 70% na camada das raízes)</span>, dias acima de 35 &deg;C, chuva acumulada e maior
+            veranico sem chuva):
+          </p>
+          <ul>
+            <li><strong><span class="tech-term">Árvore de Decisão</span> <span class="didactic-note">(algoritmo que decide em cadeia por perguntas de "sim ou não", como um fluxograma)</span> (profundidade 1 e 2):</strong> Faz perguntas em 1 ou 2 degraus (ex.: "choveu
+              menos que X?"), buscando reduzir a <span class="tech-term">Impureza de Gini</span> <span
+                class="didactic-note">(o quanto as safras normais e de quebra ainda estão misturadas após um
+                corte)</span>.</li>
+            <li><strong><span class="tech-term">Random Forest (Bagging)</span> <span class="didactic-note">(floresta aleatória: comitê de várias árvores treinadas em paralelo)</span>:</strong> Cria 200 árvores treinadas em sorteios com repetição
+              dos dados (<span class="tech-term">Bootstrap</span> <span class="didactic-note">[sorteio com reposição para dar visões levemente distintas dos dados]</span>) e tira a média das opiniões para reduzir a
+              instabilidade.</li>
+            <li><strong><span class="tech-term">Extra Trees</span> <span class="didactic-note">(árvores extremamente aleatórias)</span>:</strong> Vai além da Random Forest e sorteia até os
+              pontos de corte de cada pergunta, tentando evitar que o modelo decore o ruído de poucos anos.</li>
+            <li><strong>Outros Classificadores Multivariáveis (<code>GaussianNB</code>, <code>LDA</code>,
+                <code>KNN</code>, <code>SVC RBF</code>) <span class="didactic-note">(modelos baseados respectivamente em probabilidades gaussianas, fronteiras lineares, vizinhos mais próximos e curvas de separação)</span>:</strong> Também avaliados na comparação de múltiplos algoritmos sob o mesmo protocolo.</li>
+          </ul>
+          <p>
+            <strong>A grande descoberta didática:</strong> Na <span class="tech-term">validação OOF (Out-of-Fold) expansiva</span> <span class="didactic-note">(teste em janela crescente: treina só com os anos anteriores, testa no ano seguinte e vai avançando no tempo)</span> de 2009–2018, a
+            <strong>Extra Trees rasa</strong> chegou a ficar em 1º lugar (custo 39, AUC 0,721). Porém, quando olhamos para
+            o <strong>teste futuro congelado (2019–2024)</strong>, ela teve o <strong>mesmo custo (44)</strong>, a mesma
+            matriz de acertos e erros (13 VN <span class="didactic-note">[normais corretos]</span>, 29 FP, 3 FN, 9 TP <span class="didactic-note">[quebras acertadas]</span>) e uma <strong>AUC menor (0,627 contra 0,728)</strong>
+            do que a Regressão Logística de 1 variável! Em amostras com poucas safras independentes, algoritmos com
+            muitos <span class="tech-term">parâmetros</span> <span class="didactic-note">(números internos que o modelo ajusta para aprender)</span> acabam capturando coincidências do passado que não se repetem no futuro.
+          </p>
+
+          <!-- CAIXA DE EQUAÇÕES -->
+          <details class="formula-box">
+            <summary class="formula-box-header">Aprofundamento matemático: alvo relativo, sigmoide e função de custo</summary>
+            <div class="formula-equation">z = 0,6334 &times; ((T<sub>max</sub> &minus; 28,4588) / 1,0405) &minus; 0,1304<br>Índice(z) = 1 / (1 + e<sup>&minus;z</sup>) &ge; 0,45 &nbsp;&hArr;&nbsp; T<sub>max</sub> &ge; 28,34 &deg;C<br>Custo = 5 &times; FN + 1 &times; FP</div>
+            <p class="formula-caption">
+              Equações exatas do pipeline oficial (<code>StandardScaler + LogisticRegression L2</code>) e da regra de
+              decisão que minimizou o custo assimétrico na validação do treino.
+            </p>
+          </details>
+        </section>
+
+        <!-- SEÇÃO 4: SELEÇÃO DE VARIÁVEIS E QUADRO COMPARATIVO -->
+        <section id="comparativo">
+          <h2>4. Seleção de Variáveis e Quadro Comparativo Lado a Lado</h2>
+
+          <p>
+            Como descobrimos que só <code>tmax_enchimento</code> tinha sinal confiável? Na <strong>etapa de seleção de variáveis</strong>, testamos famílias inteiras com 9, 10 e até 20 variáveis climáticas usando validação
+            <em>leave-one-season-out</em> (deixando uma safra inteira de fora por vez) e comparamos a AUC obtida contra
+            um <span class="tech-term">teste de referência nula (<code>p95</code>)</span> <span class="didactic-note">(comparamos o modelo contra chutes obtidos embaralhando os rótulos ao acaso; o corte <code>p95</code> marca os 5% melhores resultados da pura sorte que qualquer modelo real precisa superar)</span>.
+          </p>
+
+          <p>
+            <strong>Resultado surpreendente:</strong> Nenhuma família multivariável (<code>set-abr</code>,
+            <code>subperíodos</code> ou <code>anomalias</code>) conseguiu superar o <code>p95</code> nulo no treino!
+            Somente a variável isolada <code>tmax_enchimento</code> na <code>LogisticRegression</code> venceu o acaso
+            (<code>AUC val = 0,648 &gt; p95 = 0,603</code>), enquanto o <code>GaussianNB</code> falhou na validação do
+            treino (<code>AUC val = 0,378 &lt; p95 = 0,485</code>), mostrando que seu bom número no teste isolado não era
+            sustentado pelo histórico.
+          </p>
+
+          <div class="table-responsive">
+            <table class="editorial-table">
+              <thead>
+                <tr>
+                  <th>Critério</th>
+                  <th>Baselines (Dummy / Sempre)</th>
+                  <th>Regressão Logística L2 (1 sinal)</th>
+                  <th>Árvore Rasa (prof. 1–2)</th>
+                  <th>Extra Trees / Random Forest (5 sinais)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Como Funciona</strong></td>
+                  <td>Chuta sempre a mesma classe ou repete a safra anterior.</td>
+                  <td>Padroniza a temperatura e aplica curva sigmoide L2.</td>
+                  <td>Particiona os dados em 1 ou 2 níveis de perguntas <code>se/então</code>.</td>
+                  <td>Comitê de 200 árvores rasas votando em paralelo.</td>
+                </tr>
+                <tr>
+                  <td><strong>Entradas</strong></td>
+                  <td>Nenhuma ou apenas <code>y<sub>t-1</sub></code>.</td>
+                  <td>Somente <code>tmax_enchimento</code> (dez–fev).</td>
+                  <td>1 sinal ou 5 sinais climáticos.</td>
+                  <td>5 sinais (Tmax, déficit solo, dias &ge;35&deg;C, chuva, veranico).</td>
+                </tr>
+                <tr>
+                  <td><strong>Vantagens</strong></td>
+                  <td>Custo zero e referência indispensável contra ilusões.</td>
+                  <td>Única com sinal acima do <code>p95</code> nulo na validação; regra direta (&ge; 28,34 &deg;C).</td>
+                  <td>Regras transparentes para inspeção agronômica.</td>
+                  <td>Bom ajuste na validação OOF (Extra Trees custo 39, AUC 0,721).</td>
+                </tr>
+                <tr>
+                  <td><strong>Limitações</strong></td>
+                  <td>Dummy tem Recall 0%; "Sempre" gera 100% de falsos alarmes.</td>
+                  <td>Probabilidade não calibrada; sofre com deriva climática (+1,42 &deg;C no teste).</td>
+                  <td>Instável com poucas safras (AUC teste caiu para 0,53–0,69).</td>
+                  <td>Não superou a LogReg no teste (mesmo custo 44 e AUC menor: 0,60–0,63).</td>
+                </tr>
+                <tr class="highlight-row">
+                  <td><strong>Papel no Projeto</strong></td>
+                  <td>Régua obrigatória de aprovação (custo a bater: 42).</td>
+                  <td><strong>Protótipo experimental ativo (não aprovado para operação).</strong></td>
+                  <td>Comparativo diagnóstico (não promovido).</td>
+                  <td>Candidatos exploratórios multivariáveis (não promovidos).</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- SEÇÃO 5: CÓDIGO COMENTADO E ARTEFATOS DO PIPELINE -->
+        <section id="codigo-api">
+          <h2>5. Código Comentado e Artefatos do Pipeline</h2>
+
+          <p>
+            Abaixo está o fluxo real simplificado do pipeline em Python/Scikit-Learn usado no repositório
+            (<code>src/etl_processamento.py</code> e <code>models/pipeline_final.joblib</code>). Note como o
+            <code>StandardScaler</code> é ajustado apenas no treino (<code>safra &lt;= 2018</code>) antes de avaliar o
+            teste futuro:
+          </p>
+
+          <details class="formula-box">
+            <summary class="formula-box-header" style="display: flex; justify-content: space-between; align-items: center;">
+              <span>Ver código comentado em Python (Pipeline Scikit-Learn)</span>
+              <span style="font-size: 0.78rem; font-family: var(--font-mono); color: var(--brand-primary);">Expandir código &darr;</span>
+            </summary>
+            <div style="padding: 0 16px 16px;">
+              <pre style="margin: 8px 0 0;"><code class="language-python"># Pipeline Oficial (Protótipo Experimental) | Alto Teles Pires / MT
+import pandas as pd
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression
+import joblib
+
+df = pd.read_csv("data/processed/dados_modelo_s4.csv")
+features = ["tmax_enchimento"]
+target = "quebra_safra"
+
+# Split Temporal Estrito (Treino: 2001–2018, N=138 | Teste: 2019–2024, N=54)
+df_train = df[df["split"] == "treino"]
+df_test = df[df["split"] == "teste"]
+
+pipeline = Pipeline([
+    ("scaler", StandardScaler()),
+    ("classificador", LogisticRegression(
+        C=1.0,
+        penalty="l2",
+        class_weight="balanced",
+        max_iter=2000
+    ))
+])
+
+pipeline.fit(df_train[features], df_train[target])
+
+# Corte congelado na validação (custo 5xFN + FP): índice >= 0.45 (~ 28.34 °C)
+indice_risco = pipeline.predict_proba(df_test[features])[:, 1]
+alerta_calor = (indice_risco >= 0.45).astype(int)
+
+joblib.dump(pipeline, "models/pipeline_final.joblib")</code></pre>
+            </div>
+          </details>
+
+          <div class="exec-env-box"
+            style="display: flex; flex-direction: column; gap: 8px; margin: 24px 0; background: var(--bg-surface-alt); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px;">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+              <strong style="font-size: 1rem; color: var(--text-main);">Artefatos e Reprodutibilidade no Repositório</strong>
+            </div>
+            <div
+              style="display: flex; flex-wrap: wrap; gap: 14px; font-family: var(--font-mono); font-size: 0.83rem; color: var(--text-muted);">
+              <span>Base: <strong style="color: var(--brand-primary);">dados_modelo_s4.csv</strong></span>
+              <span>Modelo: <strong style="color: var(--brand-primary);">pipeline_final.joblib</strong></span>
+              <span>Limiar: <strong style="color: var(--brand-primary);">limiar_congelado.json (0.45)</strong></span>
+              <span>Dashboard: <strong style="color: var(--brand-primary);">streamlit_app.py</strong></span>
+            </div>
+            <a href="https://github.com/SAMUKISZHSD/bx_produtividade_agricola/blob/main/docs/Model_Card.md"
+              target="_blank" rel="noopener noreferrer"
+              style="font-weight: 700; color: var(--brand-primary); text-decoration: underline; text-underline-offset: 4px; margin-top: 6px; display: inline-flex; align-items: center; gap: 6px;">
+              Ler o Model Card oficial completo no GitHub
+            </a>
+          </div>
+
+        </section>
+
+        <!-- SEÇÃO 6: RESULTADOS OFICIAIS E VEREDITO -->
+        <section id="resultados">
+          <h2>6. Resultados Oficiais e Por Que o Protótipo Não Foi Aprovado</h2>
+
+          <p>
+            No recorte oficial do projeto (<strong>Treino 2001–2018</strong>, <i>N=138</i>, e <strong>Teste Temporal
+            2019–2024</strong>, <i>N=54</i>, cobrindo os 9 municípios do Alto Teles Pires-MT), os modelos foram avaliados
+            pela métrica de negócio <code>Custo = 5 &times; FN + FP</code>. A tabela abaixo reúne os resultados reais
+            consolidados de todos os experimentos no conjunto de teste:
+          </p>
+
+          <div class="table-responsive">
+            <table class="editorial-table">
+              <thead>
+                <tr>
+                  <th>Modelo</th>
+                  <th>Recall</th>
+                  <th>Precisão</th>
+                  <th>F1-Score</th>
+                  <th>AUC-ROC</th>
+                  <th>Custo (5&times;FN+FP)</th>
+                  <th>FN / FP (Teste)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>DummyClassifier (Nunca alertar)</code></td>
+                  <td>0,0%</td>
+                  <td>0,0%</td>
+                  <td>0,000</td>
+                  <td>0,500</td>
+                  <td>60</td>
+                  <td>12 / 0</td>
+                </tr>
+                <tr>
+                  <td><code>Persistência (y_{t-1})</code></td>
+                  <td>0,0%</td>
+                  <td>0,0%</td>
+                  <td>0,000</td>
+                  <td>-</td>
+                  <td>64</td>
+                  <td>12 / 4</td>
+                </tr>
+                <tr>
+                  <td><code>Alertar sempre (piso a vencer)</code></td>
+                  <td>100,0%</td>
+                  <td>22,2%</td>
+                  <td>0,364</td>
+                  <td>-</td>
+                  <td><strong>42</strong></td>
+                  <td>0 / 42</td>
+                </tr>
+                <tr class="winner-row">
+                  <td><strong>Regressão Logística L2 (tmax_enchimento, p=0,45)</strong></td>
+                  <td><strong>75,0%</strong></td>
+                  <td><strong>23,7%</strong></td>
+                  <td><strong>0,360</strong></td>
+                  <td><strong>0,728</strong></td>
+                  <td><strong>44</strong></td>
+                  <td><strong>3 / 29</strong></td>
+                </tr>
+                <tr>
+                  <td><code>Gaussian Naive Bayes (tmax_enchimento)</code></td>
+                  <td>75,0%</td>
+                  <td>40,9%</td>
+                  <td>0,529</td>
+                  <td>0,728</td>
+                  <td>28*</td>
+                  <td>3 / 13</td>
+                </tr>
+                <tr>
+                  <td><code>Árvore de Decisão (prof. 2, tmax_enchimento)</code></td>
+                  <td>75,0%</td>
+                  <td>23,1%</td>
+                  <td>0,353</td>
+                  <td>0,679</td>
+                  <td>45</td>
+                  <td>3 / 30</td>
+                </tr>
+                <tr>
+                  <td><code>Extra Trees (rasa, 5 sinais, corte 0,50)</code></td>
+                  <td>75,0%</td>
+                  <td>23,7%</td>
+                  <td>0,360</td>
+                  <td>0,627</td>
+                  <td>44</td>
+                  <td>3 / 29</td>
+                </tr>
+                <tr>
+                  <td><code>Random Forest (rasa, 5 sinais, corte 0,50)</code></td>
+                  <td>75,0%</td>
+                  <td>23,7%</td>
+                  <td>0,360</td>
+                  <td>0,605</td>
+                  <td>44</td>
+                  <td>3 / 29</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="figure-caption" style="margin-top: -8px; margin-bottom: 18px;">
+            *Por que não promovemos o <code>GaussianNB</code> apesar do custo 28 no teste? Porque na validação dentro do
+            treino (2001–2018) ele teve <code>AUC = 0,378</code> (pior que o acaso <code>p95 = 0,485</code>). Em Ciência de
+            Dados, escolher um modelo olhando apenas para a nota no conjunto de teste é viciar o experimento!
+          </p>
+
+          <!-- FIGURA 3: MATRIZES DE CONFUSÃO REAIS POR RECORTE (RENDERIZADA VIA PROJECT_DATA) -->
+          <div class="figure-wrapper">
+            <div class="figure-header">
+              <span class="figure-title">Figura 3 - Matrizes de Confusão Reais do Protótipo Ativo por Recorte de Avaliação</span>
+            </div>
+            <div id="confusion-matrix-comparison"></div>
+            <p class="figure-caption">
+              Comparação direta das matrizes reais da Regressão Logística L2: Teste Completo (<i>N=54</i>), Teste sem a
+              safra de 2024 (<i>N=45</i>) e Recorte isolado de Sorriso-MT (<i>N=6</i>).
+            </p>
+            <div class="analysis-box">
+              <div class="analysis-box-title">O que os três recortes revelam: a lição mais importante do projeto</div>
+              <ul style="margin-bottom: 0; padding-left: 1.25rem;">
+                <li><strong>No Teste Completo (2019–2024, <i>N=54</i>):</strong> O modelo detectou 9 das 12 quebras
+                  (<code>Recall = 75%</code>, <code>AUC = 0,728</code>), mas disparou alertas em <strong>70% das
+                  observações</strong>, gerando <strong>29 falsos positivos</strong> e um custo total de <strong>44</strong>, maior do que simplesmente "alertar sempre" (42).</li>
+                <li><strong>O Teste de Estresse "Sem 2024" (<i>N=45</i>):</strong> A safra de 2024 concentrou sozinha
+                  <strong>8 das 12 quebras do teste</strong>. Quando retiramos 2024 para testar se o sinal funciona em
+                  anos comuns, o Recall cai para <strong>25%</strong>, a Precisão vai a <strong>3,4%</strong> e a AUC
+                  desaba para <strong>0,341</strong> (custo 43 contra 20 de "nunca alertar").</li>
+                <li><strong>No Recorte de Sorriso-MT (<i>N=6</i>):</strong> Embora tenha acertado as duas quebras locais
+                  (2021 e 2024, <code>Recall = 100%</code>), são apenas 6 anos, amostra pequena demais para validar um
+                  sistema comercial.</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- DESTAQUE ESPECIAL: PROTOTIPO EXPERIMENTAL -->
+          <div id="destaque" class="callout-box"
+            style="border-left: 4px solid #f59e0b; background-color: var(--bg-surface);">
+            <span class="status-warning-badge" style="margin-bottom: 10px;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" style="flex-shrink: 0;">
+                <path d="M32 7 59 54H5Z"/>
+                <path d="M32 23v14m0 8v1"/>
+              </svg>
+              <span>Status: Protótipo Experimental</span>
+            </span>
+            <div class="callout-title" style="font-size: 1.15rem; margin-bottom: 0.75rem;">
+              Por que mantivemos a Regressão Logística L2 (e por que NÃO a aprovamos) para operação?
+            </div>
+            <p style="font-size: 0.92rem; margin-bottom: 0.75rem;">
+              Nosso critério pré-definido de aprovação exigia que o modelo tivesse custo menor que <em>"nunca alertar"</em>
+              e menor que <em>"alertar sempre"</em> tanto no teste completo quanto no teste sem 2024. <strong>Esse
+              critério não foi cumprido</strong> (44 &gt; 42 no teste completo; 43 &gt; 20 sem 2024).
+            </p>
+            <ul style="font-size: 0.9rem; margin-bottom: 0; padding-left: 1.25rem;">
+              <li><strong>Por que ela continua como referência ativa?</strong> Porque entre todos os modelos avaliados ao longo
+                do estudo, foi a única a apresentar sinal estatístico acima do acaso (<code>p95</code> nulo) na
+                validação do treino, com máxima transparência: tudo se resume a uma régua térmica clara
+                (<code>tmax_enchimento &ge; 28,34 &deg;C</code>).</li>
+              <li><strong>Por que os candidatos com 5 sinais climáticos não a substituíram?</strong> Mesmo a
+                <code>Extra Trees</code> (1ª colocada na validação OOF com custo 39) repetiu exatamente os mesmos
+                <code>44</code> de custo no teste diagnóstico com AUC inferior (<code>0,627</code> vs <code>0,728</code>).</li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- SEÇÃO 7: LIMITAÇÕES, ÉTICA E PRÓXIMOS PASSOS -->
+        <section id="limitacoes">
+          <h2>7. Limitações, Ética e Próximos Passos</h2>
+
+          <p>
+            Todo bom projeto de Ciência de Dados documenta claramente onde o modelo falha antes de pensar em colocá-lo em
+            produção. As principais limitações registradas em nosso <a
+              href="https://github.com/SAMUKISZHSD/bx_produtividade_agricola/blob/main/docs/Model_Card.md"
+              target="_blank" rel="noopener noreferrer">Model Card</a> são:
+          </p>
+          <ol>
+            <li><strong><span class="tech-term">Deriva Climática (<em>Climate Drift</em>)</span> <span class="didactic-note">(mudança gradual do clima ao longo dos anos que deixa os dados recentes diferentes do passado usado no treino)</span>:</strong> A média de temperatura máxima no enchimento
+              subiu de <strong>28,46 &deg;C</strong> no treino (2001–2018) para <strong>29,88 &deg;C</strong> no teste
+              (2019–2024). Com um limiar absoluto fixo em 28,34 &deg;C, o alerta passa a disparar quase todo ano (70%),
+              gerando muitos falsos alarmes como em 2019 e 2020.</li>
+            <li><strong>Poucas Safras Independentes e Sinal Concentrado:</strong> São apenas 18 safras no treino e 6 no
+              teste. Sem as safras extremas de 2016 e 2013, a AUC de validação no treino cai de 0,65 para <strong>0,49</strong>.
+              Além disso, o <span class="tech-term">intervalo de confiança (IC 90%)</span> <span class="didactic-note">(faixa de incerteza onde o corte ideal poderia cair se repetíssemos a amostra)</span> do limiar térmico é amplo: vai de 25,06 &deg;C a 30,1 &deg;C.</li>
+            <li><strong>Mecanismo Único (Apenas Calor/Seca):</strong> Quebras causadas por excesso de chuva ou doenças
+              (como 2002, 2004, 2006, 2014 e 2022) não são detectadas. Logo, <em>ausência de alerta térmico nunca
+              significa safra garantida</em>.</li>
+            <li><strong>Escala de Satélite (0,5&deg;) e Uso Ético:</strong> Dados regionais da NASA POWER e médias
+              municipais do IBGE não enxergam microclimas de fazendas individuais. Por isso, o índice <strong>nunca deve
+              ser usado isoladamente para negar crédito rural ou seguro</strong>.</li>
+          </ol>
+
+          <div class="callout-box" style="border-left-color: var(--brand-primary);">
+            <div class="callout-title">Próximos Passos Metodológicos</div>
+            <ul style="font-size: 0.9rem; margin-bottom: 0; padding-left: 1.25rem;">
+              <li>Substituir o limiar absoluto em &deg;C por um <strong>limiar relativo à anomalia recente</strong> de cada
+                município, mitigando a deriva climática.</li>
+              <li>Incorporar dados em escala mais próxima da lavoura (talhão, calendário de plantio e doenças), além de
+                mais safras rotuladas conforme novos fechamentos do IBGE/PAM.</li>
+              <li>Aplicar <span class="tech-term">calibração de probabilidades</span> <span class="didactic-note">(ajuste matemático posterior, como Platt Scaling ou Isotonic, para que uma nota de 30% signifique realmente 30% de chance observada na prática)</span> quando houver volume amostral suficiente, separando risco relativo de probabilidade real.</li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- SEÇÃO 8: MOSTRA, REFERÊNCIAS E AUTORES -->
+        <section id="mostra">
+          <h2>8. Mostra de Tecnologia, Referências e Autores</h2>
+
+          <h3>Links Recomendados para Estudantes</h3>
+          <ul style="font-size: 0.9rem;">
+            <li><a href="https://scikit-learn.org/stable/modules/linear_model.html#logistic-regression" target="_blank"
+                rel="noopener noreferrer" style="color:var(--brand-primary); font-weight:600;">Scikit-Learn: Logistic
+                Regression:</a> Regularização L2 e impacto do <code>class_weight</code> nas probabilidades.</li>
+            <li><a href="https://power.larc.nasa.gov/" target="_blank" rel="noopener noreferrer"
+                style="color:var(--brand-primary); font-weight:600;">NASA POWER Project:</a> Séries meteorológicas
+              diárias por satélite e metodologia de umidade de solo (<code>GWETROOT</code>).</li>
+            <li><a href="https://sidra.ibge.gov.br/tabela/1612" target="_blank" rel="noopener noreferrer"
+                style="color:var(--brand-primary); font-weight:600;">IBGE SIDRA (Tabela 1612):</a> Série histórica
+              oficial da Produção Agrícola Municipal (PAM).</li>
+            <li><a href="https://doi.org/10.1371/journal.pone.0118432" target="_blank" rel="noopener noreferrer"
+                style="color:var(--brand-primary); font-weight:600;">Saito &amp; Rehmsmeier (2015), PLoS ONE:</a> Por
+              que Precisão e Recall informam mais que acurácia em bases desbalanceadas.</li>
+          </ul>
+
+          <h3>Referências Primárias</h3>
+          <p style="font-size: 0.85rem; color: var(--text-light); line-height: 1.6;">
+            [1] <strong>IBGE.</strong> Pesquisa Agrícola Municipal (PAM), tabela 1612. SIDRA, 2026.<br>
+            [2] <strong>NASA Langley Research Center.</strong> NASA POWER Daily API. 2026.<br>
+            [3] <strong>Pedregosa, F., et al. (2011).</strong> Scikit-learn: Machine Learning in Python. <em>JMLR</em>,
+            12, 2825–2830.<br>
+            [4] <strong>Saito, T., &amp; Rehmsmeier, M. (2015).</strong> The Precision-Recall Plot Is More Informative
+            than the ROC Plot When Evaluating Binary Classifiers on Imbalanced Datasets. <em>PLoS ONE</em>, 10(3).
+          </p>
+
+          <!-- CARD DA MOSTRA -->
+          <div class="mostra-card">
+            <div class="mostra-info">
+              <span class="mostra-badge">Mostra de Tecnologia 2026/2</span>
+              <h3 style="font-size: 1.25rem; color: var(--text-main); margin-bottom: 0.4rem;">SojaRisco: Protótipo
+                Experimental de Alerta Agroclimático</h3>
+              <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 0.85rem;">
+                Código-fonte aberto, Model Card transparente, cadernos de backtest e dashboard interativo em Streamlit:
+              </p>
+              <div style="display: flex; flex-wrap: wrap; gap: 0.6rem;">
+                <a href="https://github.com/SAMUKISZHSD/bx_produtividade_agricola" target="_blank" class="btn-sm-header"
+                  style="text-decoration:none;">
+                  Repositório GitHub
+                </a>
+                <span
+                  style="font-size: 0.8rem; color: var(--text-light); align-self: center; font-family: var(--font-mono);">
+                  Vídeo Pitch 90s: <a href="https://youtu.be/gYtYT7U4eMA" target="_blank" rel="noopener noreferrer"
+                    style="color: inherit; text-decoration: underline;">https://youtu.be/gYtYT7U4eMA</a>
+                </span>
+              </div>
+            </div>
+
+            <div class="mostra-qrcode-box">
+              <img src="img/qrcode_artigo.png" alt="QR Code Oficial do Artigo">
+              <span>Artigo Online</span>
+            </div>
+          </div>
+
+          <!-- AUTORES FINAIS -->
+          <div style="margin-top: 4rem; border-top: 1px solid var(--border-color); padding-top: 2.5rem;">
+            <div style="margin-bottom: 2rem;">
+              <h2
+                style="font-size: 2rem; font-weight: 700; color: var(--brand-dark); margin-bottom: 0.5rem; border-bottom: none; padding-bottom: 0;">
+                Sobre os Autores</h2>
+              <p style="font-size: 0.95rem; color: var(--text-muted); margin: 0;">
+                Equipe de Ciência de Dados e Aprendizado de Máquina &bull; Bacharelado em Sistemas de Informação
+              </p>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
+              <!-- Jean Carlos -->
+              <div
+                style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+                <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 16px;">
+                  <img loading="lazy" src="https://github.com/jeanBR2O2O.png" alt="Jean Carlos"
+                    style="width: 56px; height: 56px; border-radius: 9999px; object-fit: cover; border: 2px solid var(--border-color);"
+                    onerror="this.src='https://placehold.co/150x150/eff6ff/1e3a8a?text=JC'">
+                  <div>
+                    <h3
+                      style="margin: 0; font-size: 1.05rem; font-weight: 700; color: var(--text-main); text-transform: none; letter-spacing: normal;">
+                      Jean Carlos</h3>
+                    <p style="margin: 0; font-size: 0.82rem; color: var(--text-light);">Sistemas de Informação &bull; 8º
+                      semestre</p>
+                    <span
+                      style="font-size: 0.75rem; font-family: var(--font-mono); color: var(--brand-primary); font-weight: 600;">RGM:
+                      33783276</span>
+                  </div>
+                </div>
+                <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 12px; line-height: 1.5;">
+                  <strong>Responsabilidade:</strong> Pipelines de ML scikit-learn, split temporal sem vazamento e
+                  baselines estatísticos.
+                </p>
+                <p style="font-size: 0.85rem; color: var(--text-light); margin-bottom: 16px;">
+                  <strong>Interesses:</strong> Segurança de Dados
+                </p>
+                <div style="display: flex; gap: 16px; font-size: 0.875rem; font-weight: 700;">
+                  <a href="https://www.linkedin.com/in/jean-carlos1212/" target="_blank" rel="noopener noreferrer"
+                    style="color: var(--brand-primary); display: inline-flex; align-items: center; gap: 6px; text-decoration: none;">
+                    LinkedIn
+                  </a>
+                  <a href="https://github.com/jeanBR2O2O" target="_blank" rel="noopener noreferrer"
+                    style="color: var(--brand-primary); display: inline-flex; align-items: center; gap: 6px; text-decoration: none;">
+                    GitHub
+                  </a>
+                </div>
+              </div>
+
+              <!-- João Guilherme -->
+              <div
+                style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+                <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 16px;">
+                  <img loading="lazy" src="https://github.com/jonnguii.png" alt="João Guilherme"
+                    style="width: 56px; height: 56px; border-radius: 9999px; object-fit: cover; border: 2px solid var(--border-color);"
+                    onerror="this.src='https://placehold.co/150x150/eff6ff/1e3a8a?text=JG'">
+                  <div>
+                    <h3
+                      style="margin: 0; font-size: 1.05rem; font-weight: 700; color: var(--text-main); text-transform: none; letter-spacing: normal;">
+                      João Guilherme</h3>
+                    <p style="margin: 0; font-size: 0.82rem; color: var(--text-light);">Sistemas de Informação &bull; 7º
+                      semestre</p>
+                    <span
+                      style="font-size: 0.75rem; font-family: var(--font-mono); color: var(--brand-primary); font-weight: 600;">RGM:
+                      35880759</span>
+                  </div>
+                </div>
+                <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 12px; line-height: 1.5;">
+                  <strong>Responsabilidade:</strong> Scrum Master. Engenharia de dados idempotente, APIs e arquitetura
+                  editorial.
+                </p>
+                <p style="font-size: 0.85rem; color: var(--text-light); margin-bottom: 16px;">
+                  <strong>Interesses:</strong> Desenvolvimento e Arquitetura de Software &bull; UX Engineering
+                </p>
+                <div style="display: flex; gap: 16px; font-size: 0.875rem; font-weight: 700;">
+                  <a href="https://www.linkedin.com/in/jcravog/" target="_blank" rel="noopener noreferrer"
+                    style="color: var(--brand-primary); display: inline-flex; align-items: center; gap: 6px; text-decoration: none;">
+                    LinkedIn
+                  </a>
+                  <a href="https://github.com/jonnguii" target="_blank" rel="noopener noreferrer"
+                    style="color: var(--brand-primary); display: inline-flex; align-items: center; gap: 6px; text-decoration: none;">
+                    GitHub
+                  </a>
+                </div>
+              </div>
+
+              <!-- Samuel Allan -->
+              <div
+                style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+                <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 16px;">
+                  <img loading="lazy" src="https://github.com/SAMUKISZHSD.png" alt="Samuel Allan"
+                    style="width: 56px; height: 56px; border-radius: 9999px; object-fit: cover; border: 2px solid var(--border-color);"
+                    onerror="this.src='https://placehold.co/150x150/eff6ff/1e3a8a?text=S'">
+                  <div>
+                    <h3
+                      style="margin: 0; font-size: 1.05rem; font-weight: 700; color: var(--text-main); text-transform: none; letter-spacing: normal;">
+                      Samuel Allan</h3>
+                    <p style="margin: 0; font-size: 0.82rem; color: var(--text-light);">Sistemas de Informação &bull; 8º
+                      semestre</p>
+                    <span
+                      style="font-size: 0.75rem; font-family: var(--font-mono); color: var(--brand-primary); font-weight: 600;">RGM:
+                      34524746</span>
+                  </div>
+                </div>
+                <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 12px; line-height: 1.5;">
+                  <strong>Responsabilidade:</strong> Modelagem probabilística, validação OOF, matrizes de confusão e
+                  dashboard Streamlit.
+                </p>
+                <p style="font-size: 0.85rem; color: var(--text-light); margin-bottom: 16px;">
+                  <strong>Interesses:</strong> Engenharia de Dados
+                </p>
+                <div style="display: flex; gap: 16px; font-size: 0.875rem; font-weight: 700;">
+                  <a href="https://www.linkedin.com/in/samuel-allan-nunes-cunha/" target="_blank"
+                    rel="noopener noreferrer"
+                    style="color: var(--brand-primary); display: inline-flex; align-items: center; gap: 6px; text-decoration: none;">
+                    LinkedIn
+                  </a>
+                  <a href="https://github.com/SAMUKISZHSD" target="_blank" rel="noopener noreferrer"
+                    style="color: var(--brand-primary); display: inline-flex; align-items: center; gap: 6px; text-decoration: none;">
+                    GitHub
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </article>
 
       <!-- ====================================================================
            SIDEBAR STICKY (ÍNDICE ENXUTO NO DESKTOP)
@@ -1602,34 +2522,34 @@
           <div class="toc-title">Índice do Artigo</div>
           <nav>
             <ul class="toc-list">
-              <li><a href="#problema" class="toc-link">Resumo</a></li>
-              <li><a href="#contexto" class="toc-link">1. Problema</a></li>
-              <li><a href="#dados" class="toc-link">2. Dados e alvo</a></li>
-              <li><a href="#metodo" class="toc-link">3. Método</a></li>
-              <li><a href="#resultados" class="toc-link">4. Resultados</a></li>
-              <li><a href="#discussao" class="toc-link">5. Discussão</a></li>
-              <li><a href="#limitacoes" class="toc-link">6. Limitações</a></li>
-              <li><a href="#conclusao" class="toc-link">7. Conclusão</a></li>
-              <li><a href="#referencias" class="toc-link">Referências</a></li>
+              <li><a href="#problema" class="toc-link">1. Problema &amp; Custo</a></li>
+              <li><a href="#dados" class="toc-link">2. Dados &amp; Alvo Relativo</a></li>
+              <li><a href="#modelos" class="toc-link">3. Modelos &amp; Simulador</a></li>
+              <li><a href="#comparativo" class="toc-link">4. Seleção &amp; Quadro</a></li>
+              <li><a href="#codigo-api" class="toc-link">5. Código &amp; Artefatos</a></li>
+              <li><a href="#resultados" class="toc-link">6. Resultados &amp; Veredito</a></li>
+              <li><a href="#limitacoes" class="toc-link">7. Limitações &amp; Ética</a></li>
+              <li><a href="#mostra" class="toc-link">8. Mostra &amp; Autores</a></li>
             </ul>
           </nav>
 
           <div
             style="margin-top: 1.5rem; padding: 0.85rem; background-color: var(--bg-surface-alt); border: 1px solid var(--border-color); border-radius: var(--radius-sm); font-size: 0.78rem;">
-            <div style="font-weight: 700; color: var(--text-main); margin-bottom: 0.25rem;">Escopo regional — 9 municípios</div>
+            <div style="font-weight: 700; color: var(--text-main); margin-bottom: 0.25rem;">Alto Teles Pires - MT (9 mun.)</div>
             <div style="color: var(--text-light); line-height: 1.45;">
-              Unidade: município × safra<br>
-              Alvo: abaixo de 92% da tendência passada<br>
-              Treino: 2001–2018 (138 linhas)<br>
-              Teste: 2019–2024 (54 linhas)<br>
-              Modelo ativo: LogReg, 1 feature
+              Alvo: &lt; 92% da tendência<br>
+              Amostra: 192 (2001–2024)<br>
+              Treino: 2001–2018 (138)<br>
+              Teste: 2019–2024 (54)<br>
+              Ativo: LogReg (Tmax &ge; 28,34 &deg;C)<br>
+              Status: Protótipo experimental
             </div>
           </div>
 
           <div id="dashboard-anchor" style="margin-top: 1rem;">
-            <a href="https://github.com/SAMUKISZHSD/bx_produtividade_agricola" target="_blank" class="btn-safra-chip"
+            <a href="https://sojarisco-sorriso.streamlit.app/" target="_blank" class="btn-safra-chip"
               style="display:block; text-align:center; text-decoration:none; font-size:0.8rem;">
-              Dashboard: <code>streamlit run streamlit_app.py</code>
+              Dashboard: <code>https://sojarisco-sorriso.streamlit.app/</code>
             </a>
           </div>
         </div>
@@ -1639,156 +2559,68 @@
   </div>
 
   <!-- ========================================================================
-       RODAPÉ EDITORIAL COMPLETO COM SVGS E BADGES
+       RODAPÉ EDITORIAL
        ======================================================================== -->
   <footer class="editorial-footer">
     <div class="footer-container">
-      <!-- Coluna 1: Marca & Propósito Acadêmico -->
       <div class="footer-col">
         <a href="#" class="footer-brand">
           <img src="img/logo_sojarisco.png" alt="Logo SojaRisco" class="footer-brand-logo">
           <span>SojaRisco</span>
         </a>
         <p class="footer-desc">
-          Estudo exploratório de modelos temporais para risco de quebra relativa de safra de soja, integrando NASA POWER
-          e produtividade municipal IBGE/PAM. Os resultados não validam o uso operacional do alerta.
+          Artigo didático e protótipo experimental de monitoramento agroclimático para nove municípios do Alto Teles
+          Pires-MT (Sorriso-MT como referência), combinando NASA POWER e IBGE PAM.
         </p>
         <div class="footer-meta-item">
-          <!-- Ícone Acadêmico SVG -->
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
-            <path d="M6 12v5c3 3 9 3 12 0v-5" />
-          </svg>
           <span>Sistemas de Informação &bull; Mostra de Tecnologia 2026/2</span>
         </div>
         <div class="footer-meta-item">
-          <!-- Ícone Localização SVG -->
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-            <circle cx="12" cy="10" r="3" />
-          </svg>
-          <span>Dados: NASA POWER e IBGE/PAM &bull; Mato Grosso, Brasil</span>
+          <span>Microrregião do Alto Teles Pires &bull; Mato Grosso, Brasil</span>
         </div>
       </div>
 
-      <!-- Coluna 2: Navegação & Recursos -->
       <div class="footer-col">
         <div class="footer-heading">Seções do Artigo</div>
         <ul class="footer-links-list">
-          <li class="footer-link-item">
-            <a href="#problema">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="10" />
-                <line x1="12" y1="8" x2="12" y2="12" />
-                <line x1="12" y1="16" x2="12.01" y2="16" />
-              </svg>
-              <span>1. Contexto do problema</span>
-            </a>
-          </li>
-          <li class="footer-link-item">
-            <a href="#dados">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                stroke-linecap="round" stroke-linejoin="round">
-                <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4" />
-                <path d="M3 5v14a2 2 0 0 0 2 2h16v-5" />
-                <path d="M18 12a2 2 0 0 0 0 4h4v-4Z" />
-              </svg>
-              <span>2. Dados e definição do alvo</span>
-            </a>
-          </li>
-          <li class="footer-link-item">
-            <a href="#resultados">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                stroke-linecap="round" stroke-linejoin="round">
-                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-              </svg>
-              <span>4. Resultados</span>
-            </a>
-          </li>
-          <li class="footer-link-item">
-            <a href="#metodo">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="16 18 22 12 16 6" />
-                <polyline points="8 6 2 12 8 18" />
-              </svg>
-              <span>3. Método</span>
-            </a>
-          </li>
-          <li class="footer-link-item">
-            <a href="#limitacoes">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                stroke-linecap="round" stroke-linejoin="round">
-                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-                <circle cx="9" cy="7" r="4" />
-                <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-              </svg>
-              <span>6. Limitações</span>
-            </a>
-          </li>
+          <li class="footer-link-item"><a href="#problema"><span>1. Problema &amp; Custo do Erro</span></a></li>
+          <li class="footer-link-item"><a href="#dados"><span>2. Dados &amp; Alvo Relativo</span></a></li>
+          <li class="footer-link-item"><a href="#modelos"><span>3. Modelos &amp; Simulador</span></a></li>
+          <li class="footer-link-item"><a href="#resultados"><span>6. Resultados &amp; Veredito</span></a></li>
+          <li class="footer-link-item"><a href="#mostra"><span>8. Autores &amp; Mostra 2026/2</span></a></li>
         </ul>
       </div>
 
-      <!-- Coluna 3: Código Aberto, Dashboard & Repositório -->
       <div class="footer-col">
-        <div class="footer-heading">Aplicação & Código Aberto</div>
+        <div class="footer-heading">Código Aberto &amp; Documentação</div>
         <div class="footer-card-box">
           <div style="font-size:0.85rem; color:var(--text-muted); line-height: 1.5;">
-            Pipeline 100% reproduzível com SQLite, Scikit-Learn e Dashboard interativo em Streamlit.
+            Pipeline reproduzível com Scikit-Learn, Model Card transparente, notebooks de backtest e Dashboard Streamlit.
           </div>
           <a href="https://github.com/SAMUKISZHSD/bx_produtividade_agricola" target="_blank" rel="noopener noreferrer"
             class="footer-btn-cta">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-              <path fill-rule="evenodd" clip-rule="evenodd"
-                d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
-            </svg>
             <span>Ver no GitHub</span>
           </a>
         </div>
       </div>
     </div>
 
-    <!-- Barra Inferior de Direitos e Revisão -->
     <div class="footer-bottom-bar">
-      <div style="display: flex; align-items: center; gap: 6px;">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-          stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <circle cx="12" cy="12" r="10" />
-          <path d="M14.83 14.83a4 4 0 1 1 0-5.66" />
-        </svg>
-        <span>Licença de Código Aberto MIT &copy; 2026 Squad SojaRisco.</span>
-      </div>
+      <div><span>Licença de Código Aberto MIT &copy; 2026 Squad SojaRisco.</span></div>
       <div style="display: flex; align-items: center; gap: 16px;">
-        <span style="display: inline-flex; align-items: center; gap: 6px;">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-            <line x1="16" y1="2" x2="16" y2="6" />
-            <line x1="8" y1="2" x2="8" y2="6" />
-            <line x1="3" y1="10" x2="21" y2="10" />
-          </svg>
-          Revisão formal: <strong>12 de Novembro de 2026</strong>
-        </span>
-        <a href="#main-header"
-          style="color:var(--text-muted); text-decoration:none; display: inline-flex; align-items: center; gap: 4px;">
-          <span>Voltar ao topo</span>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-            stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="18 15 12 9 6 15" />
-          </svg>
-        </a>
+        <span>Revisão: <strong>19 de Novembro de 2026</strong></span>
+        <a href="#main-header" style="color:var(--text-muted); text-decoration:none;">Voltar ao topo &uarr;</a>
       </div>
     </div>
   </footer>
 
+  <script src="js/project-data.js"></script>
   <script>
     (function () {
-      var $ = function (s, r) { return (r || document).querySelector(s) }, $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)) };
-      /* tema TechBlog (Sun & Moon toggle) */
+      var $ = function (s, r) { return (r || document).querySelector(s) },
+          $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)) };
+
+      /* Tema claro/escuro */
       var tg = $('#theme-toggle');
       function updateThemeIcons() {
         if (!tg) return;
@@ -1805,7 +2637,8 @@
           updateThemeIcons();
         };
       }
-      /* smooth scroll com Lenis */
+
+      /* Scroll suave com Lenis */
       var lenis;
       if (typeof Lenis !== 'undefined') {
         lenis = new Lenis({
@@ -1817,48 +2650,152 @@
           wheelMultiplier: 1.0,
           touchMultiplier: 1.5
         });
-
-        function raf(time) {
-          lenis.raf(time);
-          requestAnimationFrame(raf);
-        }
+        function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
         requestAnimationFrame(raf);
-
-        // Suporte suave a cliques em links âncora (#...)
         $$('a[href^="#"]').forEach(function (anchor) {
           anchor.addEventListener('click', function (e) {
             var targetId = anchor.getAttribute('href');
             if (targetId && targetId !== '#') {
               var targetEl = document.querySelector(targetId);
-              if (targetEl) {
-                e.preventDefault();
-                lenis.scrollTo(targetEl, { offset: -84 });
-              }
+              if (targetEl) { e.preventDefault(); lenis.scrollTo(targetEl, { offset: -84 }); }
             }
           });
         });
       }
 
-      /* progresso e índice ativo */
+      /* Barra de leitura e TOC ativo */
       var pb = $('#progress-bar'), links = $$('.toc-link'), secs = links.map(function (a) { return $(a.getAttribute('href')) });
       function onScroll() {
         var h = document.documentElement, p = (h.scrollTop || document.body.scrollTop) / (h.scrollHeight - h.clientHeight || 1);
         if (pb) pb.style.transform = 'scaleX(' + p + ')';
-        var cur = 0; secs.forEach(function (s, i) { if (s && s.getBoundingClientRect().top < 140) cur = i }); links.forEach(function (a, i) { a.classList.toggle('active', i == cur) });
+        var cur = 0;
+        secs.forEach(function (s, i) { if (s && s.getBoundingClientRect().top < 140) cur = i });
+        links.forEach(function (a, i) { a.classList.toggle('active', i == cur) });
       }
-      if (lenis) {
-        lenis.on('scroll', onScroll);
-      } else {
-        addEventListener('scroll', onScroll, { passive: true });
-      }
+      if (lenis) lenis.on('scroll', onScroll); else addEventListener('scroll', onScroll, { passive: true });
       onScroll();
-      /* índice no celular */
-      var hero = $('.article-hero'); if (hero && links.length) { var d = document.createElement('details'); d.className = 'toc-mobile'; d.innerHTML = '<summary>Índice do artigo</summary>' + links.map(function (a) { return '<a href="' + a.getAttribute('href') + '">' + a.textContent + '</a>' }).join(''); hero.after(d) }
-      /* figuras: desenhar uma vez ao entrar na tela */
-      var io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target) } }) }, { threshold: .3 });
-      $$('.fig-anim').forEach(function (s) { $$(':scope>g,:scope>path,:scope>rect,:scope>text', s).forEach(function (n, i) { n.style.setProperty('--i', i) }); io.observe(s) });
-    })();
 
+      /* Índice mobile */
+      var hero = $('.article-hero');
+      if (hero && links.length) {
+        var d = document.createElement('details');
+        d.className = 'toc-mobile';
+        d.innerHTML = '<summary>Índice do artigo</summary>' + links.map(function (a) { return '<a href="' + a.getAttribute('href') + '">' + a.textContent + '</a>' }).join('');
+        hero.after(d);
+      }
+
+      /* Animação de entrada da Figura 1 */
+      var io = new IntersectionObserver(function (es) {
+        es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+      }, { threshold: .3 });
+      $$('.fig-anim').forEach(function (s) {
+        $$(':scope>g,:scope>path,:scope>rect,:scope>text', s).forEach(function (n, i) { n.style.setProperty('--i', i) });
+        io.observe(s);
+      });
+
+      /* Simulador real da Regressão Logística L2 usando window.PROJECT_DATA */
+      var PD = window.PROJECT_DATA || {};
+      var prever = PD.preverRisco || function (tmax) {
+        var z = 0.6333948141 * ((Number(tmax) - 28.458829183698764) / 1.040458233262264) - 0.1304474707;
+        var p = 1 / (1 + Math.exp(-z));
+        return { alerta: p >= 0.45, indiceRisco: p, limiar: 0.45, limiarCelsius: 28.34, caminho: [] };
+      };
+      var histMap = {};
+      if (PD.historico) {
+        PD.historico.forEach(function (row) { histMap[row.ano] = row; });
+      }
+
+      var sliderTmax = $('#sim-tmax');
+      function updateRiskSim(anoReal) {
+        if (!sliderTmax) return;
+        var tmax = parseFloat(sliderTmax.value);
+        $('#val-tmax').textContent = tmax.toFixed(2) + ' °C';
+        var res = prever(tmax);
+        var pct = (res.indiceRisco * 100);
+        var bar = $('#sim-risk-bar');
+        if (bar) {
+          bar.style.width = Math.min(100, Math.max(0, pct)).toFixed(1) + '%';
+          bar.style.background = res.alerta ? 'var(--brand-danger)' : 'var(--brand-primary)';
+        }
+        var v = $('#sim-verdict');
+        v.textContent = res.alerta ? 'ALERTA DE RISCO TÉRMICO (≥ 28,34 °C)' : 'Sem alerta térmico (< 28,34 °C)';
+        v.className = 'verdict-status ' + (res.alerta ? 'alert' : 'ok');
+        $('#sim-prob').textContent = 'Índice de risco: ' + pct.toFixed(1) + '% (corte: 45,0%)';
+        if ($('#sim-steps') && res.caminho) {
+          $('#sim-steps').innerHTML = res.caminho.map(function (c) { return '&bull; ' + c; }).join('<br>');
+        }
+        if (anoReal && histMap[anoReal]) {
+          var h = histMap[anoReal];
+          $('#sim-safra-details').textContent = 'Sorriso-MT ' + h.ano + ' (' + h.split + ') · Real: ' + h.rotulo + ' · Chuva Dez–Fev: ' + h.chuva_enchimento.toFixed(1) + ' mm · Dias >= 35°C: ' + h.dias_calor_enchimento;
+        } else if (!anoReal) {
+          $('#sim-safra-details').textContent = 'Simulação manual de temperatura máxima média (dez–fev)';
+        }
+      }
+
+      $$('.btn-safra-chip[data-ano]').forEach(function (b) {
+        b.onclick = function () {
+          $$('.btn-safra-chip[data-ano]').forEach(function (x) { x.classList.toggle('active', x == b); });
+          var ano = +b.dataset.ano;
+          var h = histMap[ano];
+          if (h && sliderTmax) { sliderTmax.value = h.tmax_enchimento; }
+          updateRiskSim(ano);
+        };
+      });
+      if (sliderTmax) {
+        sliderTmax.oninput = function () {
+          $$('.btn-safra-chip[data-ano]').forEach(function (x) { x.classList.remove('active'); });
+          updateRiskSim(null);
+        };
+        updateRiskSim(2016);
+      }
+
+      /* Figura 3: Matrizes de Confusão Reais via window.PROJECT_DATA */
+      var cm = $('#confusion-matrix-comparison');
+      if (cm && PD.modelos && PD.modelos.logisticRegression) {
+        var rec = PD.modelos.logisticRegression.recortesTeste;
+        cm.setAttribute('role', 'region');
+        cm.setAttribute('aria-label', 'Matrizes de confusão reais da Regressão Logística L2 no teste 2019-2024, teste sem 2024 e Sorriso-MT');
+        cm.innerHTML =
+          '<div class="cm-cards-grid">' +
+            '<div class="cm-card cm-card-winner">' +
+              '<div class="cm-card-header">' +
+                '<span class="cm-card-title">1. Teste Completo (2019–2024, N=' + rec.todos.n + ')</span>' +
+                '<span class="cm-card-sub">9 municípios &bull; Protótipo Ativo (p &ge; 0,45)</span>' +
+              '</div>' +
+              '<table>' +
+                '<tr><th></th><th>Prev: Normal</th><th>Prev: Alerta</th></tr>' +
+                '<tr><th>Real: Normal</th><td class="hit">' + rec.todos.tn + '</td><td class="miss">' + rec.todos.fp + '</td></tr>' +
+                '<tr><th>Real: Quebra</th><td class="miss">' + rec.todos.fn + '</td><td class="hit">' + rec.todos.tp + '</td></tr>' +
+              '</table>' +
+              '<div class="cm-card-foot">Recall = 75,0% &middot; Precisão = 23,7% &middot; Custo = 44</div>' +
+            '</div>' +
+            '<div class="cm-card">' +
+              '<div class="cm-card-header">' +
+                '<span class="cm-card-title">2. Teste Sem 2024 (N=' + rec.sem2024.n + ')</span>' +
+                '<span class="cm-card-sub">Sensibilidade sem o pico de 2024</span>' +
+              '</div>' +
+              '<table>' +
+                '<tr><th></th><th>Prev: Normal</th><th>Prev: Alerta</th></tr>' +
+                '<tr><th>Real: Normal</th><td class="hit">' + rec.sem2024.tn + '</td><td class="miss">' + rec.sem2024.fp + '</td></tr>' +
+                '<tr><th>Real: Quebra</th><td class="miss">' + rec.sem2024.fn + '</td><td class="hit">' + rec.sem2024.tp + '</td></tr>' +
+              '</table>' +
+              '<div class="cm-card-foot">Recall = 25,0% &middot; AUC = 0,341 &middot; Custo = 43</div>' +
+            '</div>' +
+            '<div class="cm-card">' +
+              '<div class="cm-card-header">' +
+                '<span class="cm-card-title">3. Apenas Sorriso-MT (N=' + rec.sorrisoMt.n + ')</span>' +
+                '<span class="cm-card-sub">Município de referência (2019–2024)</span>' +
+              '</div>' +
+              '<table>' +
+                '<tr><th></th><th>Prev: Normal</th><th>Prev: Alerta</th></tr>' +
+                '<tr><th>Real: Normal</th><td class="hit">' + rec.sorrisoMt.tn + '</td><td class="miss">' + rec.sorrisoMt.fp + '</td></tr>' +
+                '<tr><th>Real: Quebra</th><td class="zero">' + rec.sorrisoMt.fn + '</td><td class="hit">' + rec.sorrisoMt.tp + '</td></tr>' +
+              '</table>' +
+              '<div class="cm-card-foot">Recall = 100% &middot; Precisão = 50,0% &middot; Custo = 2</div>' +
+            '</div>' +
+          '</div>';
+      }
+    })();
   </script>
 </body>
 

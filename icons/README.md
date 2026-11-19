@@ -15,12 +15,12 @@ shield, alert, brain, history, database, chart_line, chart_bar,
 calendar, location, settings, info, water, refresh e sojarisco_logo.
 
 ## Uso
-Coloque os SVGs em `assets/icons/` e use:
+Coloque os SVGs em `icons/` e use:
 ```python
 from pathlib import Path
 import streamlit as st
 
-ASSETS = Path(__file__).parent / "assets" / "icons"
+ASSETS = Path(__file__).parent / "icons"
 st.image(str(ASSETS / "sojarisco_logo.svg"), width=240)
 st.image(str(ASSETS / "weather.svg"), width=36)
 ```
