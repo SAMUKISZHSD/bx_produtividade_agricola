@@ -23,3 +23,4 @@
 | **S5** | S5-04 | Persistência relacional SQLite (3 tabelas) e Dashboard Streamlit | Samuel Allan | CONCLUÍDO | `src/database.py`, `data/monitoramento_safra.db`, `streamlit_app.py` |
 | **S5** | S5-05 | Artigo técnico web (GitHub Pages), QR Code e Diário Final | João Guilherme | CONCLUÍDO | `docs/index.html`, `docs/js/project-data.js`, `docs/img/qrcode_artigo.png`, `DIARIO.md` |
 
+> **Nota de consolidação:** a versão oficial mais recente usa os notebooks 08–13 e os artefatos `s5_*`, com recorte regional de nove municípios, treino 2001–2018 e teste 2019–2024. Registros históricos de sprints anteriores que citavam Sorriso-MT com 10 safras ou 4 features estão preservados apenas como histórico e não representam o modelo final.

@@ -1,8 +1,30 @@
 {
-  "modelo_referencia": "LogisticRegression",
-  "limiar_otimo": 0.35,
-  "motivo": "Minimizacao de FN com base no custo de seguro rural do RFC e maximizacao de F1 na validacao temporal do treino",
-  "recall_validacao": 1.0,
-  "precisao_validacao": 0.5,
-  "f1_validacao": 0.67
+  "modelo_referencia": "LogReg C=1.0",
+  "features": [
+    "tmax_enchimento"
+  ],
+  "limiar_otimo": 0.45,
+  "limiar_celsius": 28.34,
+  "regra_alerta": "alerta se tmax_enchimento (média da tmax diária dez-fev) >= 28.34 °C",
+  "motivo": "menor custo esperado na validação deixando uma safra de fora (treino 2001-2018), com custo FN = 5 x FP (RFC); limiar absoluto",
+  "custo_fn": 5.0,
+  "custo_fp": 1.0,
+  "recall_validacao": 0.7083333333333334,
+  "precisao_validacao": 0.2786885245901639,
+  "f1_validacao": 0.39999999999999997,
+  "pct_alertas_validacao": 0.4420289855072464,
+  "pct_real_validacao": 0.17391304347826086,
+  "custo_validacao": 79.0,
+  "ic90_bootstrap_limiar": [
+    0.1,
+    0.705
+  ],
+  "ic90_bootstrap_celsius": [
+    25.06,
+    30.1
+  ],
+  "interpretacao_probabilidade": "índice de risco: class_weight='balanced' infla as probabilidades; não é a chance real de quebra",
+  "aviso_deriva": "o teste é mais quente (média 29.88 °C vs 28.46 °C no treino); com limiar absoluto o alerta dispara com mais frequência em anos quentes",
+  "momento_alerta": "março (após o fim do enchimento, antes da colheita)",
+  "teste_usado_na_escolha": false
 }

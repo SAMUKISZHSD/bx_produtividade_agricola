@@ -1,0 +1,44 @@
+{
+  "modelo": "LogReg C=1.0",
+  "features": [
+    "tmax_enchimento"
+  ],
+  "limiar": 0.45,
+  "limiar_celsius": 28.34,
+  "regra_alerta": "alerta se tmax_enchimento (média da tmax diária dez-fev) >= 28.34 °C",
+  "status": "protótipo experimental (não aprovado para decisão operacional)",
+  "aprovado": false,
+  "treinado_em": "safras 2001-2018, 9 municípios",
+  "teste": {
+    "todos": {
+      "recall": 0.75,
+      "precisao": 0.23684210526315788,
+      "%_alertas": 0.7037037037037037,
+      "%_real": 0.2222222222222222,
+      "custo": 44.0,
+      "auc": 0.7281746031746033
+    },
+    "sem 2024": {
+      "recall": 0.25,
+      "precisao": 0.034482758620689655,
+      "%_alertas": 0.6444444444444445,
+      "%_real": 0.08888888888888889,
+      "custo": 43.0,
+      "auc": 0.3414634146341463
+    },
+    "Sorriso-MT": {
+      "recall": 1.0,
+      "precisao": 0.5,
+      "%_alertas": 0.6666666666666666,
+      "%_real": 0.3333333333333333,
+      "custo": 2.0,
+      "auc": 1.0
+    }
+  },
+  "auc_teste_ic90_bootstrap": [
+    0.24012158054711247,
+    0.9572368421052632
+  ],
+  "interpretacao_probabilidade": "índice de risco: class_weight='balanced' infla as probabilidades; não é a chance real de quebra",
+  "momento_alerta": "março (após o fim do enchimento, antes da colheita)"
+}

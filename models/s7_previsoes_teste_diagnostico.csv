@@ -1,0 +1,541 @@
+cod_municipio,municipio,safra,quebra_safra,modelo,probabilidade,alerta
+5104526,Ipiranga do Norte,2019,0,LogReg L2 balanceada,0.43013153783674346,0
+5104526,Ipiranga do Norte,2020,0,LogReg L2 balanceada,0.4365654402853827,0
+5104526,Ipiranga do Norte,2021,0,LogReg L2 balanceada,0.8164695488911643,1
+5104526,Ipiranga do Norte,2022,0,LogReg L2 balanceada,0.24492141581926122,0
+5104526,Ipiranga do Norte,2023,0,LogReg L2 balanceada,0.25102957622663685,0
+5104526,Ipiranga do Norte,2024,1,LogReg L2 balanceada,0.945986658825121,1
+5104542,Itanhangá,2019,0,LogReg L2 balanceada,0.3531613438030814,0
+5104542,Itanhangá,2020,0,LogReg L2 balanceada,0.5239130588759129,1
+5104542,Itanhangá,2021,0,LogReg L2 balanceada,0.9077589171063671,1
+5104542,Itanhangá,2022,0,LogReg L2 balanceada,0.26419023460589264,0
+5104542,Itanhangá,2023,0,LogReg L2 balanceada,0.3049418520913733,0
+5104542,Itanhangá,2024,1,LogReg L2 balanceada,0.945278421375271,1
+5105259,Lucas do Rio Verde,2019,0,LogReg L2 balanceada,0.6448695924101775,1
+5105259,Lucas do Rio Verde,2020,0,LogReg L2 balanceada,0.8484536217386621,1
+5105259,Lucas do Rio Verde,2021,0,LogReg L2 balanceada,0.9420725757475185,1
+5105259,Lucas do Rio Verde,2022,1,LogReg L2 balanceada,0.44905122383082074,0
+5105259,Lucas do Rio Verde,2023,0,LogReg L2 balanceada,0.4544389626918695,0
+5105259,Lucas do Rio Verde,2024,1,LogReg L2 balanceada,0.9624312630462271,1
+5105903,Nobres,2019,0,LogReg L2 balanceada,0.7158858055377569,1
+5105903,Nobres,2020,0,LogReg L2 balanceada,0.7529143956399137,1
+5105903,Nobres,2021,0,LogReg L2 balanceada,0.7992332713190982,1
+5105903,Nobres,2022,0,LogReg L2 balanceada,0.566429660622584,1
+5105903,Nobres,2023,0,LogReg L2 balanceada,0.5249183901465351,1
+5105903,Nobres,2024,1,LogReg L2 balanceada,0.9770507190897948,1
+5106224,Nova Mutum,2019,0,LogReg L2 balanceada,0.7055828862759014,1
+5106224,Nova Mutum,2020,0,LogReg L2 balanceada,0.9076699207929946,1
+5106224,Nova Mutum,2021,0,LogReg L2 balanceada,0.8739174927538739,1
+5106224,Nova Mutum,2022,1,LogReg L2 balanceada,0.3764522509594722,0
+5106224,Nova Mutum,2023,0,LogReg L2 balanceada,0.35556558112235587,0
+5106224,Nova Mutum,2024,1,LogReg L2 balanceada,0.9593720499992987,1
+5106240,Nova Ubiratã,2019,0,LogReg L2 balanceada,0.5861305093248902,1
+5106240,Nova Ubiratã,2020,0,LogReg L2 balanceada,0.8018788342070586,1
+5106240,Nova Ubiratã,2021,0,LogReg L2 balanceada,0.7851354713491633,1
+5106240,Nova Ubiratã,2022,0,LogReg L2 balanceada,0.5001008180776227,1
+5106240,Nova Ubiratã,2023,0,LogReg L2 balanceada,0.5138340265937479,1
+5106240,Nova Ubiratã,2024,0,LogReg L2 balanceada,0.9148319712780606,1
+5107768,Santa Rita do Trivelato,2019,0,LogReg L2 balanceada,0.657294705060242,1
+5107768,Santa Rita do Trivelato,2020,0,LogReg L2 balanceada,0.9379349481459154,1
+5107768,Santa Rita do Trivelato,2021,0,LogReg L2 balanceada,0.7248150361477297,1
+5107768,Santa Rita do Trivelato,2022,0,LogReg L2 balanceada,0.568877305183992,1
+5107768,Santa Rita do Trivelato,2023,0,LogReg L2 balanceada,0.5006574109471154,1
+5107768,Santa Rita do Trivelato,2024,1,LogReg L2 balanceada,0.9554369073241902,1
+5107925,Sorriso,2019,0,LogReg L2 balanceada,0.533399674098325,1
+5107925,Sorriso,2020,0,LogReg L2 balanceada,0.5754314007599004,1
+5107925,Sorriso,2021,1,LogReg L2 balanceada,0.8828203210149599,1
+5107925,Sorriso,2022,0,LogReg L2 balanceada,0.3279104159214666,0
+5107925,Sorriso,2023,0,LogReg L2 balanceada,0.2751015129975165,0
+5107925,Sorriso,2024,1,LogReg L2 balanceada,0.9172726700952204,1
+5108006,Tapurah,2019,0,LogReg L2 balanceada,0.4741515503428146,0
+5108006,Tapurah,2020,0,LogReg L2 balanceada,0.5755577387107439,1
+5108006,Tapurah,2021,0,LogReg L2 balanceada,0.9041824433453034,1
+5108006,Tapurah,2022,1,LogReg L2 balanceada,0.29659771088089787,0
+5108006,Tapurah,2023,0,LogReg L2 balanceada,0.3162912962540784,0
+5108006,Tapurah,2024,1,LogReg L2 balanceada,0.9314944565282777,1
+5104526,Ipiranga do Norte,2019,0,GaussianNB,0.06941980189524001,0
+5104526,Ipiranga do Norte,2020,0,GaussianNB,0.07443890027364819,0
+5104526,Ipiranga do Norte,2021,0,GaussianNB,0.9999963852987572,1
+5104526,Ipiranga do Norte,2022,0,GaussianNB,0.02721843790555364,0
+5104526,Ipiranga do Norte,2023,0,GaussianNB,0.030917761734191817,0
+5104526,Ipiranga do Norte,2024,1,GaussianNB,1.0,1
+5104542,Itanhangá,2019,0,GaussianNB,0.03388145948692737,0
+5104542,Itanhangá,2020,0,GaussianNB,0.07831812070562483,0
+5104542,Itanhangá,2021,0,GaussianNB,1.0,1
+5104542,Itanhangá,2022,0,GaussianNB,0.03054325894322028,0
+5104542,Itanhangá,2023,0,GaussianNB,0.032444041760235964,0
+5104542,Itanhangá,2024,1,GaussianNB,1.0,1
+5105259,Lucas do Rio Verde,2019,0,GaussianNB,0.4192085129423276,0
+5105259,Lucas do Rio Verde,2020,0,GaussianNB,0.999903780575818,1
+5105259,Lucas do Rio Verde,2021,0,GaussianNB,1.0,1
+5105259,Lucas do Rio Verde,2022,1,GaussianNB,0.021193116179832234,0
+5105259,Lucas do Rio Verde,2023,0,GaussianNB,0.06336120112796977,0
+5105259,Lucas do Rio Verde,2024,1,GaussianNB,1.0,1
+5105903,Nobres,2019,0,GaussianNB,0.5279925293411308,1
+5105903,Nobres,2020,0,GaussianNB,0.6759312660343654,1
+5105903,Nobres,2021,0,GaussianNB,0.988018846800942,1
+5105903,Nobres,2022,0,GaussianNB,0.12467556849418197,0
+5105903,Nobres,2023,0,GaussianNB,0.24195988368300836,0
+5105903,Nobres,2024,1,GaussianNB,1.0,1
+5106224,Nova Mutum,2019,0,GaussianNB,0.7879015249418169,1
+5106224,Nova Mutum,2020,0,GaussianNB,0.9999999979272935,1
+5106224,Nova Mutum,2021,0,GaussianNB,1.0,1
+5106224,Nova Mutum,2022,1,GaussianNB,0.017598984281908106,0
+5106224,Nova Mutum,2023,0,GaussianNB,0.02528975992731539,0
+5106224,Nova Mutum,2024,1,GaussianNB,1.0,1
+5106240,Nova Ubiratã,2019,0,GaussianNB,0.26630019720140324,0
+5106240,Nova Ubiratã,2020,0,GaussianNB,0.9599181176246044,1
+5106240,Nova Ubiratã,2021,0,GaussianNB,0.9999620613539916,1
+5106240,Nova Ubiratã,2022,0,GaussianNB,0.07513403443509653,0
+5106240,Nova Ubiratã,2023,0,GaussianNB,0.25271045441535106,0
+5106240,Nova Ubiratã,2024,0,GaussianNB,1.0,1
+5107768,Santa Rita do Trivelato,2019,0,GaussianNB,0.47344452419369637,0
+5107768,Santa Rita do Trivelato,2020,0,GaussianNB,1.0,1
+5107768,Santa Rita do Trivelato,2021,0,GaussianNB,0.9905798070207387,1
+5107768,Santa Rita do Trivelato,2022,0,GaussianNB,0.04710416964295081,0
+5107768,Santa Rita do Trivelato,2023,0,GaussianNB,0.027659108775847766,0
+5107768,Santa Rita do Trivelato,2024,1,GaussianNB,1.0,1
+5107925,Sorriso,2019,0,GaussianNB,0.2514969377488252,0
+5107925,Sorriso,2020,0,GaussianNB,0.18933571851291017,0
+5107925,Sorriso,2021,1,GaussianNB,0.9999999991300683,1
+5107925,Sorriso,2022,0,GaussianNB,0.02612965236631768,0
+5107925,Sorriso,2023,0,GaussianNB,0.023192059082447782,0
+5107925,Sorriso,2024,1,GaussianNB,1.0,1
+5108006,Tapurah,2019,0,GaussianNB,0.11282656762611938,0
+5108006,Tapurah,2020,0,GaussianNB,0.32708015685695646,0
+5108006,Tapurah,2021,0,GaussianNB,1.0,1
+5108006,Tapurah,2022,1,GaussianNB,0.029969656860235484,0
+5108006,Tapurah,2023,0,GaussianNB,0.053370879352295154,0
+5108006,Tapurah,2024,1,GaussianNB,1.0,1
+5104526,Ipiranga do Norte,2019,0,SVC RBF balanceado,0.18454747919394757,0
+5104526,Ipiranga do Norte,2020,0,SVC RBF balanceado,0.1837859107578015,0
+5104526,Ipiranga do Norte,2021,0,SVC RBF balanceado,0.19904959868167826,0
+5104526,Ipiranga do Norte,2022,0,SVC RBF balanceado,0.16426144280296234,0
+5104526,Ipiranga do Norte,2023,0,SVC RBF balanceado,0.16627548568484846,0
+5104526,Ipiranga do Norte,2024,1,SVC RBF balanceado,0.19052555443208571,0
+5104542,Itanhangá,2019,0,SVC RBF balanceado,0.16246329924243164,0
+5104542,Itanhangá,2020,0,SVC RBF balanceado,0.1876290393793954,0
+5104542,Itanhangá,2021,0,SVC RBF balanceado,0.19322337421669608,0
+5104542,Itanhangá,2022,0,SVC RBF balanceado,0.16585413060678994,0
+5104542,Itanhangá,2023,0,SVC RBF balanceado,0.1674052668973582,0
+5104542,Itanhangá,2024,1,SVC RBF balanceado,0.19066069643577238,0
+5105259,Lucas do Rio Verde,2019,0,SVC RBF balanceado,0.21162933077103274,0
+5105259,Lucas do Rio Verde,2020,0,SVC RBF balanceado,0.19225226168506027,0
+5105259,Lucas do Rio Verde,2021,0,SVC RBF balanceado,0.19147351104017327,0
+5105259,Lucas do Rio Verde,2022,1,SVC RBF balanceado,0.1617825414649682,0
+5105259,Lucas do Rio Verde,2023,0,SVC RBF balanceado,0.18129585713463478,0
+5105259,Lucas do Rio Verde,2024,1,SVC RBF balanceado,0.1908951435327137,0
+5105903,Nobres,2019,0,SVC RBF balanceado,0.19461055490052023,0
+5105903,Nobres,2020,0,SVC RBF balanceado,0.20123618411064356,0
+5105903,Nobres,2021,0,SVC RBF balanceado,0.19504571968643034,0
+5105903,Nobres,2022,0,SVC RBF balanceado,0.20082063132198946,0
+5105903,Nobres,2023,0,SVC RBF balanceado,0.20600814513449558,0
+5105903,Nobres,2024,1,SVC RBF balanceado,0.1906911979913621,0
+5106224,Nova Mutum,2019,0,SVC RBF balanceado,0.20114300757315726,0
+5106224,Nova Mutum,2020,0,SVC RBF balanceado,0.18387346967825294,0
+5106224,Nova Mutum,2021,0,SVC RBF balanceado,0.18541314058027786,0
+5106224,Nova Mutum,2022,1,SVC RBF balanceado,0.1581482962824441,0
+5106224,Nova Mutum,2023,0,SVC RBF balanceado,0.16911405756148562,0
+5106224,Nova Mutum,2024,1,SVC RBF balanceado,0.1906970651448688,0
+5106240,Nova Ubiratã,2019,0,SVC RBF balanceado,0.21361116152193124,0
+5106240,Nova Ubiratã,2020,0,SVC RBF balanceado,0.1993923371969634,0
+5106240,Nova Ubiratã,2021,0,SVC RBF balanceado,0.20051342289247107,0
+5106240,Nova Ubiratã,2022,0,SVC RBF balanceado,0.19152338004508657,0
+5106240,Nova Ubiratã,2023,0,SVC RBF balanceado,0.18848293687934495,0
+5106240,Nova Ubiratã,2024,0,SVC RBF balanceado,0.191045853390832,0
+5107768,Santa Rita do Trivelato,2019,0,SVC RBF balanceado,0.20850854275590147,0
+5107768,Santa Rita do Trivelato,2020,0,SVC RBF balanceado,0.1912868583803652,0
+5107768,Santa Rita do Trivelato,2021,0,SVC RBF balanceado,0.20406379471844527,0
+5107768,Santa Rita do Trivelato,2022,0,SVC RBF balanceado,0.19717360811943302,0
+5107768,Santa Rita do Trivelato,2023,0,SVC RBF balanceado,0.18425852307469825,0
+5107768,Santa Rita do Trivelato,2024,1,SVC RBF balanceado,0.19046077488017146,0
+5107925,Sorriso,2019,0,SVC RBF balanceado,0.19622005834391243,0
+5107925,Sorriso,2020,0,SVC RBF balanceado,0.19794646245538602,0
+5107925,Sorriso,2021,1,SVC RBF balanceado,0.18455173854141457,0
+5107925,Sorriso,2022,0,SVC RBF balanceado,0.1621105690335023,0
+5107925,Sorriso,2023,0,SVC RBF balanceado,0.16900302770387304,0
+5107925,Sorriso,2024,1,SVC RBF balanceado,0.19248578976938183,0
+5108006,Tapurah,2019,0,SVC RBF balanceado,0.20127134191343796,0
+5108006,Tapurah,2020,0,SVC RBF balanceado,0.20677904661978824,0
+5108006,Tapurah,2021,0,SVC RBF balanceado,0.18915432078264077,0
+5108006,Tapurah,2022,1,SVC RBF balanceado,0.16102364930918386,0
+5108006,Tapurah,2023,0,SVC RBF balanceado,0.1793803169530641,0
+5108006,Tapurah,2024,1,SVC RBF balanceado,0.19119130819383745,0
+5104526,Ipiranga do Norte,2019,0,LDA,0.12519244265654994,0
+5104526,Ipiranga do Norte,2020,0,LDA,0.14322554995168604,0
+5104526,Ipiranga do Norte,2021,0,LDA,0.6332285650271949,1
+5104526,Ipiranga do Norte,2022,0,LDA,0.050992681952439285,0
+5104526,Ipiranga do Norte,2023,0,LDA,0.05280495371516082,0
+5104526,Ipiranga do Norte,2024,1,LDA,0.9567704588457312,1
+5104542,Itanhangá,2019,0,LDA,0.09377093527090163,0
+5104542,Itanhangá,2020,0,LDA,0.20166548749563243,0
+5104542,Itanhangá,2021,0,LDA,0.8820477122776206,1
+5104542,Itanhangá,2022,0,LDA,0.058496930345141536,0
+5104542,Itanhangá,2023,0,LDA,0.07061073397693028,0
+5104542,Itanhangá,2024,1,LDA,0.9542795909434255,1
+5105259,Lucas do Rio Verde,2019,0,LDA,0.3035202084408814,0
+5105259,Lucas do Rio Verde,2020,0,LDA,0.6758368835534176,1
+5105259,Lucas do Rio Verde,2021,0,LDA,0.9397662573931644,1
+5105259,Lucas do Rio Verde,2022,1,LDA,0.15079701771977302,0
+5105259,Lucas do Rio Verde,2023,0,LDA,0.1594116389629119,0
+5105259,Lucas do Rio Verde,2024,1,LDA,0.9712948902043457,1
+5105903,Nobres,2019,0,LDA,0.3238143759577959,0
+5105903,Nobres,2020,0,LDA,0.4259827036438557,0
+5105903,Nobres,2021,0,LDA,0.529438533113327,1
+5105903,Nobres,2022,0,LDA,0.16420103237204917,0
+5105903,Nobres,2023,0,LDA,0.15104758474064994,0
+5105903,Nobres,2024,1,LDA,0.9823191789203879,1
+5106224,Nova Mutum,2019,0,LDA,0.38865254220293327,0
+5106224,Nova Mutum,2020,0,LDA,0.8285862794979884,1
+5106224,Nova Mutum,2021,0,LDA,0.7933447499398455,1
+5106224,Nova Mutum,2022,1,LDA,0.09917922120207477,0
+5106224,Nova Mutum,2023,0,LDA,0.09568424776700718,0
+5106224,Nova Mutum,2024,1,LDA,0.967883707918362,1
+5106240,Nova Ubiratã,2019,0,LDA,0.22967096938948486,0
+5106240,Nova Ubiratã,2020,0,LDA,0.5612822985002158,1
+5106240,Nova Ubiratã,2021,0,LDA,0.5845755159046974,1
+5106240,Nova Ubiratã,2022,0,LDA,0.15389826131562137,0
+5106240,Nova Ubiratã,2023,0,LDA,0.18132843871248674,0
+5106240,Nova Ubiratã,2024,0,LDA,0.9062620690507401,1
+5107768,Santa Rita do Trivelato,2019,0,LDA,0.31354796916932504,0
+5107768,Santa Rita do Trivelato,2020,0,LDA,0.9300203123568326,1
+5107768,Santa Rita do Trivelato,2021,0,LDA,0.4484122228308936,0
+5107768,Santa Rita do Trivelato,2022,0,LDA,0.20444547269909605,0
+5107768,Santa Rita do Trivelato,2023,0,LDA,0.18843715986324852,0
+5107768,Santa Rita do Trivelato,2024,1,LDA,0.9690100417312851,1
+5107925,Sorriso,2019,0,LDA,0.16951561922659844,0
+5107925,Sorriso,2020,0,LDA,0.25585883035756074,0
+5107925,Sorriso,2021,1,LDA,0.7745596941682413,1
+5107925,Sorriso,2022,0,LDA,0.07008412367332288,0
+5107925,Sorriso,2023,0,LDA,0.06387485542046437,0
+5107925,Sorriso,2024,1,LDA,0.9074087847797804,1
+5108006,Tapurah,2019,0,LDA,0.14661547443033154,0
+5108006,Tapurah,2020,0,LDA,0.22775360394370237,0
+5108006,Tapurah,2021,0,LDA,0.868087129752088,1
+5108006,Tapurah,2022,1,LDA,0.059318841526151196,0
+5108006,Tapurah,2023,0,LDA,0.07999053619178613,0
+5108006,Tapurah,2024,1,LDA,0.9339834367480144,1
+5104526,Ipiranga do Norte,2019,0,KNN (k=7),0.29290753268178554,0
+5104526,Ipiranga do Norte,2020,0,KNN (k=7),0.28620597951324817,0
+5104526,Ipiranga do Norte,2021,0,KNN (k=7),0.5960029257152097,1
+5104526,Ipiranga do Norte,2022,0,KNN (k=7),0.1661941350144722,0
+5104526,Ipiranga do Norte,2023,0,KNN (k=7),0.14612919837186536,0
+5104526,Ipiranga do Norte,2024,1,KNN (k=7),0.5825222370464416,1
+5104542,Itanhangá,2019,0,KNN (k=7),0.08933657264181702,0
+5104542,Itanhangá,2020,0,KNN (k=7),0.36781237087080265,0
+5104542,Itanhangá,2021,0,KNN (k=7),0.5807896894213868,1
+5104542,Itanhangá,2022,0,KNN (k=7),0.1429282195406561,0
+5104542,Itanhangá,2023,0,KNN (k=7),0.17714539656193087,0
+5104542,Itanhangá,2024,1,KNN (k=7),0.5803658816571161,1
+5105259,Lucas do Rio Verde,2019,0,KNN (k=7),0.6714248173692299,1
+5105259,Lucas do Rio Verde,2020,0,KNN (k=7),0.4306120939823183,0
+5105259,Lucas do Rio Verde,2021,0,KNN (k=7),0.578058512745024,1
+5105259,Lucas do Rio Verde,2022,1,KNN (k=7),0.0,0
+5105259,Lucas do Rio Verde,2023,0,KNN (k=7),0.2669090181171318,0
+5105259,Lucas do Rio Verde,2024,1,KNN (k=7),0.5844498406954879,1
+5105903,Nobres,2019,0,KNN (k=7),0.12045696578466819,0
+5105903,Nobres,2020,0,KNN (k=7),0.340776330625661,0
+5105903,Nobres,2021,0,KNN (k=7),0.5553769542136417,1
+5105903,Nobres,2022,0,KNN (k=7),0.11275975582438687,0
+5105903,Nobres,2023,0,KNN (k=7),0.17197519416397997,0
+5105903,Nobres,2024,1,KNN (k=7),0.5791949297507845,1
+5106224,Nova Mutum,2019,0,KNN (k=7),0.5314942388877406,1
+5106224,Nova Mutum,2020,0,KNN (k=7),0.3842543538012534,0
+5106224,Nova Mutum,2021,0,KNN (k=7),0.47499643598139885,0
+5106224,Nova Mutum,2022,1,KNN (k=7),0.0,0
+5106224,Nova Mutum,2023,0,KNN (k=7),0.20240439960655848,0
+5106224,Nova Mutum,2024,1,KNN (k=7),0.5768245361892987,1
+5106240,Nova Ubiratã,2019,0,KNN (k=7),0.5211884126365112,1
+5106240,Nova Ubiratã,2020,0,KNN (k=7),0.5832002525713056,1
+5106240,Nova Ubiratã,2021,0,KNN (k=7),0.6719025180105286,1
+5106240,Nova Ubiratã,2022,0,KNN (k=7),0.26024606491294655,0
+5106240,Nova Ubiratã,2023,0,KNN (k=7),0.25539127048660126,0
+5106240,Nova Ubiratã,2024,0,KNN (k=7),0.5858233303569929,1
+5107768,Santa Rita do Trivelato,2019,0,KNN (k=7),0.5729734824081318,1
+5107768,Santa Rita do Trivelato,2020,0,KNN (k=7),0.5584574073508383,1
+5107768,Santa Rita do Trivelato,2021,0,KNN (k=7),0.6402857538390193,1
+5107768,Santa Rita do Trivelato,2022,0,KNN (k=7),0.25002095556817316,0
+5107768,Santa Rita do Trivelato,2023,0,KNN (k=7),0.23850679346794848,0
+5107768,Santa Rita do Trivelato,2024,1,KNN (k=7),0.47279247021395704,0
+5107925,Sorriso,2019,0,KNN (k=7),0.2598806118483242,0
+5107925,Sorriso,2020,0,KNN (k=7),0.4769041563006059,0
+5107925,Sorriso,2021,1,KNN (k=7),0.46122499853536947,0
+5107925,Sorriso,2022,0,KNN (k=7),0.0,0
+5107925,Sorriso,2023,0,KNN (k=7),0.2706976516233998,0
+5107925,Sorriso,2024,1,KNN (k=7),0.59575842802401,1
+5108006,Tapurah,2019,0,KNN (k=7),0.31294052207363426,0
+5108006,Tapurah,2020,0,KNN (k=7),0.484797741613216,0
+5108006,Tapurah,2021,0,KNN (k=7),0.5309428561972817,1
+5108006,Tapurah,2022,1,KNN (k=7),0.0,0
+5108006,Tapurah,2023,0,KNN (k=7),0.12950447723018932,0
+5108006,Tapurah,2024,1,KNN (k=7),0.5869215700546107,1
+5104526,Ipiranga do Norte,2019,0,Árvore (profundidade 1),0.6743215031315235,1
+5104526,Ipiranga do Norte,2020,0,Árvore (profundidade 1),0.6743215031315235,1
+5104526,Ipiranga do Norte,2021,0,Árvore (profundidade 1),0.6743215031315235,1
+5104526,Ipiranga do Norte,2022,0,Árvore (profundidade 1),0.30715935334872935,0
+5104526,Ipiranga do Norte,2023,0,Árvore (profundidade 1),0.30715935334872935,0
+5104526,Ipiranga do Norte,2024,1,Árvore (profundidade 1),0.6743215031315235,1
+5104542,Itanhangá,2019,0,Árvore (profundidade 1),0.30715935334872935,0
+5104542,Itanhangá,2020,0,Árvore (profundidade 1),0.6743215031315235,1
+5104542,Itanhangá,2021,0,Árvore (profundidade 1),0.6743215031315235,1
+5104542,Itanhangá,2022,0,Árvore (profundidade 1),0.30715935334872935,0
+5104542,Itanhangá,2023,0,Árvore (profundidade 1),0.30715935334872935,0
+5104542,Itanhangá,2024,1,Árvore (profundidade 1),0.6743215031315235,1
+5105259,Lucas do Rio Verde,2019,0,Árvore (profundidade 1),0.6743215031315235,1
+5105259,Lucas do Rio Verde,2020,0,Árvore (profundidade 1),0.6743215031315235,1
+5105259,Lucas do Rio Verde,2021,0,Árvore (profundidade 1),0.6743215031315235,1
+5105259,Lucas do Rio Verde,2022,1,Árvore (profundidade 1),0.30715935334872935,0
+5105259,Lucas do Rio Verde,2023,0,Árvore (profundidade 1),0.6743215031315235,1
+5105259,Lucas do Rio Verde,2024,1,Árvore (profundidade 1),0.6743215031315235,1
+5105903,Nobres,2019,0,Árvore (profundidade 1),0.6743215031315235,1
+5105903,Nobres,2020,0,Árvore (profundidade 1),0.6743215031315235,1
+5105903,Nobres,2021,0,Árvore (profundidade 1),0.6743215031315235,1
+5105903,Nobres,2022,0,Árvore (profundidade 1),0.6743215031315235,1
+5105903,Nobres,2023,0,Árvore (profundidade 1),0.6743215031315235,1
+5105903,Nobres,2024,1,Árvore (profundidade 1),0.6743215031315235,1
+5106224,Nova Mutum,2019,0,Árvore (profundidade 1),0.6743215031315235,1
+5106224,Nova Mutum,2020,0,Árvore (profundidade 1),0.6743215031315235,1
+5106224,Nova Mutum,2021,0,Árvore (profundidade 1),0.6743215031315235,1
+5106224,Nova Mutum,2022,1,Árvore (profundidade 1),0.30715935334872935,0
+5106224,Nova Mutum,2023,0,Árvore (profundidade 1),0.30715935334872935,0
+5106224,Nova Mutum,2024,1,Árvore (profundidade 1),0.6743215031315235,1
+5106240,Nova Ubiratã,2019,0,Árvore (profundidade 1),0.6743215031315235,1
+5106240,Nova Ubiratã,2020,0,Árvore (profundidade 1),0.6743215031315235,1
+5106240,Nova Ubiratã,2021,0,Árvore (profundidade 1),0.6743215031315235,1
+5106240,Nova Ubiratã,2022,0,Árvore (profundidade 1),0.30715935334872935,0
+5106240,Nova Ubiratã,2023,0,Árvore (profundidade 1),0.30715935334872935,0
+5106240,Nova Ubiratã,2024,0,Árvore (profundidade 1),0.6743215031315235,1
+5107768,Santa Rita do Trivelato,2019,0,Árvore (profundidade 1),0.6743215031315235,1
+5107768,Santa Rita do Trivelato,2020,0,Árvore (profundidade 1),0.6743215031315235,1
+5107768,Santa Rita do Trivelato,2021,0,Árvore (profundidade 1),0.6743215031315235,1
+5107768,Santa Rita do Trivelato,2022,0,Árvore (profundidade 1),0.30715935334872935,0
+5107768,Santa Rita do Trivelato,2023,0,Árvore (profundidade 1),0.30715935334872935,0
+5107768,Santa Rita do Trivelato,2024,1,Árvore (profundidade 1),0.6743215031315235,1
+5107925,Sorriso,2019,0,Árvore (profundidade 1),0.6743215031315235,1
+5107925,Sorriso,2020,0,Árvore (profundidade 1),0.6743215031315235,1
+5107925,Sorriso,2021,1,Árvore (profundidade 1),0.6743215031315235,1
+5107925,Sorriso,2022,0,Árvore (profundidade 1),0.30715935334872935,0
+5107925,Sorriso,2023,0,Árvore (profundidade 1),0.30715935334872935,0
+5107925,Sorriso,2024,1,Árvore (profundidade 1),0.6743215031315235,1
+5108006,Tapurah,2019,0,Árvore (profundidade 1),0.6743215031315235,1
+5108006,Tapurah,2020,0,Árvore (profundidade 1),0.6743215031315235,1
+5108006,Tapurah,2021,0,Árvore (profundidade 1),0.6743215031315235,1
+5108006,Tapurah,2022,1,Árvore (profundidade 1),0.30715935334872935,0
+5108006,Tapurah,2023,0,Árvore (profundidade 1),0.30715935334872935,0
+5108006,Tapurah,2024,1,Árvore (profundidade 1),0.6743215031315235,1
+5104526,Ipiranga do Norte,2019,0,Árvore (profundidade 2),0.598853868194842,1
+5104526,Ipiranga do Norte,2020,0,Árvore (profundidade 2),0.598853868194842,1
+5104526,Ipiranga do Norte,2021,0,Árvore (profundidade 2),0.8769230769230769,1
+5104526,Ipiranga do Norte,2022,0,Árvore (profundidade 2),0.4042553191489359,0
+5104526,Ipiranga do Norte,2023,0,Árvore (profundidade 2),0.0,0
+5104526,Ipiranga do Norte,2024,1,Árvore (profundidade 2),0.8769230769230769,1
+5104542,Itanhangá,2019,0,Árvore (profundidade 2),0.4042553191489359,0
+5104542,Itanhangá,2020,0,Árvore (profundidade 2),0.598853868194842,1
+5104542,Itanhangá,2021,0,Árvore (profundidade 2),0.8769230769230769,1
+5104542,Itanhangá,2022,0,Árvore (profundidade 2),0.4042553191489359,0
+5104542,Itanhangá,2023,0,Árvore (profundidade 2),0.0,0
+5104542,Itanhangá,2024,1,Árvore (profundidade 2),0.8769230769230769,1
+5105259,Lucas do Rio Verde,2019,0,Árvore (profundidade 2),0.598853868194842,1
+5105259,Lucas do Rio Verde,2020,0,Árvore (profundidade 2),0.8769230769230769,1
+5105259,Lucas do Rio Verde,2021,0,Árvore (profundidade 2),0.8769230769230769,1
+5105259,Lucas do Rio Verde,2022,1,Árvore (profundidade 2),0.4042553191489359,0
+5105259,Lucas do Rio Verde,2023,0,Árvore (profundidade 2),0.598853868194842,1
+5105259,Lucas do Rio Verde,2024,1,Árvore (profundidade 2),0.8769230769230769,1
+5105903,Nobres,2019,0,Árvore (profundidade 2),0.598853868194842,1
+5105903,Nobres,2020,0,Árvore (profundidade 2),0.8769230769230769,1
+5105903,Nobres,2021,0,Árvore (profundidade 2),0.8769230769230769,1
+5105903,Nobres,2022,0,Árvore (profundidade 2),0.598853868194842,1
+5105903,Nobres,2023,0,Árvore (profundidade 2),0.598853868194842,1
+5105903,Nobres,2024,1,Árvore (profundidade 2),0.8769230769230769,1
+5106224,Nova Mutum,2019,0,Árvore (profundidade 2),0.598853868194842,1
+5106224,Nova Mutum,2020,0,Árvore (profundidade 2),0.8769230769230769,1
+5106224,Nova Mutum,2021,0,Árvore (profundidade 2),0.8769230769230769,1
+5106224,Nova Mutum,2022,1,Árvore (profundidade 2),0.4042553191489359,0
+5106224,Nova Mutum,2023,0,Árvore (profundidade 2),0.0,0
+5106224,Nova Mutum,2024,1,Árvore (profundidade 2),0.8769230769230769,1
+5106240,Nova Ubiratã,2019,0,Árvore (profundidade 2),0.598853868194842,1
+5106240,Nova Ubiratã,2020,0,Árvore (profundidade 2),0.8769230769230769,1
+5106240,Nova Ubiratã,2021,0,Árvore (profundidade 2),0.598853868194842,1
+5106240,Nova Ubiratã,2022,0,Árvore (profundidade 2),0.4042553191489359,0
+5106240,Nova Ubiratã,2023,0,Árvore (profundidade 2),0.4042553191489359,0
+5106240,Nova Ubiratã,2024,0,Árvore (profundidade 2),0.8769230769230769,1
+5107768,Santa Rita do Trivelato,2019,0,Árvore (profundidade 2),0.598853868194842,1
+5107768,Santa Rita do Trivelato,2020,0,Árvore (profundidade 2),0.8769230769230769,1
+5107768,Santa Rita do Trivelato,2021,0,Árvore (profundidade 2),0.598853868194842,1
+5107768,Santa Rita do Trivelato,2022,0,Árvore (profundidade 2),0.4042553191489359,0
+5107768,Santa Rita do Trivelato,2023,0,Árvore (profundidade 2),0.0,0
+5107768,Santa Rita do Trivelato,2024,1,Árvore (profundidade 2),0.8769230769230769,1
+5107925,Sorriso,2019,0,Árvore (profundidade 2),0.598853868194842,1
+5107925,Sorriso,2020,0,Árvore (profundidade 2),0.598853868194842,1
+5107925,Sorriso,2021,1,Árvore (profundidade 2),0.8769230769230769,1
+5107925,Sorriso,2022,0,Árvore (profundidade 2),0.4042553191489359,0
+5107925,Sorriso,2023,0,Árvore (profundidade 2),0.0,0
+5107925,Sorriso,2024,1,Árvore (profundidade 2),0.8769230769230769,1
+5108006,Tapurah,2019,0,Árvore (profundidade 2),0.598853868194842,1
+5108006,Tapurah,2020,0,Árvore (profundidade 2),0.598853868194842,1
+5108006,Tapurah,2021,0,Árvore (profundidade 2),0.8769230769230769,1
+5108006,Tapurah,2022,1,Árvore (profundidade 2),0.4042553191489359,0
+5108006,Tapurah,2023,0,Árvore (profundidade 2),0.0,0
+5108006,Tapurah,2024,1,Árvore (profundidade 2),0.8769230769230769,1
+5104526,Ipiranga do Norte,2019,0,Random Forest (rasa),0.555204305243194,1
+5104526,Ipiranga do Norte,2020,0,Random Forest (rasa),0.6045057417967254,1
+5104526,Ipiranga do Norte,2021,0,Random Forest (rasa),0.7087526586471801,1
+5104526,Ipiranga do Norte,2022,0,Random Forest (rasa),0.335973708602256,0
+5104526,Ipiranga do Norte,2023,0,Random Forest (rasa),0.32300127482825225,0
+5104526,Ipiranga do Norte,2024,1,Random Forest (rasa),0.7465968390924522,1
+5104542,Itanhangá,2019,0,Random Forest (rasa),0.3531354156762979,0
+5104542,Itanhangá,2020,0,Random Forest (rasa),0.5576994407977705,1
+5104542,Itanhangá,2021,0,Random Forest (rasa),0.7125562107808977,1
+5104542,Itanhangá,2022,0,Random Forest (rasa),0.3499429522817056,0
+5104542,Itanhangá,2023,0,Random Forest (rasa),0.3472410106600188,0
+5104542,Itanhangá,2024,1,Random Forest (rasa),0.7017128901591295,1
+5105259,Lucas do Rio Verde,2019,0,Random Forest (rasa),0.7381975665869516,1
+5105259,Lucas do Rio Verde,2020,0,Random Forest (rasa),0.7012032149598032,1
+5105259,Lucas do Rio Verde,2021,0,Random Forest (rasa),0.7101235091619671,1
+5105259,Lucas do Rio Verde,2022,1,Random Forest (rasa),0.3100621746624247,0
+5105259,Lucas do Rio Verde,2023,0,Random Forest (rasa),0.5623348497929842,1
+5105259,Lucas do Rio Verde,2024,1,Random Forest (rasa),0.7068317323019574,1
+5105903,Nobres,2019,0,Random Forest (rasa),0.5971776824237396,1
+5105903,Nobres,2020,0,Random Forest (rasa),0.6359902406477034,1
+5105903,Nobres,2021,0,Random Forest (rasa),0.6388569451954557,1
+5105903,Nobres,2022,0,Random Forest (rasa),0.5292472459089607,1
+5105903,Nobres,2023,0,Random Forest (rasa),0.6325398225188997,1
+5105903,Nobres,2024,1,Random Forest (rasa),0.6987333847473807,1
+5106224,Nova Mutum,2019,0,Random Forest (rasa),0.7201449040912621,1
+5106224,Nova Mutum,2020,0,Random Forest (rasa),0.705006767093521,1
+5106224,Nova Mutum,2021,0,Random Forest (rasa),0.7063199570282493,1
+5106224,Nova Mutum,2022,1,Random Forest (rasa),0.3115413339070816,0
+5106224,Nova Mutum,2023,0,Random Forest (rasa),0.30391867894090596,0
+5106224,Nova Mutum,2024,1,Random Forest (rasa),0.7292840819961499,1
+5106240,Nova Ubiratã,2019,0,Random Forest (rasa),0.7303187725641702,1
+5106240,Nova Ubiratã,2020,0,Random Forest (rasa),0.7227205549289206,1
+5106240,Nova Ubiratã,2021,0,Random Forest (rasa),0.6153712263483013,1
+5106240,Nova Ubiratã,2022,0,Random Forest (rasa),0.4169253747819334,0
+5106240,Nova Ubiratã,2023,0,Random Forest (rasa),0.4372117607143358,0
+5106240,Nova Ubiratã,2024,0,Random Forest (rasa),0.6299256180049838,1
+5107768,Santa Rita do Trivelato,2019,0,Random Forest (rasa),0.7337695946233878,1
+5107768,Santa Rita do Trivelato,2020,0,Random Forest (rasa),0.7063199570282493,1
+5107768,Santa Rita do Trivelato,2021,0,Random Forest (rasa),0.6919301601982909,1
+5107768,Santa Rita do Trivelato,2022,0,Random Forest (rasa),0.4028147290863344,0
+5107768,Santa Rita do Trivelato,2023,0,Random Forest (rasa),0.3636032854925921,0
+5107768,Santa Rita do Trivelato,2024,1,Random Forest (rasa),0.7165717771938992,1
+5107925,Sorriso,2019,0,Random Forest (rasa),0.6379179916496206,1
+5107925,Sorriso,2020,0,Random Forest (rasa),0.6260570535517386,1
+5107925,Sorriso,2021,1,Random Forest (rasa),0.7296099737226703,1
+5107925,Sorriso,2022,0,Random Forest (rasa),0.28162816121548045,0
+5107925,Sorriso,2023,0,Random Forest (rasa),0.23931506673560318,0
+5107925,Sorriso,2024,1,Random Forest (rasa),0.6409725682805469,1
+5108006,Tapurah,2019,0,Random Forest (rasa),0.6625710486572177,1
+5108006,Tapurah,2020,0,Random Forest (rasa),0.7131062159323344,1
+5108006,Tapurah,2021,0,Random Forest (rasa),0.7087526586471801,1
+5108006,Tapurah,2022,1,Random Forest (rasa),0.26783753503982694,0
+5108006,Tapurah,2023,0,Random Forest (rasa),0.39318770690121363,0
+5108006,Tapurah,2024,1,Random Forest (rasa),0.6586160903265992,1
+5104526,Ipiranga do Norte,2019,0,Extra Trees (rasa),0.5037568506933128,1
+5104526,Ipiranga do Norte,2020,0,Extra Trees (rasa),0.5011202349514681,1
+5104526,Ipiranga do Norte,2021,0,Extra Trees (rasa),0.6507514471168647,1
+5104526,Ipiranga do Norte,2022,0,Extra Trees (rasa),0.42708565422002737,0
+5104526,Ipiranga do Norte,2023,0,Extra Trees (rasa),0.4277350158517415,0
+5104526,Ipiranga do Norte,2024,1,Extra Trees (rasa),0.650568559567231,1
+5104542,Itanhangá,2019,0,Extra Trees (rasa),0.4408647694889695,0
+5104542,Itanhangá,2020,0,Extra Trees (rasa),0.5256092922620882,1
+5104542,Itanhangá,2021,0,Extra Trees (rasa),0.6518161805197867,1
+5104542,Itanhangá,2022,0,Extra Trees (rasa),0.43156147503762216,0
+5104542,Itanhangá,2023,0,Extra Trees (rasa),0.4495844780937412,0
+5104542,Itanhangá,2024,1,Extra Trees (rasa),0.6427978115085652,1
+5105259,Lucas do Rio Verde,2019,0,Extra Trees (rasa),0.6270842361962136,1
+5105259,Lucas do Rio Verde,2020,0,Extra Trees (rasa),0.6451817385097922,1
+5105259,Lucas do Rio Verde,2021,0,Extra Trees (rasa),0.6439804007535581,1
+5105259,Lucas do Rio Verde,2022,1,Extra Trees (rasa),0.4343382780920674,0
+5105259,Lucas do Rio Verde,2023,0,Extra Trees (rasa),0.5010003550398815,1
+5105259,Lucas do Rio Verde,2024,1,Extra Trees (rasa),0.6466453308338083,1
+5105903,Nobres,2019,0,Extra Trees (rasa),0.5946977536651686,1
+5105903,Nobres,2020,0,Extra Trees (rasa),0.6172095707998895,1
+5105903,Nobres,2021,0,Extra Trees (rasa),0.6304884815448963,1
+5105903,Nobres,2022,0,Extra Trees (rasa),0.553109062143732,1
+5105903,Nobres,2023,0,Extra Trees (rasa),0.5762443107284153,1
+5105903,Nobres,2024,1,Extra Trees (rasa),0.6400947810004887,1
+5106224,Nova Mutum,2019,0,Extra Trees (rasa),0.6526697649967623,1
+5106224,Nova Mutum,2020,0,Extra Trees (rasa),0.6439804007535581,1
+5106224,Nova Mutum,2021,0,Extra Trees (rasa),0.648445141304837,1
+5106224,Nova Mutum,2022,1,Extra Trees (rasa),0.41708245703076957,0
+5106224,Nova Mutum,2023,0,Extra Trees (rasa),0.43075398676625176,0
+5106224,Nova Mutum,2024,1,Extra Trees (rasa),0.659385034583713,1
+5106240,Nova Ubiratã,2019,0,Extra Trees (rasa),0.6026122894253211,1
+5106240,Nova Ubiratã,2020,0,Extra Trees (rasa),0.6485463386187292,1
+5106240,Nova Ubiratã,2021,0,Extra Trees (rasa),0.6231939731978527,1
+5106240,Nova Ubiratã,2022,0,Extra Trees (rasa),0.4345535020489774,0
+5106240,Nova Ubiratã,2023,0,Extra Trees (rasa),0.43406260458979196,0
+5106240,Nova Ubiratã,2024,0,Extra Trees (rasa),0.6063693629167767,1
+5107768,Santa Rita do Trivelato,2019,0,Extra Trees (rasa),0.6343564825253342,1
+5107768,Santa Rita do Trivelato,2020,0,Extra Trees (rasa),0.648445141304837,1
+5107768,Santa Rita do Trivelato,2021,0,Extra Trees (rasa),0.6176699100747023,1
+5107768,Santa Rita do Trivelato,2022,0,Extra Trees (rasa),0.46584558599913656,0
+5107768,Santa Rita do Trivelato,2023,0,Extra Trees (rasa),0.4454207175545472,0
+5107768,Santa Rita do Trivelato,2024,1,Extra Trees (rasa),0.64306985342847,1
+5107925,Sorriso,2019,0,Extra Trees (rasa),0.5460172914160559,1
+5107925,Sorriso,2020,0,Extra Trees (rasa),0.5490091154556709,1
+5107925,Sorriso,2021,1,Extra Trees (rasa),0.6491548925357701,1
+5107925,Sorriso,2022,0,Extra Trees (rasa),0.4158905359385173,0
+5107925,Sorriso,2023,0,Extra Trees (rasa),0.41029249431595666,0
+5107925,Sorriso,2024,1,Extra Trees (rasa),0.6213595585199152,1
+5108006,Tapurah,2019,0,Extra Trees (rasa),0.556725221253971,1
+5108006,Tapurah,2020,0,Extra Trees (rasa),0.6055886597273124,1
+5108006,Tapurah,2021,0,Extra Trees (rasa),0.6526586044625615,1
+5108006,Tapurah,2022,1,Extra Trees (rasa),0.4156582901797395,0
+5108006,Tapurah,2023,0,Extra Trees (rasa),0.47300212885285897,0
+5108006,Tapurah,2024,1,Extra Trees (rasa),0.6260058407354491,1
+5104526,Ipiranga do Norte,2019,0,Modelo ativo (Tmax; threshold oficial 0.45),0.4934223127760234,1
+5104526,Ipiranga do Norte,2020,0,Modelo ativo (Tmax; threshold oficial 0.45),0.5202034734055688,1
+5104526,Ipiranga do Norte,2021,0,Modelo ativo (Tmax; threshold oficial 0.45),0.8061714273518575,1
+5104526,Ipiranga do Norte,2022,0,Modelo ativo (Tmax; threshold oficial 0.45),0.3243690409965059,0
+5104526,Ipiranga do Norte,2023,0,Modelo ativo (Tmax; threshold oficial 0.45),0.3375326442908667,0
+5104526,Ipiranga do Norte,2024,1,Modelo ativo (Tmax; threshold oficial 0.45),0.8738073067082567,1
+5104542,Itanhangá,2019,0,Modelo ativo (Tmax; threshold oficial 0.45),0.4176273063997715,0
+5104542,Itanhangá,2020,0,Modelo ativo (Tmax; threshold oficial 0.45),0.5708113519745018,1
+5104542,Itanhangá,2021,0,Modelo ativo (Tmax; threshold oficial 0.45),0.8670509955718443,1
+5104542,Itanhangá,2022,0,Modelo ativo (Tmax; threshold oficial 0.45),0.3491524185972703,0
+5104542,Itanhangá,2023,0,Modelo ativo (Tmax; threshold oficial 0.45),0.38219351342339675,0
+5104542,Itanhangá,2024,1,Modelo ativo (Tmax; threshold oficial 0.45),0.8778376662071262,1
+5105259,Lucas do Rio Verde,2019,0,Modelo ativo (Tmax; threshold oficial 0.45),0.7046034962837737,1
+5105259,Lucas do Rio Verde,2020,0,Modelo ativo (Tmax; threshold oficial 0.45),0.8604199551753552,1
+5105259,Lucas do Rio Verde,2021,0,Modelo ativo (Tmax; threshold oficial 0.45),0.9079413850717285,1
+5105259,Lucas do Rio Verde,2022,1,Modelo ativo (Tmax; threshold oficial 0.45),0.4388727206410635,0
+5105259,Lucas do Rio Verde,2023,0,Modelo ativo (Tmax; threshold oficial 0.45),0.5222221724923946,1
+5105259,Lucas do Rio Verde,2024,1,Modelo ativo (Tmax; threshold oficial 0.45),0.9047199492128829,1
+5105903,Nobres,2019,0,Modelo ativo (Tmax; threshold oficial 0.45),0.7238570590725645,1
+5105903,Nobres,2020,0,Modelo ativo (Tmax; threshold oficial 0.45),0.7800704602701922,1
+5105903,Nobres,2021,0,Modelo ativo (Tmax; threshold oficial 0.45),0.7840396411299533,1
+5105903,Nobres,2022,0,Modelo ativo (Tmax; threshold oficial 0.45),0.5594441458038115,1
+5105903,Nobres,2023,0,Modelo ativo (Tmax; threshold oficial 0.45),0.6086623474604662,1
+5105903,Nobres,2024,1,Modelo ativo (Tmax; threshold oficial 0.45),0.9440994227821948,1
+5106224,Nova Mutum,2019,0,Modelo ativo (Tmax; threshold oficial 0.45),0.746714763704294,1
+5106224,Nova Mutum,2020,0,Modelo ativo (Tmax; threshold oficial 0.45),0.8991596059721119,1
+5106224,Nova Mutum,2021,0,Modelo ativo (Tmax; threshold oficial 0.45),0.8489674927292146,1
+5106224,Nova Mutum,2022,1,Modelo ativo (Tmax; threshold oficial 0.45),0.36118832476903767,0
+5106224,Nova Mutum,2023,0,Modelo ativo (Tmax; threshold oficial 0.45),0.38971156848082517,0
+5106224,Nova Mutum,2024,1,Modelo ativo (Tmax; threshold oficial 0.45),0.9163915895925407,1
+5106240,Nova Ubiratã,2019,0,Modelo ativo (Tmax; threshold oficial 0.45),0.6447518003747653,1
+5106240,Nova Ubiratã,2020,0,Modelo ativo (Tmax; threshold oficial 0.45),0.8044571708833494,1
+5106240,Nova Ubiratã,2021,0,Modelo ativo (Tmax; threshold oficial 0.45),0.7281893793931561,1
+5106240,Nova Ubiratã,2022,0,Modelo ativo (Tmax; threshold oficial 0.45),0.3223710612285652,0
+5106240,Nova Ubiratã,2023,0,Modelo ativo (Tmax; threshold oficial 0.45),0.30705596387190837,0
+5106240,Nova Ubiratã,2024,0,Modelo ativo (Tmax; threshold oficial 0.45),0.8023014878307433,1
+5107768,Santa Rita do Trivelato,2019,0,Modelo ativo (Tmax; threshold oficial 0.45),0.7067249034949733,1
+5107768,Santa Rita do Trivelato,2020,0,Modelo ativo (Tmax; threshold oficial 0.45),0.9093502913850402,1
+5107768,Santa Rita do Trivelato,2021,0,Modelo ativo (Tmax; threshold oficial 0.45),0.6979295670681845,1
+5107768,Santa Rita do Trivelato,2022,0,Modelo ativo (Tmax; threshold oficial 0.45),0.4425573050996324,0
+5107768,Santa Rita do Trivelato,2023,0,Modelo ativo (Tmax; threshold oficial 0.45),0.42410642856108227,0
+5107768,Santa Rita do Trivelato,2024,1,Modelo ativo (Tmax; threshold oficial 0.45),0.8981115061069266,1
+5107925,Sorriso,2019,0,Modelo ativo (Tmax; threshold oficial 0.45),0.5558568147798703,1
+5107925,Sorriso,2020,0,Modelo ativo (Tmax; threshold oficial 0.45),0.6409393103320412,1
+5107925,Sorriso,2021,1,Modelo ativo (Tmax; threshold oficial 0.45),0.8421132776706111,1
+5107925,Sorriso,2022,0,Modelo ativo (Tmax; threshold oficial 0.45),0.33257473834808027,0
+5107925,Sorriso,2023,0,Modelo ativo (Tmax; threshold oficial 0.45),0.33397251697830005,0
+5107925,Sorriso,2024,1,Modelo ativo (Tmax; threshold oficial 0.45),0.8225616110346587,1
+5108006,Tapurah,2019,0,Modelo ativo (Tmax; threshold oficial 0.45),0.5430814023302322,1
+5108006,Tapurah,2020,0,Modelo ativo (Tmax; threshold oficial 0.45),0.6624511977570655,1
+5108006,Tapurah,2021,0,Modelo ativo (Tmax; threshold oficial 0.45),0.8743743781147104,1
+5108006,Tapurah,2022,1,Modelo ativo (Tmax; threshold oficial 0.45),0.3258531673007285,0
+5108006,Tapurah,2023,0,Modelo ativo (Tmax; threshold oficial 0.45),0.42156429697380343,0
+5108006,Tapurah,2024,1,Modelo ativo (Tmax; threshold oficial 0.45),0.8464028957128845,1

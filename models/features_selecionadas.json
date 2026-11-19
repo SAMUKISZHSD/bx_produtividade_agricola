@@ -1,0 +1,216 @@
+{
+  "features": [
+    "tmax_enchimento"
+  ],
+  "escopo": "risco por calor/seca no enchimento de grãos (dez-fev)",
+  "decisao": "hipótese A (calor/seca)",
+  "modelo_referencia": "LogisticRegression(C=0.3, class_weight='balanced')",
+  "avaliacao_modelo_decidido": {
+    "auc_validacao": 0.6476608187134503,
+    "auc_nulo_p95": 0.6143640350877192,
+    "sinal": true,
+    "linhas": 138
+  },
+  "opcoes_avaliadas": [
+    {
+      "opcao": "A: tmax_enchimento",
+      "n_features": 1,
+      "auc": 0.6442857142857144,
+      "auc_nulo_p95": 0.5623095238095238,
+      "sinal": true,
+      "recall": 0.5238095238095238,
+      "%_prevista": 0.2975206611570248,
+      "%_real": 0.17355371900826447
+    },
+    {
+      "opcao": "A aninhada: melhor feature única da rodada",
+      "n_features": 1,
+      "auc": 0.42666666666666664,
+      "auc_nulo_p95": 0.5941190476190475,
+      "sinal": false,
+      "recall": 0.23809523809523808,
+      "%_prevista": 0.2231404958677686,
+      "%_real": 0.17355371900826447
+    },
+    {
+      "opcao": "B: dois extremos (6)",
+      "n_features": 6,
+      "auc": 0.6190476190476191,
+      "auc_nulo_p95": 0.6576190476190475,
+      "sinal": false,
+      "recall": 0.6190476190476191,
+      "%_prevista": 0.3884297520661157,
+      "%_real": 0.17355371900826447
+    },
+    {
+      "opcao": "B: tmax_enchimento + dois extremos (7)",
+      "n_features": 7,
+      "auc": 0.6309523809523809,
+      "auc_nulo_p95": 0.6352857142857142,
+      "sinal": false,
+      "recall": 0.5714285714285714,
+      "%_prevista": 0.35537190082644626,
+      "%_real": 0.17355371900826447
+    },
+    {
+      "opcao": "B aninhada: tmax_enchimento + melhor extremo da rodada",
+      "n_features": 2,
+      "auc": 0.6042857142857143,
+      "auc_nulo_p95": 0.6662142857142855,
+      "sinal": false,
+      "recall": 0.47619047619047616,
+      "%_prevista": 0.2809917355371901,
+      "%_real": 0.17355371900826447
+    }
+  ],
+  "selecao_automatica_referencia": [
+    "tmax_enchimento",
+    "amplitude_termica",
+    "T2M_MIN",
+    "chuva_plantio"
+  ],
+  "candidatas": [
+    "PRECTOTCORR",
+    "T2M",
+    "T2M_MAX",
+    "T2M_MIN",
+    "RH2M",
+    "GWETROOT",
+    "amplitude_termica",
+    "precipitacao_por_temperatura",
+    "GWET_x_PREC",
+    "PRECTOTCORR_anom",
+    "T2M_anom",
+    "T2M_MAX_anom",
+    "T2M_MIN_anom",
+    "RH2M_anom",
+    "GWETROOT_anom",
+    "amplitude_termica_anom",
+    "precipitacao_por_temperatura_anom",
+    "GWET_x_PREC_anom",
+    "chuva_plantio",
+    "veranico_plantio",
+    "dias_calor_plantio",
+    "gwet_plantio",
+    "tmax_plantio",
+    "chuva_enchimento",
+    "veranico_enchimento",
+    "dias_calor_enchimento",
+    "gwet_enchimento",
+    "tmax_enchimento",
+    "chuva_plantio_anom",
+    "veranico_plantio_anom",
+    "dias_calor_plantio_anom",
+    "gwet_plantio_anom",
+    "tmax_plantio_anom",
+    "chuva_enchimento_anom",
+    "veranico_enchimento_anom",
+    "dias_calor_enchimento_anom",
+    "gwet_enchimento_anom",
+    "tmax_enchimento_anom",
+    "chuva_plantio_deficit",
+    "chuva_plantio_excesso",
+    "chuva_enchimento_deficit",
+    "chuva_enchimento_excesso",
+    "gwet_enchimento_deficit",
+    "gwet_enchimento_excesso"
+  ],
+  "familias": {
+    "set-abr (S3)": [
+      "PRECTOTCORR",
+      "T2M",
+      "T2M_MAX",
+      "T2M_MIN",
+      "RH2M",
+      "GWETROOT",
+      "amplitude_termica",
+      "precipitacao_por_temperatura",
+      "GWET_x_PREC"
+    ],
+    "set-abr anomalia": [
+      "PRECTOTCORR_anom",
+      "T2M_anom",
+      "T2M_MAX_anom",
+      "T2M_MIN_anom",
+      "RH2M_anom",
+      "GWETROOT_anom",
+      "amplitude_termica_anom",
+      "precipitacao_por_temperatura_anom",
+      "GWET_x_PREC_anom"
+    ],
+    "subperíodos": [
+      "chuva_plantio",
+      "veranico_plantio",
+      "dias_calor_plantio",
+      "gwet_plantio",
+      "tmax_plantio",
+      "chuva_enchimento",
+      "veranico_enchimento",
+      "dias_calor_enchimento",
+      "gwet_enchimento",
+      "tmax_enchimento"
+    ],
+    "subperíodos anomalia": [
+      "chuva_plantio_anom",
+      "veranico_plantio_anom",
+      "dias_calor_plantio_anom",
+      "gwet_plantio_anom",
+      "tmax_plantio_anom",
+      "chuva_enchimento_anom",
+      "veranico_enchimento_anom",
+      "dias_calor_enchimento_anom",
+      "gwet_enchimento_anom",
+      "tmax_enchimento_anom"
+    ],
+    "subperíodos bruta + anomalia": [
+      "chuva_plantio",
+      "veranico_plantio",
+      "dias_calor_plantio",
+      "gwet_plantio",
+      "tmax_plantio",
+      "chuva_enchimento",
+      "veranico_enchimento",
+      "dias_calor_enchimento",
+      "gwet_enchimento",
+      "tmax_enchimento",
+      "chuva_plantio_anom",
+      "veranico_plantio_anom",
+      "dias_calor_plantio_anom",
+      "gwet_plantio_anom",
+      "tmax_plantio_anom",
+      "chuva_enchimento_anom",
+      "veranico_enchimento_anom",
+      "dias_calor_enchimento_anom",
+      "gwet_enchimento_anom",
+      "tmax_enchimento_anom"
+    ]
+  },
+  "procedimento": {
+    "k_max": 4,
+    "r_max": 0.7,
+    "criterio": "|AUC-0.5| univariado no ajuste + filtro de redundância"
+  },
+  "anomalia": {
+    "k": 10,
+    "min": 3
+  },
+  "safras_selecao": [
+    2004,
+    2018
+  ],
+  "avaliacao_aninhada": [
+    {
+      "modelo": "GaussianNB",
+      "auc": 0.16285714285714284,
+      "auc_nulo_p95": 0.5651904761904761,
+      "sinal": false
+    },
+    {
+      "modelo": "LogReg",
+      "auc": 0.18714285714285714,
+      "auc_nulo_p95": 0.5659047619047618,
+      "sinal": false
+    }
+  ],
+  "ha_sinal_selecao_automatica": false
+}
