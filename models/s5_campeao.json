@@ -1,0 +1,29 @@
+{
+  "campeao": "LogReg C=1.0",
+  "features": [
+    "tmax_enchimento"
+  ],
+  "params": {
+    "C": 1.0,
+    "class_weight": "balanced",
+    "dual": false,
+    "fit_intercept": true,
+    "intercept_scaling": 1,
+    "l1_ratio": null,
+    "max_iter": 2000,
+    "multi_class": "deprecated",
+    "n_jobs": null,
+    "penalty": "l2",
+    "random_state": null,
+    "solver": "lbfgs",
+    "tol": 0.0001,
+    "verbose": 0,
+    "warm_start": false
+  },
+  "auc_validacao": 0.6480263157894737,
+  "auc_nulo_p95": 0.6032711988304094,
+  "recall_validacao_limiar_05": 0.5833333333333334,
+  "brier_validacao": 0.22108497530101925,
+  "regra": "maior AUC acima do p95 nulo; empate (< 0,02) -> mais simples",
+  "exploratorio_calor_chuva_com_sinal": false
+}

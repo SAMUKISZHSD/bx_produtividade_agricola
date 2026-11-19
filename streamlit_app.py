@@ -1,11 +1,8 @@
 """SojaRisco - dashboard de apoio à decisão agroclimática.
 
-O app funciona em dois modos:
-- DEMONSTRAÇÃO: usa dados ilustrativos e nunca finge que existe um modelo treinado.
-- MODELO REAL: carrega models/pipeline_final.joblib quando o artefato estiver disponível.
-
-Contrato esperado do pipeline: predict_proba(DataFrame) e classes_ contendo a classe positiva 1.
-As colunas de entrada são configuráveis em MODEL_FEATURES.
+O app carrega models/pipeline_final.joblib: regressão logística em tmax_enchimento.
+O alerta dispara se a probabilidade for >= 0,45, o que equivale a tmax média de dez-fev >= 28,34 °C.
+O Model Card classifica este pipeline como protótipo experimental, não aprovado para decisão operacional.
 Acessibilidade: WCAG 2.1 AA (contraste de texto >= 4.5:1, semântica e suporte a tema claro/escuro).
 """
 
@@ -24,6 +21,7 @@ import numpy as np
 import pandas as pd
 import requests
 import streamlit as st
+from sklearn.metrics import accuracy_score, confusion_matrix, precision_score, recall_score, roc_auc_score
 
 # -----------------------------------------------------------------------------
 # Configuração e caminhos
@@ -32,9 +30,10 @@ BASE_DIR = Path(__file__).resolve().parent
 DATA_DIR = BASE_DIR / "data"
 PROCESSED_DIR = DATA_DIR / "processed"
 MODEL_DIR = BASE_DIR / "models"
-ASSETS_DIR = BASE_DIR / "assets" / "icons"
-DATA_PROCESSED_PATH = PROCESSED_DIR / "dados_modelo.csv"
+ASSETS_DIR = BASE_DIR / "icons"
+DATA_PROCESSED_PATH = PROCESSED_DIR / "dados_modelo_s4.csv"
 MODEL_PATH = MODEL_DIR / "pipeline_final.joblib"
+LIMIAR_PATH = MODEL_DIR / "limiar_congelado.json"
 DB_PATH = DATA_DIR / "monitoramento_safra.db"
 LOG_DIR = BASE_DIR / "logs"
 LOG_PATH = LOG_DIR / "sojarisco.log"
@@ -44,15 +43,15 @@ MUNICIPIO = os.getenv("SOJARISCO_MUNICIPIO", "Sorriso")
 UF = os.getenv("SOJARISCO_UF", "MT")
 LATITUDE = float(os.getenv("SOJARISCO_LATITUDE", "-12.5414"))
 LONGITUDE = float(os.getenv("SOJARISCO_LONGITUDE", "-55.7269"))
-LIMIAR_ALERTA = float(os.getenv("SOJARISCO_THRESHOLD", "0.50"))
+FEATURE = "tmax_enchimento"
+MODELO_NOME = "LogisticRegression L2 (C=1.0, class_weight=balanced)"
+MODEL_FEATURES = {FEATURE: FEATURE}
 
-# Ajustar este mapeamento para os nomes exatos usados no treinamento.
-MODEL_FEATURES = {
-    "deficit_hidrico_solo": "deficit_hidrico_solo",
-    "dias_pico_calor": "dias_pico_calor",
-    "amplitude_termica": "amplitude_termica",
-    "precipitacao_enchimento": "precipitacao_enchimento",
-}
+def _ler_limiar() -> tuple[float, float]:
+    cfg = json.loads(LIMIAR_PATH.read_text(encoding="utf-8"))
+    return float(cfg["limiar_otimo"]), float(cfg["limiar_celsius"])
+
+LIMIAR_ALERTA, LIMIAR_CELSIUS = _ler_limiar()
 
 st.set_page_config(
     page_title="SojaRisco | Inteligência Agroclimática",
@@ -553,45 +552,9 @@ def get_db_connection() -> sqlite3.Connection:
 
 
 @st.cache_resource(show_spinner=False)
-def inicializar_banco() -> None:
-    with get_db_connection() as conn:
-        conn.executescript(
-            """
-            CREATE TABLE IF NOT EXISTS dados_historicos (
-                id_historico INTEGER PRIMARY KEY AUTOINCREMENT,
-                ano_safra INTEGER NOT NULL UNIQUE,
-                deficit_hidrico_solo REAL,
-                dias_pico_calor REAL,
-                amplitude_termica REAL,
-                precipitacao_enchimento REAL,
-                quebra_safra INTEGER,
-                fonte TEXT,
-                atualizado_em TEXT DEFAULT CURRENT_TIMESTAMP
-            );
-            CREATE TABLE IF NOT EXISTS previsoes_sistemicas (
-                id_previsao INTEGER PRIMARY KEY AUTOINCREMENT,
-                id_historico INTEGER,
-                ano_safra INTEGER,
-                modelo_utilizado TEXT,
-                alerta_quebra INTEGER NOT NULL,
-                probabilidade_quebra REAL NOT NULL,
-                limiar_decisao REAL NOT NULL,
-                tempo_inferencia_ms REAL,
-                origem_execucao TEXT,
-                data_previsao TEXT DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY(id_historico) REFERENCES dados_historicos(id_historico)
-            );
-            CREATE TABLE IF NOT EXISTS logs_monitoramento (
-                id_log INTEGER PRIMARY KEY AUTOINCREMENT,
-                id_previsao INTEGER,
-                nivel_log TEXT NOT NULL,
-                mensagem TEXT NOT NULL,
-                payload_entrada TEXT,
-                data_log TEXT DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY(id_previsao) REFERENCES previsoes_sistemicas(id_previsao)
-            );
-            """
-        )
+def inicializar_banco() -> dict[str, int]:
+    from src.database import inicializar_e_popular_banco
+    return inicializar_e_popular_banco()
 
 
 def salvar_previsao(ano: int, alerta: int, prob: float, tempo_ms: float,
@@ -599,10 +562,10 @@ def salvar_previsao(ano: int, alerta: int, prob: float, tempo_ms: float,
     with get_db_connection() as conn:
         cur = conn.execute(
             """INSERT INTO previsoes_sistemicas
-            (ano_safra, modelo_utilizado, alerta_quebra, probabilidade_quebra,
-             limiar_decisao, tempo_inferencia_ms, origem_execucao)
-            VALUES (?, ?, ?, ?, ?, ?, ?)""",
-            (ano, modelo, alerta, prob, LIMIAR_ALERTA, tempo_ms, origem),
+            (ano_safra, municipio, modelo_utilizado, alerta_quebra, probabilidade_quebra,
+             limiar_decisao, limiar_celsius, tempo_inferencia_ms, origem_execucao)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+            (ano, MUNICIPIO, modelo, alerta, prob, LIMIAR_ALERTA, LIMIAR_CELSIUS, tempo_ms, origem),
         )
         conn.execute(
             "INSERT INTO logs_monitoramento (id_previsao,nivel_log,mensagem,payload_entrada) VALUES (?,?,?,?)",
@@ -610,7 +573,7 @@ def salvar_previsao(ano: int, alerta: int, prob: float, tempo_ms: float,
         )
 
 
-inicializar_banco()
+_contagens_banco = inicializar_banco()
 
 # -----------------------------------------------------------------------------
 # Carregamento de Dados e Modelo
@@ -621,6 +584,8 @@ def carregar_historico() -> pd.DataFrame:
         df = pd.read_csv(DATA_PROCESSED_PATH)
         if "ano" in df.columns and "ano_safra" not in df.columns:
             df = df.rename(columns={"ano": "ano_safra"})
+        if "safra" in df.columns and "ano_safra" not in df.columns:
+            df = df.rename(columns={"safra": "ano_safra"})
         return df
     return pd.DataFrame()
 
@@ -673,12 +638,14 @@ def consultar_nasa_power(ano: int) -> dict[str, Any]:
 def dados_demo() -> pd.DataFrame:
     rng = np.random.default_rng(21)
     anos = np.arange(2015, 2025)
+    tmax = np.array([28.1, 28.6, 27.8, 29.2, 28.0, 29.8, 28.7, 30.1, 29.4, 30.3])
     deficit = np.array([12, 18, 9, 27, 14, 31, 22, 38, 17, 25], dtype=float)
     calor = np.array([1, 2, 0, 4, 1, 5, 3, 7, 2, 4], dtype=float)
     chuva = np.array([430, 390, 510, 280, 450, 230, 320, 190, 470, 300], dtype=float)
     amplitude = np.array([25.1, 26.4, 24.8, 29.1, 25.7, 30.2, 28.1, 31.0, 26.0, 28.8])
     return pd.DataFrame({
         "ano_safra": anos,
+        "tmax_enchimento": tmax,
         "deficit_hidrico_solo": deficit + rng.normal(0, 1, len(anos)),
         "dias_pico_calor": calor,
         "amplitude_termica": amplitude,
@@ -700,7 +667,8 @@ else:
 def executar_predicao(features: dict[str, float], modo_simulacao: bool = False):
     inicio = time.perf_counter()
     if modelo is not None and status_modelo == "REAL" and not modo_simulacao:
-        X = pd.DataFrame([{MODEL_FEATURES[k]: v for k, v in features.items()}])
+        tmax = float(features.get(FEATURE, features.get("amplitude_termica", LIMIAR_CELSIUS)))
+        X = pd.DataFrame({FEATURE: [tmax]})
         probas = modelo.predict_proba(X)[0]
         classes = list(getattr(modelo, "classes_", [0, 1]))
         if 1 not in classes:
@@ -709,10 +677,8 @@ def executar_predicao(features: dict[str, float], modo_simulacao: bool = False):
         nome = modelo.__class__.__name__
         tipo = "REAL"
     else:
-        score = (features["deficit_hidrico_solo"] / 60 * .35
-                 + features["dias_pico_calor"] / 15 * .25
-                 + (1 - min(features["precipitacao_enchimento"], 900) / 900) * .25
-                 + (features["amplitude_termica"] - 15) / 20 * .15)
+        tmax = float(features.get(FEATURE, LIMIAR_CELSIUS))
+        score = (tmax - 24.0) / 10.0
         prob = float(np.clip(score, 0.03, 0.97))
         nome = "Simulação ilustrativa (sem modelo serializado)"
         tipo = "SIMULAÇÃO"
@@ -724,10 +690,10 @@ def executar_predicao(features: dict[str, float], modo_simulacao: bool = False):
 # Sidebar com Logo Oficial, Indicador de Tema WCAG e Navegação
 # -----------------------------------------------------------------------------
 with st.sidebar:
-    # Logo Oficial Vetorial com atributo alt
+    # Logo vetorial oficial
     logo_svg_path = ASSETS_DIR / "sojarisco_logo.svg"
     if logo_svg_path.exists():
-        st.image(str(logo_svg_path), width="stretch", alt="Logo Oficial SojaRisco - Assistente Agroclimático")
+        st.image(str(logo_svg_path), use_container_width=True)
     else:
         st.markdown("### 🌱 SojaRisco")
 
@@ -738,7 +704,7 @@ with st.sidebar:
 
     # Alternância de Modo Claro / Modo Escuro (WCAG AA)
     btn_theme_label = "☀️ Modo Claro" if is_dark else "🌙 Modo Escuro"
-    if st.button(btn_theme_label, key="theme_toggle", width="stretch"):
+    if st.button(btn_theme_label, key="theme_toggle", use_container_width=True):
         st.session_state["dark_mode"] = not is_dark
         st.rerun()
 
@@ -751,7 +717,7 @@ with st.sidebar:
     status_cor = "🟢" if status_modelo == "REAL" else ("🟡" if status_modelo == "DEMONSTRAÇÃO" else "🔴")
     st.markdown(f"**{status_cor} Motor: {status_modelo}**")
     if status_modelo == "REAL":
-        st.caption("Pipeline oficial serializado (DecisionTreeClassifier) ativo e integrado ao SQLite.")
+        st.caption("Pipeline oficial serializado (LogisticRegression L2) ativo e integrado ao SQLite.")
     else:
         st.caption("O assistente opera em modo de simulação até a integração do artefato pipeline_final.joblib.")
     if mostrar_tecnico:
@@ -807,6 +773,7 @@ with aba_previsao:
     if not linha.empty:
         r = linha.iloc[0]
         defaults = {
+            "tmax_enchimento": float(r.get("tmax_enchimento", LIMIAR_CELSIUS)),
             "deficit_hidrico_solo": float(r.get("deficit_hidrico_solo", 18)),
             "dias_pico_calor": float(r.get("dias_pico_calor", 2)),
             "precipitacao_enchimento": float(r.get("precipitacao_enchimento", 400)),
@@ -814,7 +781,7 @@ with aba_previsao:
         }
         quebra_observada = r.get("quebra_safra", None)
     else:
-        defaults = {"deficit_hidrico_solo": 18.0, "dias_pico_calor": 2.0,
+        defaults = {"tmax_enchimento": LIMIAR_CELSIUS, "deficit_hidrico_solo": 18.0, "dias_pico_calor": 2.0,
                     "precipitacao_enchimento": 400.0, "amplitude_termica": 26.0}
         quebra_observada = None
 
@@ -941,27 +908,22 @@ with aba_previsao:
     if chart_cols:
         chart_df = df_visual.set_index("ano_safra")[chart_cols].copy()
         chart_df.columns = ["Chuva Enchimento (mm)", "Déficit Hídrico (dias)"]
-        st.line_chart(chart_df, height=260, width="stretch")
+        st.line_chart(chart_df, height=260, use_container_width=True)
 
     # Simulador de Cenários isolado com @st.fragment para performance
     @st.fragment
     def render_simulador_cenarios(defaults_sim: dict[str, float]) -> None:
         with st.expander("🧪 Explorar cenários na fazenda - Simulador Agroclimático", expanded=False):
-            st.info("Altere as variáveis para simular como secas prolongadas ou ondas de calor impactam a probabilidade de risco.")
+            st.info("Altere a temperatura máxima média de dezembro a fevereiro para calcular o índice atual do modelo.")
             sc1, sc2 = st.columns(2)
             with sc1:
-                sim_deficit = st.slider("Déficit hídrico estimado no solo (dias)", 0.0, 60.0, defaults_sim["deficit_hidrico_solo"], 0.5)
-                sim_calor = st.slider("Dias com pico de calor (≥ 35 °C)", 0.0, 15.0, defaults_sim["dias_pico_calor"], 1.0)
+                sim_tmax = st.slider("Temperatura máxima média no enchimento (°C)", 20.0, 35.0, float(defaults_sim.get("tmax_enchimento", LIMIAR_CELSIUS)), 0.1)
             with sc2:
-                sim_chuva = st.slider("Precipitação na fase de enchimento (mm)", 0.0, 900.0, defaults_sim["precipitacao_enchimento"], 10.0)
-                sim_amp = st.slider("Amplitude térmica diária (°C)", 15.0, 35.0, defaults_sim["amplitude_termica"], 0.1)
+                st.metric("Limiar oficial", f"{LIMIAR_CELSIUS:.2f} °C")
 
-            if st.button("Calcular Risco do Cenário", type="primary", width="stretch"):
+            if st.button("Calcular Risco do Cenário", type="primary", use_container_width=True):
                 sim_features = {
-                    "deficit_hidrico_solo": sim_deficit,
-                    "dias_pico_calor": sim_calor,
-                    "precipitacao_enchimento": sim_chuva,
-                    "amplitude_termica": sim_amp,
+                    "tmax_enchimento": sim_tmax,
                 }
                 sim_alerta, sim_prob, sim_ms, sim_nome, sim_tipo = executar_predicao(sim_features, modo_simulacao=False)
                 st.session_state["ultimo_cenario"] = {"alerta": sim_alerta, "prob": sim_prob, "features": sim_features}
@@ -991,7 +953,7 @@ with aba_previsao:
         api_col, api_info = st.columns([1, 2])
         with api_col:
             ano_api = st.number_input("Ano da consulta", min_value=1985, max_value=date.today().year, value=ano_padrao, step=1)
-            consultar = st.button("Consultar NASA POWER", width="stretch")
+            consultar = st.button("Consultar NASA POWER", use_container_width=True)
         with api_info:
             st.markdown("<div class='notice'><strong>Fonte Oficial:</strong> A consulta recupera a série histórica de radiação e precipitação medida por satélite e reanálise meteorológica para as coordenadas do município.</div>", unsafe_allow_html=True)
 
@@ -1018,7 +980,7 @@ with aba_previsao:
     @st.fragment
     def render_salvar_registro(ano_salvar: int, alerta_salvar: int, prob_salvar: float, tempo_salvar: float, modelo_salvar: str, defaults_salvar: dict[str, float]) -> None:
         st.markdown("---")
-        if st.button("Salvar Registro Desta Análise", width="content"):
+        if st.button("Salvar Registro Desta Análise"):
             try:
                 salvar_previsao(ano_salvar, alerta_salvar, prob_salvar, tempo_salvar, modelo_salvar, defaults_salvar, "dashboard")
                 st.success("Análise persistida com sucesso no banco de monitoramento local.")
@@ -1046,8 +1008,16 @@ with aba_historico:
     if not df_historico.empty:
         cols = [c for c in ["ano_safra", "precipitacao_enchimento", "deficit_hidrico_solo", "dias_pico_calor", "amplitude_termica", "quebra_safra"] if c in df_historico.columns]
         df_display = df_historico[cols].sort_values("ano_safra", ascending=False).copy()
-        df_display.columns = ["Safra", "Chuva Enchimento (mm)", "Déficit Hídrico (dias)", "Picos de Calor (dias)", "Amplitude Térmica (°C)", "Quebra Observada"]
-        st.dataframe(df_display, width="stretch", hide_index=True)
+        nomes_colunas = {
+            "ano_safra": "Safra",
+            "precipitacao_enchimento": "Chuva Enchimento (mm)",
+            "deficit_hidrico_solo": "Déficit Hídrico (dias)",
+            "dias_pico_calor": "Picos de Calor (dias)",
+            "amplitude_termica": "Amplitude Térmica (°C)",
+            "quebra_safra": "Quebra Observada",
+        }
+        df_display = df_display.rename(columns=nomes_colunas)
+        st.dataframe(df_display, use_container_width=True, hide_index=True)
     else:
         st.info("Nenhum dado processado encontrado em data/processed/dados_modelo.csv. A visualização demonstrativa utiliza valores de referência.")
 
@@ -1056,38 +1026,80 @@ with aba_historico:
         <div class='section-head'>
             {load_svg('chart_bar', svg_color_main, 22, 22)}
             <div>
-                <h2 class='section-title'>Desempenho e Validação dos Modelos</h2>
-                <p class='section-sub'>Métricas reais da avaliação cruzada temporal (TimeSeriesSplit)</p>
+                <h2 class='section-title'>Como o modelo se saiu no teste temporal</h2>
+                <p class='section-sub'>Safras 2019–2024: quebras observadas e alertas do pipeline ativo, por município</p>
             </div>
         </div>
         """,
         unsafe_allow_html=True,
     )
-    metric_path = BASE_DIR / "models" / "evaluation_metrics.json"
-    if metric_path.exists():
-        try:
-            with open(metric_path, "r", encoding="utf-8") as f:
-                metricas = json.load(f)
-            if metricas:
-                st.dataframe(pd.DataFrame(metricas), width="stretch", hide_index=True)
-            else:
-                st.info("Arquivo de métricas disponível, aguardando gravação dos testes.")
-        except Exception as exc:
-            st.error(f"Falha ao ler evaluation_metrics.json: {exc}")
+    colunas_avaliacao = {"ano_safra", "split", "quebra_safra", FEATURE}
+    faltantes_avaliacao = colunas_avaliacao - set(df_historico.columns)
+    if modelo is None or status_modelo != "REAL":
+        st.warning("O gráfico de desempenho requer o pipeline serializado carregado; nenhum resultado demonstrativo será apresentado como métrica real.")
+    elif faltantes_avaliacao:
+        st.error(f"Não é possível avaliar o modelo: faltam colunas na base histórica: {sorted(faltantes_avaliacao)}")
     else:
-        st.markdown(
-            f"""
-            <div class="panel">
-                <div class="pill pill-warn">{load_svg('alert', '#b45309', 14, 14)} Validação em andamento</div>
-                <h3 style="margin:14px 0 6px">Métricas dos Experimentos de Machine Learning</h3>
-                <p style="color:var(--text-body);font-size:14px;line-height:1.6;margin:0">
-                    O pipeline final foi avaliado por divisão temporal para garantir generalização em safras futuras. 
-                    Assim que as métricas forem salvas em <code>models/evaluation_metrics.json</code>, esta área apresentará precisão, recall, F1 e matrizes de confusão reais.
-                </p>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
+        dados_teste = df_historico.loc[df_historico["split"].eq("teste")].copy()
+        if dados_teste.empty:
+            st.warning("A base não contém linhas do teste temporal congelado.")
+        else:
+            X_teste = dados_teste[[FEATURE]]
+            prob_teste = modelo.predict_proba(X_teste)[:, list(modelo.classes_).index(1)]
+            y_teste = pd.to_numeric(dados_teste["quebra_safra"], errors="raise").astype(int).to_numpy()
+            alerta_teste = (prob_teste >= LIMIAR_ALERTA).astype(int)
+            tn, fp, fn, tp = confusion_matrix(y_teste, alerta_teste, labels=[0, 1]).ravel()
+            auc_teste = roc_auc_score(y_teste, prob_teste) if np.unique(y_teste).size == 2 else float("nan")
+
+            teste_sem_2024 = dados_teste["ano_safra"].astype(int).to_numpy() != 2024
+            tn_sem24, fp_sem24, fn_sem24, tp_sem24 = confusion_matrix(
+                y_teste[teste_sem_2024], alerta_teste[teste_sem_2024], labels=[0, 1]
+            ).ravel()
+
+            met_cols = st.columns(4)
+            met_cols[0].metric("Acurácia", f"{accuracy_score(y_teste, alerta_teste):.1%}")
+            met_cols[1].metric("Recall das quebras", f"{recall_score(y_teste, alerta_teste, zero_division=0):.1%}")
+            met_cols[2].metric("Precisão dos alertas", f"{precision_score(y_teste, alerta_teste, zero_division=0):.1%}")
+            met_cols[3].metric("AUC", f"{auc_teste:.3f}" if np.isfinite(auc_teste) else "N/A")
+
+            dados_teste["alerta_modelo"] = alerta_teste
+            dados_teste["verdadeiro_positivo"] = (
+                dados_teste["quebra_safra"].astype(int).eq(1) & dados_teste["alerta_modelo"].eq(1)
+            ).astype(int)
+            dados_teste["falso_positivo"] = (
+                dados_teste["quebra_safra"].astype(int).eq(0) & dados_teste["alerta_modelo"].eq(1)
+            ).astype(int)
+            dados_teste["falso_negativo"] = (
+                dados_teste["quebra_safra"].astype(int).eq(1) & dados_teste["alerta_modelo"].eq(0)
+            ).astype(int)
+            grafico_safras = (
+                dados_teste.groupby("ano_safra", as_index=False)
+                .agg(
+                    **{
+                        "Quebras observadas": ("quebra_safra", "sum"),
+                        "Quebras alertadas corretamente": ("verdadeiro_positivo", "sum"),
+                        "Falsos alarmes": ("falso_positivo", "sum"),
+                        "Quebras não alertadas": ("falso_negativo", "sum"),
+                    }
+                )
+                .rename(columns={"ano_safra": "Safra"})
+                .sort_values("Safra")
+            )
+            st.bar_chart(
+                grafico_safras,
+                x="Safra",
+                y=["Quebras observadas", "Quebras alertadas corretamente", "Falsos alarmes", "Quebras não alertadas"],
+                stack=False,
+                height=340,
+                use_container_width=True,
+            )
+            st.caption(
+                "Cada barra conta municípios (n=9 por safra). O teste contém seis safras compartilhadas; "
+                "as 54 linhas município-safra não são 54 anos independentes. "
+                f"Custo dos erros: {5 * fn + fp} (5×FN+FP); sem 2024: {5 * fn_sem24 + fp_sem24} "
+                f"(TN={tn_sem24}, FP={fp_sem24}, FN={fn_sem24}, TP={tp_sem24}). "
+                "É uma avaliação retrospectiva, não garantia de desempenho em safras futuras."
+            )
 
     st.markdown(
         f"""
@@ -1111,7 +1123,7 @@ with aba_historico:
             st.caption("Nenhuma previsão persistida até o momento. Utilize o botão 'Salvar Registro Desta Análise' na primeira aba.")
         else:
             df_prev.columns = ["Safra", "Modelo", "Alerta", "Probabilidade", "Tempo (ms)", "Origem", "Data/Hora"]
-            st.dataframe(df_prev, width="stretch", hide_index=True)
+            st.dataframe(df_prev, use_container_width=True, hide_index=True)
     except Exception as exc:
         st.error(f"Falha ao consultar banco local: {exc}")
 
@@ -1134,7 +1146,7 @@ with aba_sistema:
     passos = [
         ("01", "Captura de Dados Agroclimáticos", "O assistente monitora automaticamente dados diários de chuva, temperatura e déficit hídrico coletados por satélites da NASA e órgãos públicos.", "weather"),
         ("02", "Engenharia de Indicadores", "Transforma milhões de registros climáticos em variáveis agronômicas determinantes: dias de pico de calor e chuva no enchimento do grão.", "water"),
-        ("03", "Inferência Probabilística", "Algoritmos parcimoniosos de Árvores de Decisão avaliam as combinações de risco sem alucinações e com explicabilidade total.", "brain"),
+        ("03", "Inferência Probabilística", "A regressão logística padronizada avalia a temperatura máxima média de dez-fev; a probabilidade é um índice de risco, não uma probabilidade clínica calibrada.", "brain"),
         ("04", "Apoio à Tomada de Decisão", "Entrega uma probabilidade calibrada para orientar compras de insumos, manejo e proteção comercial de contratos futuros de grãos.", "shield"),
     ]
     for num, titulo, desc, icon in passos:

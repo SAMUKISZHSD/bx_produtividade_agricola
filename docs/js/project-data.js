@@ -3,8 +3,8 @@
  * Camada Centralizada de Dados do Projeto - Previsão de Produtividade Agrícola
  * ==============================================================================
  * 
- * Dados oficiais consolidados da Sprint 5 (Sorriso-MT, N=10 safras consolidadas:
- * 2015-2022 treino com 3 quebras severas, 2023-2024 teste cego com 2 safras normais).
+ * Fonte atual: notebooks 08-13 e Model Card Sprint 5.
+ * Unidade: municipio x safra; regioes do Alto Teles Pires.
  */
 
 window.PROJECT_DATA = {
@@ -13,12 +13,15 @@ window.PROJECT_DATA = {
     municipio: "Sorriso - MT",
     codigo_ibge: "5107925",
     cultura: "Soja em Grão",
-    media_historica_kg_ha: 3477.0,
-    limiar_quebra_kg_ha: 3400.0,
-    amostra_total: 10,
-    treino_anos: "2015 a 2022 (8 safras)",
-    teste_anos: "2023 a 2024 (2 safras)",
-    split_estrategia: "Temporal sem vazamento (80% treino antigo / 20% teste recente)",
+    unidade: "municipio x safra",
+    amostra_total: 192,
+    municipios: 9,
+    treino_anos: "2001 a 2018",
+    teste_anos: "2019 a 2024",
+    split_estrategia: "Temporal",
+    feature: "tmax_enchimento",
+    limiar_probabilidade: 0.45,
+    limiar_celsius: 28.34,
     is_mock: false,
     tag_status: "Dados Oficiais Consolidados (Sprint 5)"
   },
@@ -39,9 +42,7 @@ window.PROJECT_DATA = {
 
   // Tabela de Lift de Engenharia de Atributos (Sprint 3 -> Sprint 4)
   liftS3S4: [
-    { modelo: "DummyClassifier", recallS3: 0.0, recallS4: 0.0, f1S3: 0.0, f1S4: 0.0, deltaRecall: "+0.00", status: "Inerte ao evento raro" },
-    { modelo: "Persistência", recallS3: 0.0, recallS4: 0.0, f1S3: 0.0, f1S4: 0.0, deltaRecall: "+0.00", status: "Falha nas transições de quebra" },
-    { modelo: "GaussianNB", recallS3: 0.67, recallS4: 1.00, f1S3: 0.57, f1S4: 0.86, deltaRecall: "+0.33", status: "Capturou Safra 2021 (Eliminou FN)" }
+    { modelo: "Seleção de famílias", recallS3: null, recallS4: 0.71, f1S3: null, f1S4: 0.40, deltaRecall: "Modelo atual", status: "Nenhuma família superou a referência nula; tmax_enchimento manteve sinal" }
   ],
 
   // Métricas Consolidadas dos Modelos (Sprint 5 Oficial)
@@ -108,13 +109,13 @@ window.PROJECT_DATA = {
     },
     logisticRegression: {
       id: "logisticRegression",
-      nome: "Regressão Logística (L2, p=0.35)",
+      nome: "Regressão Logística (L2, p=0.45)",
       familia: "Linear Probabilístico Calibrado",
-      tipoBadge: "Co-Campeão Linear",
-      recall: 1.0,
-      precisao: 0.50,
-      f1: 0.67,
-      acuracia: 1.0,
+      tipoBadge: "Modelo Campeão",
+      recall: 0.75,
+      precisao: 0.24,
+      f1: 0.36,
+      acuracia: null,
       fnTreino: 0,
       fpTreino: 0,
       fnTeste: 0,
@@ -124,13 +125,13 @@ window.PROJECT_DATA = {
       riscoOverfitting: "Muito Baixo (penalidade L2)",
       interpretabilidade: "Alta (Pesos Lineares)",
       cenarioIdeal: "Calibração contínua de probabilidade em amostras pequenas",
-      matrizConfusao: { tn: 2, fp: 0, fn: 0, tp: 0 }
+      matrizConfusao: { tn: 12, fp: 30, fn: 3, tp: 9 }
     },
     decisionTree: {
       id: "decisionTree",
-      nome: "Árvore de Decisão Rasa",
+      nome: "Árvore de Decisão (não campeã)",
       familia: "Particionamento Binário",
-      tipoBadge: "Melhor Modelo (Vencedor)",
+      tipoBadge: "Modelo histórico",
       recall: 1.0,
       precisao: 0.50,
       f1: 0.67,
@@ -191,50 +192,26 @@ window.PROJECT_DATA = {
     }
   },
 
-  // Importância Relativa dos Atributos Preditores (Random Forest Ensemble + Correlação)
+  // Modelo final: uma feature padronizada
   featureImportance: [
-    { feature: "deficit_hidrico_solo", nome: "Déficit Hídrico no Solo (Jan-Fev)", peso: 0.49, correlacao: "+0.90", unidade: "dias com GWETROOT < 0.70" },
-    { feature: "dias_pico_calor", nome: "Picos de Calor Extremo (Jan-Fev)", peso: 0.18, correlacao: "+0.74", unidade: "dias com T2M_MAX >= 35°C" },
-    { feature: "precipitacao_enchimento", nome: "Chuva no Enchimento de Grãos", peso: 0.18, correlacao: "-0.55", unidade: "milímetros acumulados (mm)" },
-    { feature: "amplitude_termica", nome: "Amplitude Térmica Média", peso: 0.15, correlacao: "+0.41", unidade: "variação diária em °C" }
+    { feature: "tmax_enchimento", nome: "Temperatura máxima média no enchimento", peso: 1.0, correlacao: "AUC 0,73 no teste", unidade: "°C, média diária de dezembro a fevereiro" }
   ],
 
-  // Função utilitária de simulação local da Árvore de Decisão
-  preverRisco: function(deficit, picoCalor, precEnchimento, ampTermica) {
-    let probabilidade = 0.05;
-    let caminho = [];
-    let alerta = false;
-
-    caminho.push("Nó Raiz: Avaliando Déficit Hídrico no Solo em Jan-Fev (corte: 21,5 dias)...");
-    if (deficit > 21.5) {
-      caminho.push(`Déficit Hídrico (${deficit} dias) > 21,5 dias → Ramo de Estresse Hídrico`);
-      if (picoCalor >= 2.5 || deficit >= 28.0) {
-        caminho.push(`Pico de Calor (${picoCalor} dias) ou Déficit Crítico (${deficit} >= 28) → Nó Folha de Quebra (Gini = 0.0)`);
-        probabilidade = 0.95;
-        alerta = true;
-      } else {
-        caminho.push(`Calor moderado (${picoCalor} dias) e déficit intermediário → Nó Folha Limítrofe`);
-        probabilidade = 0.45;
-        alerta = false;
-      }
-    } else {
-      caminho.push(`Déficit Hídrico (${deficit} dias) <= 21,5 dias → Solo com umidade adequada`);
-      if (precEnchimento < 200.0 && ampTermica > 28.0) {
-        caminho.push(`Chuva de enchimento baixa (${precEnchimento} mm) com amplitude alta → Alerta preventivo`);
-        probabilidade = 0.52;
-        alerta = true;
-      } else {
-        caminho.push(`Precipitação favorável (${precEnchimento} mm) → Nó Folha Safra Normal (Gini = 0.0)`);
-        probabilidade = 0.05;
-        alerta = false;
-      }
-    }
-
+  // Simulação ilustrativa; o limiar oficial corresponde a 28,34 °C.
+  preverRisco: function(tmaxEnchimento, picoCalor, precEnchimento, ampTermica) {
+    const z = (tmaxEnchimento - 28.34) / 1.0;
+    const probabilidade = 1 / (1 + Math.exp(-z));
+    const alerta = tmaxEnchimento >= 28.34;
+    const caminho = [
+      `Entrada: tmax_enchimento = ${tmaxEnchimento} °C`,
+      `Regra: alerta se ${tmaxEnchimento} >= 28,34 °C`,
+      alerta ? "Resultado: alerta de risco por calor" : "Resultado: sem alerta pelo limiar atual"
+    ];
     return {
       alerta: alerta,
       probabilidade: probabilidade,
       caminho: caminho,
-      modelo: "DecisionTreeClassifier (Parcimonioso - max_depth=2)"
+      modelo: "LogisticRegression L2 (C=1.0, class_weight=balanced)"
     };
   }
 };

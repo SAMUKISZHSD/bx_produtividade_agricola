@@ -1,0 +1,12 @@
+regra,linhas_removidas,linhas_restantes
+entrada (saída do 01),0,225
+safra > 2024,9,216
+"chave (cod_municipio, safra) duplicada",0,216
+rendimento fora de 500-6000 kg/ha,0,216
+"área colhida > 1,01 x área plantada",0,216
+chuva acumulada negativa,0,216
+"T2M fora de [T2M_MIN, T2M_MAX]",0,216
+RH2M fora de 0-100,0,216
+GWETROOT fora de 0-1,0,216
+sem rótulo (sem safras de referência),24,192
+alguma feature ausente,0,192

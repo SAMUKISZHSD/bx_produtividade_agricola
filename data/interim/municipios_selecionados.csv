@@ -1,0 +1,10 @@
+cod_municipio,cobertura_serie,area_colhida_mediana_ha,selecionado,municipio,lat,lon,fonte_coord
+5104526,0.84,182000.0,True,Ipiranga do Norte,-12.017,-56.0587,ibge_metadados
+5104542,0.84,88000.0,True,Itanhangá,-12.1404,-56.7549,ibge_metadados
+5105259,1.0,230000.0,True,Lucas do Rio Verde,-13.0373,-56.1675,ibge_metadados
+5105903,1.0,29590.0,True,Nobres,-14.377,-55.8125,ibge_metadados
+5106224,1.0,385772.0,True,Nova Mutum,-13.6296,-56.1061,ibge_metadados
+5106240,1.0,280140.0,True,Nova Ubiratã,-12.7925,-54.7164,ibge_metadados
+5107768,1.0,157680.0,True,Santa Rita do Trivelato,-13.8337,-55.2936,ibge_metadados
+5107925,1.0,598500.0,True,Sorriso,-12.668,-55.723,ibge_metadados
+5108006,1.0,173000.0,True,Tapurah,-12.568,-56.5318,ibge_metadados

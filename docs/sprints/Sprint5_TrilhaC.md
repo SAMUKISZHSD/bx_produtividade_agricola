@@ -1,4 +1,6 @@
 # Diário de Sprint 5 - Modelagem completa, limiar de decisão e seleção
+
+> **Nota consolidada (fonte atual):** este documento histórico foi parcialmente substituído pelos notebooks 08–13 e pelo `docs/Model_Card.md`. O modelo atual é uma Regressão Logística L2 com uma única feature (`tmax_enchimento`), limiar 28,34 °C e recorte regional 2001–2024. Trechos abaixo que citam Sorriso-MT com 10 safras, 4 features ou Árvore como campeã pertencem a uma versão anterior da sprint.
 **Período:** 12/10/2026 a 08/11/2026
 **Trilha:** C - Risco de baixa produtividade agrícola
 
